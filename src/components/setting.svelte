@@ -1,6 +1,6 @@
 <script lang="ts">
     import SettingPanel from "../libs/setting-panel.svelte";
-    import {main} from "@/test/index";
+    import {main} from "@/test";
 
     let groups: string[] = ["基础设置", "高级设置", "开发模式"];
     let focusGroup = groups[0];
