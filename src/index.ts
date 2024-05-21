@@ -21,7 +21,7 @@ import {
 import "@/index.scss";
 
 import HelloExample from "@/hello.svelte";
-import SettingExample from "@/setting-example.svelte";
+import SettingExample from "@/components/setting.svelte";
 
 import { SettingUtils } from "./libs/setting-utils";
 
