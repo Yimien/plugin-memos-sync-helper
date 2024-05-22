@@ -1,7 +1,7 @@
-import {METHOD, STATUS} from "@/constants";
+import {METHOD, STATUS} from "@/configs/utils";
 import {isEmptyValue} from "@/utils";
-import {Requests} from "@/utils/requests";
-import {IResponse} from "@/interface/requests";
+import {Requests} from "@/utils/misc/requests";
+import {IResponse} from "@/types/utils/requests";
 
 
 async function request(method: string, pathName: string, data: any): Promise<any> {

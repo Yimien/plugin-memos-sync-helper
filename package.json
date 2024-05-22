@@ -1,11 +1,11 @@
 {
-  "name": "plugin-sample-vite-svelte",
-  "version": "0.3.5",
+  "name": "plugin-memos-sync-helper",
+  "version": "0.0.1",
   "type": "module",
-  "description": "This is a sample plugin based on vite and svelte for Siyuan (https://b3log.org/siyuan)",
+  "description": "This is a plugin for sync Memos data to SiYuan",
   "repository": "",
   "homepage": "",
-  "author": "frostime",
+  "author": "Yimien",
   "license": "MIT",
   "scripts": {
     "make-link": "node  --no-warnings ./scripts/make_dev_link.js",
@@ -30,5 +30,9 @@
     "vite": "^5.0.0",
     "vite-plugin-static-copy": "^1.0.2",
     "vite-plugin-zip-pack": "^1.0.5"
+  },
+  "dependencies": {
+    "deepmerge": "^4.3.1",
+    "ua-parser-js": "^1.0.37"
   }
 }

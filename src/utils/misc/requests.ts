@@ -1,6 +1,6 @@
-import {IResponse} from '@/interface/requests'
-import {METHOD} from '@/constants'
-import {isEmptyValue} from '@/utils/index'
+import {IResponse} from '@/types/utils/requests'
+import {METHOD} from '@/configs/utils'
+import {isEmptyValue} from '@/utils'
 
 
 export class Requests {
