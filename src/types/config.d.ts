@@ -2,13 +2,13 @@ export interface IGeneral {
     version: string | number,
     host: string,
     token: string,
+    lastSyncTime: string,
     syncPlan: string | number,
     notebook: string,
     docPath: string
 }
 
 export interface IAdvanced {
-    lastSyncTime: string,
     isLinks: boolean,
     subjectPath: string,
     isLabelTop: boolean,

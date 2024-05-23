@@ -1,33 +1,33 @@
 import {IConfig} from "@/types/config";
 
 import {
-    versionKey, syncPlanKey, resourceDownloadKey, quoteHandleKey, labelMatchKey, imageBlockLayoutKey
-} from "@/configs/components/input"
+    VersionKey, SyncPlanKey, ResourceDownloadKey, QuoteHandleKey, LabelMatchKey, ImageBlockLayoutKey
+} from "@/configs/components/select"
 
 export const DEFAULT_CONFIG:IConfig = {
     general: {
-        version: versionKey.v2,
+        version: VersionKey.v2,
         host: "",
         token: "",
-        syncPlan: syncPlanKey.dailyNotes,
+        lastSyncTime: "",
+        syncPlan: SyncPlanKey.dailyNotes,
         notebook: "",
         docPath: ""
     },
     advanced: {
-        lastSyncTime: "",
         isLinks: false,
         subjectPath: "",
         isLabelTop: false,
         labelName: "",
-        quoteHandle: quoteHandleKey.blockRef,
-        imageBlockLayout: imageBlockLayoutKey.direction,
+        quoteHandle: QuoteHandleKey.blockRef,
+        imageBlockLayout: ImageBlockLayoutKey.direction,
         isHref: false,
-        resourceDownload: resourceDownloadKey.uid,
+        resourceDownload: ResourceDownloadKey.uid,
         isImproveVideoStyle: false,
         videoFormats: "mp4"
     },
     old: {
-        labelMatch: labelMatchKey.lastLine
+        labelMatch: LabelMatchKey.lastLine
     },
     debug: {
         isDebug: false,

@@ -1,40 +1,40 @@
-interface IResGetNotebookConf {
+export interface IResGetNotebookConf {
     box: string;
     conf: NotebookConf;
     name: string;
 }
 
-interface IReslsNotebooks {
+export interface IReslsNotebooks {
     notebooks: Notebook[];
 }
 
-interface IResUpload {
+export interface IResUpload {
     errFiles: string[];
     succMap: { [key: string]: string };
 }
 
-interface IResdoOperations {
+export interface IResdoOperations {
     doOperations: doOperation[];
     undoOperations: doOperation[] | null;
 }
 
-interface IResGetBlockKramdown {
+export interface IResGetBlockKramdown {
     id: BlockId;
     kramdown: string;
 }
 
-interface IResGetChildBlock {
+export interface IResGetChildBlock {
     id: BlockId;
     type: BlockType;
     subtype?: BlockSubType;
 }
 
-interface IResGetTemplates {
+export interface IResGetTemplates {
     content: string;
     path: string;
 }
 
-interface IResReadDir {
+export interface IResReadDir {
     isDir: boolean;
     isSymlink: boolean;
     name: string;

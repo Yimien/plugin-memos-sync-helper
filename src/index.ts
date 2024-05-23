@@ -1,37 +1,88 @@
 import {
+    Plugin,
     Dialog,
-    ICard,
-    ICardData,
-    Plugin
+    getFrontend
 } from "siyuan";
 import "@/index.scss";
 
-import SettingExample from "@/components/custom.svelte";
+import SettingExample from "@/components/setting.svelte";
 
 import {IConfig} from "@/types/config";
 
-import {DEFAULT_CONFIG} from "@/configs/default"
+import {DEFAULT_CONFIG} from "@/configs/default";
+import {ICONS} from "@/configs/assets/icons";
 
-import {mergeIgnoreArray} from "@/utils/misc/merge"
-import {Logger} from "@/utils/logger"
+import {mergeIgnoreArray} from "@/utils/misc/merge";
+import {Logger} from "@/utils/logger";
+
 
 export default class PluginMemosSyncHelper extends Plugin {
-    static readonly STORAGE_NAME = "memos-sync-helper-config";
+    /**
+     * 插件名称
+     */
+    static readonly PLUGIN_NAME : string = "Memos 同步助手";
+
+    /**
+     * 配置名称
+     */
+    static readonly STORAGE_NAME : string = this.name;
+
+    /**
+     * 是否是手机端
+     * @private
+     */
+    private isMobile: boolean;
+
+    /**
+     * 配置数据
+     * @protected
+     */
+    protected config: IConfig;
+
+    /**
+     * 日志
+     */
     public readonly logger: InstanceType<typeof Logger>;
 
-    public config: IConfig;
+    /**
+     * 顶栏控件
+     * @private
+     */
+    private topBarElement : HTMLElement;
+
+
+    // **************************************** 官方 ****************************************
+
 
     constructor(options: any) {
         super(options);
-
         this.logger = new Logger(this.name);
     }
 
+    /**
+     * 思源在初始化的时候会调用该方法。
+     */
     async onload() {
+        const frontEnd = getFrontend();
+        this.isMobile = frontEnd === "mobile" || frontEnd === "browser-mobile";
+
+        // 批量添加图标
+        await this.batchAddIcons(ICONS);
+
+        // 为插件在顶栏添加一个图标
+        this.topBarElement = this.addTopBar({
+            icon: ICONS.iconMemos.name,
+            title: PluginMemosSyncHelper.PLUGIN_NAME,
+            position: "right",
+            callback: () => {
+                console.log("test");
+            }
+        });
+
+        // 读取配置数据
         this.loadData(PluginMemosSyncHelper.STORAGE_NAME)
             .then(config => {
                 this.config = mergeIgnoreArray(DEFAULT_CONFIG, config || {}) as IConfig;
-                console.log(this.config);
             })
             .catch(error => this.logger.error(error))
             .finally(async () => {
@@ -40,84 +91,21 @@ export default class PluginMemosSyncHelper extends Plugin {
     }
 
     onLayoutReady() {
-        // this.loadData(STORAGE_NAME);
-        // this.settingUtils.load();
-        // console.log(`frontend: ${getFrontend()}; backend: ${getBackend()}`);
-        //
-        // console.log(
-        //     "Official settings value calling example:\n" +
-        //     this.settingUtils.get("InputArea") + "\n" +
-        //     this.settingUtils.get("Slider") + "\n" +
-        //     this.settingUtils.get("Select") + "\n"
-        // );
-        //
-        // let tabDiv = document.createElement("div");
-        // new HelloExample({
-        //     target: tabDiv,
-        //     props: {
-        //         app: this.app,
-        //     }
-        // });
-        // this.customTab = this.addTab({
-        //     type: TAB_TYPE,
-        //     init() {
-        //         this.element.appendChild(tabDiv);
-        //         console.log(this.element);
-        //     },
-        //     beforeDestroy() {
-        //         console.log("before destroy tab:", TAB_TYPE);
-        //     },
-        //     destroy() {
-        //         console.log("destroy tab:", TAB_TYPE);
-        //     }
-        // });
-    }
 
-    async onunload() {
-        // console.log(this.i18n.byePlugin);
-        // showMessage("Goodbye SiYuan Plugin");
-        // console.log("onunload");
-    }
-
-    uninstall() {
-        console.log("uninstall");
-    }
-
-    async updateCards(options: ICardData) {
-        options.cards.sort((a: ICard, b: ICard) => {
-            if (a.blockID < b.blockID) {
-                return -1;
-            }
-            if (a.blockID > b.blockID) {
-                return 1;
-            }
-            return 0;
-        });
-        return options;
     }
 
     /**
-     * A custom setting pannel provided by svelte
+     * 当插件被禁用的时候，会调用此方法。
      */
-    openDIYSetting(): void {
-        let dialog = new Dialog({
-            title: "Memos 同步助手",
-            content: `<div id="SettingPanel" style="height: 100%;"></div>`,
-            width: "900px",
-            height: "700px",
-            destroyCallback: (options) => {
-                console.log("destroyCallback", options);
-                //You'd better destroy the component when the dialog is closed
-                pannel.$destroy();
-            }
-        });
-        let pannel = new SettingExample({
-            target: dialog.element.querySelector("#SettingPanel"),
-            props: {
-                config: this.config,
-                plugin: this
-            }
-        });
+    async onunload() {
+        console.log("onunload");
+    }
+
+    /**
+     * 当插件被卸载的时候，会调用此方法。
+     */
+    uninstall() {
+        console.log("uninstall");
     }
 
     /**
@@ -125,6 +113,34 @@ export default class PluginMemosSyncHelper extends Plugin {
      */
     openSetting() {
         this.openDIYSetting()
+    }
+
+
+    // **************************************** 自定义 ****************************************
+
+
+    /**
+     * 自定义设置
+     */
+    private openDIYSetting(): void {
+        let dialog = new Dialog({
+            title: PluginMemosSyncHelper.PLUGIN_NAME,
+            content: `<div id="SettingPanel""></div>`,
+            width: "800px",
+            height: "700px",
+            destroyCallback: (options) => {
+                console.log("destroyCallback", options);
+                //You'd better destroy the component when the dialog is closed
+                panel.$destroy();
+            }
+        });
+        let panel = new SettingExample({
+            target: dialog.element.querySelector("#SettingPanel"),
+            props: {
+                config: this.config,
+                plugin: this
+            }
+        });
     }
 
     /**
@@ -136,5 +152,16 @@ export default class PluginMemosSyncHelper extends Plugin {
             this.config = config;
         }
         return this.saveData(PluginMemosSyncHelper.STORAGE_NAME, this.config);
+    }
+
+    /**
+     * 批量添加图标
+     * @param icons
+     * @private
+     */
+    private async batchAddIcons(icons: any){
+        for (const key in icons){
+            this.addIcons(icons[key].icon);
+        }
     }
 }

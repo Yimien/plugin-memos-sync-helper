@@ -15,17 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export enum ItemType {
-    checkbox,
-    text,
-    number,
-    slider,
-    button,
-    select,
-    textarea,
-    longText
-}
-
 export interface ILimits {
     min: number;
     max: number;

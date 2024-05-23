@@ -7,12 +7,25 @@
  */
 
 import { fetchSyncPost, IWebSocketData } from "siyuan";
+import {
+    IReslsNotebooks,
+    IResGetNotebookConf,
+    IResUpload,
+    IResdoOperations,
+    IResGetBlockKramdown,
+    IResGetChildBlock,
+    IResGetTemplates,
+    IResReadDir,
+    IResExportMdContent,
+    IResBootProgress,
+    IResForwardProxy,
+    IResExportResources
+} from "@/types/controllers/siyuan/api"
 
 
 export async function request(url: string, data: any) {
     let response: IWebSocketData = await fetchSyncPost(url, data);
-    let res = response.code === 0 ? response.data : null;
-    return res;
+    return response.code === 0 ? response.data : null;
 }
 
 

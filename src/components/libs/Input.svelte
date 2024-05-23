@@ -20,7 +20,9 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
 
-    import { ItemType, type ILimits, type IOptions } from "@/types/components/item.d";
+    import { ItemType } from "@/configs/components/input";
+
+    import { type ILimits, type IOptions } from "@/types/components/item.d";
 
     export let type: ItemType; // Setting Type
     export let settingKey: string;

@@ -4,17 +4,17 @@
     import Item from "@/components/libs/Item.svelte";
     import Input from "@/components/libs/Input.svelte";
 
-    import { PanelKey, panels} from "@/configs/components/panels"
+    import { PanelKey, panels} from "@/configs/components/panels";
+    import { ItemType } from "@/configs/components/input";
     import {
         versionOptions, quoteHandleOptions, labelMatchOptions, resourceDownloadOptions,
         syncPlanOptions, imageBlockLayoutOptions
-    } from "@/configs/components/input";
+    } from "@/configs/components/select";
 
-    import { ItemType } from "@/types/components/item";
-    import { IConfig } from "@/types/config";
+    import { IConfig } from "@/types/config.d";
 
     import type PluginMemosSyncHelper from "@/index";
-    import { checkAccessToken} from "@/api/memos/v2";
+    import { checkAccessToken} from "@/controllers/memos/v2";
 
     export let plugin: InstanceType<typeof PluginMemosSyncHelper>;
     export let config: IConfig;
@@ -64,10 +64,12 @@
             />
         </Item>
         <Item
+                block={true}
                 title="服务器地址"
-                text="访问 Memos 的网址"
+                text=""
         >
             <Input
+                    block={true}
                     slot="input"
                     type={ItemType.text}
                     settingKey="Host"
@@ -80,10 +82,12 @@
             />
         </Item>
         <Item
+                block={true}
                 title="授权码"
-                text="Memos 设置页面的 Access Token"
+                text=""
         >
             <Input
+                    block={true}
                     slot="input"
                     type={ItemType.text}
                     settingKey="Token"
@@ -145,9 +149,6 @@
                 }
             />
         </Item>
-    </Panel>
-
-    <Panel display={panels[1].key === focusPanel}>
         <Item
                 title="上次同步时间"
                 text="上次完成同步的时间，在同步完成后自动更新"
@@ -156,14 +157,18 @@
                     slot="input"
                     type={ItemType.text}
                     settingKey="LastSyncTime"
-                    settingValue={config.advanced.lastSyncTime}
+                    settingValue={config.general.lastSyncTime}
                     on:changed={e => {
-                        config.advanced.lastSyncTime = e.detail.value;
+                        config.general.lastSyncTime = e.detail.value;
                         updated();
                     }
                 }
             />
         </Item>
+    </Panel>
+
+    <Panel display={panels[1].key === focusPanel}>
+
         <Item
                 title="识别双向链接符号"
                 text="配置目标文档的路径"
