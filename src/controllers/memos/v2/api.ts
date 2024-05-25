@@ -1,42 +1,70 @@
-import {METHOD, STATUS} from "@/configs/utils";
-import {isEmptyValue} from "@/utils";
-import {Requests} from "@/utils/misc/requests";
+import {IResListMemos} from "@/types/controllers/memos/v2";
 import {IResponse} from "@/types/utils/requests";
 
+import {pluginConfigData} from "@/index";
+import {METHOD, STATUS} from "@/configs/utils";
+import {UA} from "@/utils/misc/user-agent";
 
-async function request(method: string, pathName: string, data: any): Promise<any> {
-    const hostName: string = "http://192.168.31.104:15231"
-    const accessToken: string = "eyJhbGciOiJIUzI1NiIsImtpZCI6InYxIiwidHlwIjoiSldUIn0.eyJuYW1lIjoidGVzdCIsImlzcyI6Im1lbW9zIiwic3ViIjoiMiIsImF1ZCI6WyJ1c2VyLmFjY2Vzcy10b2tlbiJdLCJpYXQiOjE3MTYxMjYzNzN9.8doJUMsAVFsvEq-88phBc7p0pCbi3xL9wVlkrSvdGn4"
+import {debugMessage, isEmptyValue} from "@/utils";
+import {Requests} from "@/utils/misc/requests";
+
+
+async function request(method: string, pathName: string, data?: any): Promise<any> {
+    const hostName: string = pluginConfigData.general.host;
+    const accessToken: string = pluginConfigData.general.token;
 
     let headers = new Headers({
         'Content-Type': 'application/json; charset=UTF-8',
-        'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.1938.76",
+        'User-Agent': UA.ua,
         'Authorization': `Bearer ${accessToken}`
     })
     let r = new Requests(headers);
-    let url = `${hostName}${pathName}`
+    let url = `${hostName}${pathName}`;
+    let response: IResponse;
+    let result : any;
+
+    debugMessage(pluginConfigData.debug.isDebug, "请求地址", url);
+    if (!isEmptyValue(data)){
+        debugMessage(pluginConfigData.debug.isDebug, "请求参数", data);
+    }
 
     if (method === METHOD.GET) {
-        let response: IResponse = await r.get(url, data);
-        return response.code === STATUS.OK ? response.data : null;
+        response = await r.get(url, data);
+        result = response.code === STATUS.OK ? response.data : null;
     } else if (method === METHOD.POST) {
-        let response: IResponse = await r.post(url, data);
-        return response.code === STATUS.OK ? response.data : null;
+        response = await r.post(url, data);
+        result =  response.code === STATUS.OK ? response.data : null;
     } else if (method === METHOD.PUT) {
-        let response: IResponse = await r.put(url, data);
-        return response.code === STATUS.OK ? response.data : null;
+        response = await r.put(url, data);
+        result =  response.code === STATUS.OK ? response.data : null;
     } else if (method === METHOD.DELETE) {
-        let response: IResponse = await r.delete(url, data);
-        return response.code === STATUS.OK ? response.data : null;
+        response = await r.delete(url, data);
+        result =  response.code === STATUS.OK ? response.data : null;
     }
+
+    debugMessage(pluginConfigData.debug.isDebug, "响应结果", response);
+    return result;
 }
 
 /**
  * 转换过滤器
  * @param filter - 待处理的过滤器
  */
-async function changeFilter(filter: any) {
-    return await isEmptyValue(filter) ? null : filter.join(" && ")
+function changeFilter(filter: any) {
+    return isEmptyValue(filter) ? null : filter.join(" && ")
+}
+
+
+// **************************************** UserService ****************************************
+
+
+/**
+ * 列出用户列表
+ * 注：需要管理员身份及以上
+ * @constructor
+ */
+export async function ListUsers() {
+    return await request(METHOD.GET, '/api/v1/users');
 }
 
 
@@ -44,16 +72,28 @@ async function changeFilter(filter: any) {
 
 
 /**
- * 列出带有分页和过滤器的备忘录。
+ * 获取用户的当前身份验证信息
+ * @constructor
+ */
+export async function GetAuthStatus(){
+    return await request(METHOD.POST, "/api/v1/auth/status");
+}
+
+
+// **************************************** MemoService ****************************************
+
+
+/**
+ * 列出带有分页和过滤器的备忘录
  * @param pageSize - 返回的最大条数
  * @param pageToken - 检索后续页面的令牌
  * @param filter - 过滤器
  * @constructor
  */
-export async function ListMemos(pageSize?: number, pageToken?: string, filter?: any) {
+export async function ListMemos(pageSize?: number, pageToken?: string, filter?: any) : Promise<IResListMemos> {
     return await request(METHOD.GET, '/api/v1/memos', {
         pageSize: pageSize,
         pageToken: pageToken,
         filter: changeFilter(filter)
-    })
+    });
 }

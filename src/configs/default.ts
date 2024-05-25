@@ -9,7 +9,7 @@ export const DEFAULT_CONFIG:IConfig = {
         version: VersionKey.v2,
         host: "",
         token: "",
-        lastSyncTime: "",
+        lastSyncTime: "2021/12/08 00:00:00",
         syncPlan: SyncPlanKey.dailyNotes,
         notebook: "",
         docPath: ""

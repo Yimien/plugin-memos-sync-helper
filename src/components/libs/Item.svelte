@@ -8,6 +8,9 @@
     export let title: string = ""; // Displaying Setting Title
     export let text: string = ""; // Displaying Setting Text
     export let block: boolean = false; // Using Block Style
+    export let isRequired: boolean = false; // 必填项
+    export let isTip : boolean = false;
+    export let tipTest: string = "";
 </script>
 
 <label class="fn__flex b3-label">
@@ -15,9 +18,19 @@
         class="fn__flex-1"
         class:visible={block}
     >
-        <slot name="title">{@html title}</slot>
+        <slot name="title">
+            <span>{@html title}</span>
+            {#if isRequired}
+                <span class="required">*</span>
+            {/if}
+        </slot>
         <div class="b3-label__text">
-            <slot name="text">{@html text}</slot>
+            <slot name="text">
+                <span>{@html text}</span>
+                {#if isTip}
+                    <span class="required">{@html `<br>请注意：${tipTest}`}</span>
+                {/if}
+            </slot>
         </div>
 
         {#if block}
@@ -35,5 +48,9 @@
 <style lang="scss">
   .visible {
     overflow: visible;
+  }
+
+  .required {
+    color: red;
   }
 </style>

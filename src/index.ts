@@ -4,29 +4,39 @@ import {
     getFrontend
 } from "siyuan";
 import "@/index.scss";
+import {lsNotebooks} from "@/api";
 
 import SettingExample from "@/components/setting.svelte";
 
 import {IConfig} from "@/types/config";
+import {IOption, IOptions} from "@/types/components/item";
 
 import {DEFAULT_CONFIG} from "@/configs/default";
 import {ICONS} from "@/configs/assets/icons";
 
+import {main} from "@/controllers/plugin";
+
+import {debugMessage} from "@/utils";
 import {mergeIgnoreArray} from "@/utils/misc/merge";
 import {Logger} from "@/utils/logger";
 
 
+/**
+ * 插件名称
+ */
+export const PLUGIN_NAME: string = "Memos 同步助手";
+
+/**
+ * 配置名称
+ */
+export const STORAGE_NAME :string = "plugin-memos-sync-helper";
+
+/**
+ * 配置数据
+ */
+export let pluginConfigData: IConfig;
+
 export default class PluginMemosSyncHelper extends Plugin {
-    /**
-     * 插件名称
-     */
-    static readonly PLUGIN_NAME : string = "Memos 同步助手";
-
-    /**
-     * 配置名称
-     */
-    static readonly STORAGE_NAME : string = this.name;
-
     /**
      * 是否是手机端
      * @private
@@ -34,21 +44,15 @@ export default class PluginMemosSyncHelper extends Plugin {
     private isMobile: boolean;
 
     /**
-     * 配置数据
-     * @protected
+     * 顶栏控件
+     * @private
      */
-    protected config: IConfig;
+    private topBarElement : HTMLElement;
 
     /**
      * 日志
      */
     public readonly logger: InstanceType<typeof Logger>;
-
-    /**
-     * 顶栏控件
-     * @private
-     */
-    private topBarElement : HTMLElement;
 
 
     // **************************************** 官方 ****************************************
@@ -72,47 +76,75 @@ export default class PluginMemosSyncHelper extends Plugin {
         // 为插件在顶栏添加一个图标
         this.topBarElement = this.addTopBar({
             icon: ICONS.iconMemos.name,
-            title: PluginMemosSyncHelper.PLUGIN_NAME,
+            title: PLUGIN_NAME,
             position: "right",
             callback: () => {
-                console.log("test");
+                main();
             }
         });
 
         // 读取配置数据
-        this.loadData(PluginMemosSyncHelper.STORAGE_NAME)
+        this.loadData(STORAGE_NAME)
             .then(config => {
-                this.config = mergeIgnoreArray(DEFAULT_CONFIG, config || {}) as IConfig;
+                pluginConfigData = mergeIgnoreArray(DEFAULT_CONFIG, config || {}) as IConfig;
             })
             .catch(error => this.logger.error(error))
             .finally(async () => {
 
             });
+
     }
 
     onLayoutReady() {
-
+        // console.log("onLayoutReady");
     }
 
     /**
      * 当插件被禁用的时候，会调用此方法。
      */
-    async onunload() {
-        console.log("onunload");
+    onunload() {
+        // console.log("onunload");
     }
 
     /**
      * 当插件被卸载的时候，会调用此方法。
      */
     uninstall() {
-        console.log("uninstall");
+        // console.log("uninstall");
     }
 
     /**
      * 打开设置页面
      */
-    openSetting() {
-        this.openDIYSetting()
+    async openSetting() {
+        await this.openDIYSetting()
+    }
+
+
+    // **************************************** api ****************************************
+
+
+    /**
+     * 获取笔记本列表，并转换成下拉选项
+     * @private
+     */
+    private async getNotebookOptions() {
+        debugMessage(pluginConfigData.debug.isDebug, "正在获取笔记本列表，并转换成下拉选项...");
+
+        let notebookOptions: IOptions = [];
+        const responseData = await lsNotebooks();
+        const notebooks = responseData.notebooks;
+
+        for (const notebook of notebooks) {
+            let n : IOption = {
+                key: notebook.id,
+                text: notebook.name
+            }
+            notebookOptions.push(n);
+        }
+
+        debugMessage(pluginConfigData.debug.isDebug, "转换结果", notebookOptions);
+        return notebookOptions;
     }
 
 
@@ -122,12 +154,12 @@ export default class PluginMemosSyncHelper extends Plugin {
     /**
      * 自定义设置
      */
-    private openDIYSetting(): void {
+    private async openDIYSetting() {
         let dialog = new Dialog({
-            title: PluginMemosSyncHelper.PLUGIN_NAME,
-            content: `<div id="SettingPanel""></div>`,
-            width: "800px",
-            height: "700px",
+            title: PLUGIN_NAME,
+            content: `<div id="SettingPanel" style="height: 100%;"></div>`,
+            width: "915px",
+            height: "763px",
             destroyCallback: (options) => {
                 console.log("destroyCallback", options);
                 //You'd better destroy the component when the dialog is closed
@@ -137,8 +169,9 @@ export default class PluginMemosSyncHelper extends Plugin {
         let panel = new SettingExample({
             target: dialog.element.querySelector("#SettingPanel"),
             props: {
-                config: this.config,
-                plugin: this
+                config: pluginConfigData,
+                plugin: this,
+                notebookOptions: await this.getNotebookOptions()
             }
         });
     }
@@ -148,10 +181,10 @@ export default class PluginMemosSyncHelper extends Plugin {
      * @param config - 配置数据
      */
     public async updateConfig(config?: IConfig): Promise<void> {
-        if (config && config !== this.config) {
-            this.config = config;
+        if (config && config !== config) {
+            pluginConfigData = config;
         }
-        return this.saveData(PluginMemosSyncHelper.STORAGE_NAME, this.config);
+        return this.saveData(STORAGE_NAME, pluginConfigData);
     }
 
     /**

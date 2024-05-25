@@ -86,7 +86,7 @@ export class Requests {
      */
     async removeEmptyValues(obj: any) {
         for (let key in obj) {
-            if (await isEmptyValue(obj[key])) {
+            if (isEmptyValue(obj[key])) {
                 delete obj[key];
             }
         }

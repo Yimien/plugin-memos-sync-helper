@@ -20,10 +20,10 @@ import {
     IResBootProgress,
     IResForwardProxy,
     IResExportResources
-} from "@/types/controllers/siyuan/api"
+} from "@/types/api"
 
 
-export async function request(url: string, data: any) {
+export async function request(url: string, data?: any) {
     let response: IWebSocketData = await fetchSyncPost(url, data);
     return response.code === 0 ? response.data : null;
 }
@@ -467,4 +467,15 @@ export async function version(): Promise<string> {
 
 export async function currentTime(): Promise<number> {
     return request('/api/system/currentTime', {});
+}
+
+
+// **************************************** Storage ****************************************
+
+
+/**
+ * 获取持久化的本地存储数据
+ */
+export async function getLocalStorage(){
+    return request('/api/storage/getLocalStorage');
 }
