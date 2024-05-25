@@ -15,7 +15,7 @@
     import {IConfig} from "@/types/config.d";
 
     import type PluginMemosSyncHelper from "@/index";
-    import {checkAccessToken, test} from "@/controllers/plugin";
+    import {checkAccessToken, test} from "@/main";
 
 
     export let plugin: InstanceType<typeof PluginMemosSyncHelper>;

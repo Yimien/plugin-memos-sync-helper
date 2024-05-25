@@ -9,7 +9,7 @@ export class MemosServer {
     /**
      * 检查授权码
      */
-    async checkAccessToken() : Promise<boolean> {
+    static async checkAccessToken() : Promise<boolean> {
         const version = pluginConfigData.general.version;
         let result : boolean = false;
 
@@ -25,7 +25,7 @@ export class MemosServer {
     /**
      * 检查是否存在可同步的数据
      */
-    async checkNew() : Promise<boolean> {
+    static async checkNew() : Promise<boolean> {
         const version = pluginConfigData.general.version;
         let result : boolean = false;
 
@@ -38,7 +38,7 @@ export class MemosServer {
         return result;
     }
 
-    async getMemos() {
+    static async getMemos() {
         const version = pluginConfigData.general.version;
         let result : IResGetMemos;
 

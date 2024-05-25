@@ -14,7 +14,7 @@ import {IOption, IOptions} from "@/types/components/item";
 import {DEFAULT_CONFIG} from "@/configs/default";
 import {ICONS} from "@/configs/assets/icons";
 
-import {main} from "@/controllers/plugin";
+import {main} from "@/main";
 
 import {debugMessage} from "@/utils";
 import {mergeIgnoreArray} from "@/utils/misc/merge";
@@ -36,19 +36,18 @@ export const STORAGE_NAME :string = "plugin-memos-sync-helper";
  */
 export let pluginConfigData: IConfig;
 
+/**
+ * 是否是手机端
+ */
+export let isMobile: boolean;
+
+/**
+ * 顶栏图标
+ */
+export let topBarElement: HTMLElement;
+
+
 export default class PluginMemosSyncHelper extends Plugin {
-    /**
-     * 是否是手机端
-     * @private
-     */
-    private isMobile: boolean;
-
-    /**
-     * 顶栏控件
-     * @private
-     */
-    private topBarElement : HTMLElement;
-
     /**
      * 日志
      */
@@ -68,13 +67,13 @@ export default class PluginMemosSyncHelper extends Plugin {
      */
     async onload() {
         const frontEnd = getFrontend();
-        this.isMobile = frontEnd === "mobile" || frontEnd === "browser-mobile";
+        isMobile = frontEnd === "mobile" || frontEnd === "browser-mobile";
 
         // 批量添加图标
         await this.batchAddIcons(ICONS);
 
         // 为插件在顶栏添加一个图标
-        this.topBarElement = this.addTopBar({
+        topBarElement = this.addTopBar({
             icon: ICONS.iconMemos.name,
             title: PLUGIN_NAME,
             position: "right",

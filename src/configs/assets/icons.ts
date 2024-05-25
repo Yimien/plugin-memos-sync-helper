@@ -1,8 +1,5 @@
-import {
-    iconPodcast,
-    iconSpinner,
-    iconMemos,
-} from "@/assets/icons";
+import {iconDownload, iconSync, iconMemos} from "@/assets/icons";
+import {svgMemos, svgDownload, svgSync} from "@/assets/svg";
 
 export const ICONS = {
     /**
@@ -10,20 +7,23 @@ export const ICONS = {
      */
     iconMemos: {
         name: "iconMemos",
-        icon: iconMemos
+        icon: iconMemos,
+        svg: svgMemos
     },
     /**
      * 检查到可同步数据
      */
-    iconWaiting: {
+    iconSync: {
         name: "iconPodcast",
-        icon: iconPodcast
+        icon: iconSync,
+        svg: svgSync
     },
     /**
-     * 同步中
+     * 同步下载中
      */
-    iconSyncing: {
+    iconDownload: {
         name: "iconSpinner",
-        icon: iconSpinner
+        icon: iconDownload,
+        svg: svgDownload
     }
 }
