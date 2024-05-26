@@ -15,11 +15,11 @@ export class Sync {
         let svg: any;
 
         if (Sync.status === SYNC_STATUS.waiting) {
-            svg = ICONS.iconSync.svg;
+            svg = ICONS.sync.svg;
         } else if (Sync.status === SYNC_STATUS.downloading) {
-            svg = ICONS.iconDownload.svg;
+            svg = ICONS.download.svg;
         } else if (Sync.status === SYNC_STATUS.completed) {
-            svg = ICONS.iconMemos.svg;
+            svg = ICONS.memos.svg;
         }
 
         if (isMobile) {

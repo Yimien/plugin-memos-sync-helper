@@ -23,7 +23,7 @@
 
     export let notebookOptions : IOptions;
 
-    let panels_focus_key = PanelKey.general;
+    let panels_focus_key = PanelKey.base;
 
     function updated() {
         plugin.updateConfig(config);
@@ -58,10 +58,10 @@
                 slot="input"
                 type={ItemType.select}
                 settingKey="Version"
-                settingValue={config.general.version}
+                settingValue={config.base.version}
                 options={versionOptions}
                 on:changed={e => {
-                        config.general.version = e.detail.value;
+                        config.base.version = e.detail.value;
                         updated();
                     }
                 }
@@ -79,9 +79,9 @@
                     type={ItemType.text}
                     placeholder="支持域名和IP地址，注意不要以 '/' 结尾"
                     settingKey="Host"
-                    settingValue={config.general.host}
+                    settingValue={config.base.host}
                     on:changed={e => {
-                        config.general.host = e.detail.value;
+                        config.base.host = e.detail.value;
                         updated();
                     }
                 }
@@ -99,9 +99,9 @@
                     type={ItemType.text}
                     placeholder="在 Memos 的‘我的账号’页面自行创建"
                     settingKey="Token"
-                    settingValue={config.general.token}
+                    settingValue={config.base.token}
                     on:changed={e => {
-                        config.general.token = e.detail.value;
+                        config.base.token = e.detail.value;
                         updated();
                     }
                 }
@@ -120,10 +120,10 @@
                     slot="input"
                     type={ItemType.select}
                     settingKey="SyncPlan"
-                    settingValue={config.general.syncPlan}
+                    settingValue={config.base.syncPlan}
                     options={syncPlanOptions}
                     on:changed={e => {
-                        config.general.syncPlan = e.detail.value;
+                        config.base.syncPlan = e.detail.value;
                         updated();
                     }
                 }
@@ -139,10 +139,10 @@
                     slot="input"
                     type={ItemType.select}
                     settingKey="notebook"
-                    settingValue={config.general.notebook}
+                    settingValue={config.base.notebook}
                     options={notebookOptions}
                     on:changed={e => {
-                        config.general.notebook = e.detail.value;
+                        config.base.notebook = e.detail.value;
                         updated();
                     }
                 }
@@ -161,9 +161,9 @@
                     type={ItemType.text}
                     settingKey="docPath"
                     placeholder="请以'/'开头进行填写"
-                    settingValue={config.general.docPath}
+                    settingValue={config.base.docPath}
                     on:changed={e => {
-                        config.general.docPath = e.detail.value;
+                        config.base.docPath = e.detail.value;
                         updated();
                     }
                 }
@@ -177,10 +177,10 @@
                     slot="input"
                     type={ItemType.text}
                     settingKey="LastSyncTime"
-                    settingValue={config.general.lastSyncTime}
+                    settingValue={config.base.lastSyncTime}
                     placeholder="YYYY/MM/DD HH:mm:ss"
                     on:changed={e => {
-                        config.general.lastSyncTime = e.detail.value;
+                        config.base.lastSyncTime = e.detail.value;
                         updated();
                     }
                 }
@@ -297,7 +297,7 @@
                 title="上级标签名称"
                 text="配置上级标签的名称"
                 isTip={true}
-                tipTest="当需要增加上级标签时，此项必填"
+                tipTest="当打开标签管理优化开关时，此项必填"
         >
             <Input
                     slot="input"
@@ -347,23 +347,6 @@
                 }
             />
         </Item>
-        <Item
-                title="资源下载方案"
-                text="当资源（图片）无法正确显示或下载时请选择切换其它模式"
-        >
-            <Input
-                    slot="input"
-                    type={ItemType.select}
-                    settingKey="ResourceDownload"
-                    settingValue={config.advanced.resourceDownload}
-                    options={resourceDownloadOptions}
-                    on:changed={e => {
-                        config.advanced.resourceDownload = e.detail.value;
-                        updated();
-                    }
-                }
-            />
-        </Item>
     </Panel>
 
     <Panel display={panels[2].key === focusPanel}>
@@ -377,10 +360,27 @@
                     slot="input"
                     type={ItemType.select}
                     settingKey="Version"
-                    settingValue={config.old.labelMatch}
+                    settingValue={config.special.labelMatch}
                     options={labelMatchOptions}
                     on:changed={e => {
-                        config.old.labelMatch = e.detail.value;
+                        config.special.labelMatch = e.detail.value;
+                        updated();
+                    }
+                }
+            />
+        </Item>
+        <Item
+                title="资源下载方案"
+                text="当资源（图片）无法正确显示或下载时请选择切换其它模式"
+        >
+            <Input
+                    slot="input"
+                    type={ItemType.select}
+                    settingKey="ResourceDownload"
+                    settingValue={config.special.resourceDownload}
+                    options={resourceDownloadOptions}
+                    on:changed={e => {
+                        config.special.resourceDownload = e.detail.value;
                         updated();
                     }
                 }

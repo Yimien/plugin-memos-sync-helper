@@ -6,7 +6,7 @@ import {pushErrMsg} from "@/api";
 
 export class PluginServer {
     static async run() {
-        const memosVersion = pluginConfigData.general.version; // memos 版本
+        const memosVersion = pluginConfigData.base.version; // memos 版本
 
         if (memosVersion === VersionKey.v1){
             let plugin = new PluginV1();

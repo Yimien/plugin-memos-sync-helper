@@ -55,7 +55,7 @@ export class MemosService {
 
         debugMessage(pluginConfigData.debug.isDebug, "正在处理 Memos 数据...");
 
-        const lastSyncTime = pluginConfigData.general.lastSyncTime; // 上次同步时间
+        const lastSyncTime = pluginConfigData.base.lastSyncTime; // 上次同步时间
 
         let memosCreatedBeforeLastSync = allMemos.filter(
             memo => timeIsEarly(toChinaTime(memo.createTime), lastSyncTime)
@@ -79,7 +79,7 @@ export class MemosService {
 
         await this.initData();
 
-        const lastSyncTime = pluginConfigData.general.lastSyncTime; // 上次同步时间
+        const lastSyncTime = pluginConfigData.base.lastSyncTime; // 上次同步时间
         const pageSize : number = 200; // 每页最大条数
         let pageToken = undefined;
 

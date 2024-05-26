@@ -5,7 +5,7 @@ import {
 } from "@/configs/components/select"
 
 export const DEFAULT_CONFIG:IConfig = {
-    general: {
+    base: {
         version: VersionKey.v2,
         host: "",
         token: "",
@@ -22,12 +22,12 @@ export const DEFAULT_CONFIG:IConfig = {
         quoteHandle: QuoteHandleKey.blockRef,
         imageBlockLayout: ImageBlockLayoutKey.direction,
         isHref: false,
-        resourceDownload: ResourceDownloadKey.uid,
         isImproveVideoStyle: false,
         videoFormats: "mp4"
     },
-    old: {
-        labelMatch: LabelMatchKey.lastLine
+    special: {
+        labelMatch: LabelMatchKey.lastLine,
+        resourceDownload: ResourceDownloadKey.uid,
     },
     debug: {
         isDebug: false,

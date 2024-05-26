@@ -74,7 +74,7 @@ export default class PluginMemosSyncHelper extends Plugin {
 
         // 为插件在顶栏添加一个图标
         topBarElement = this.addTopBar({
-            icon: ICONS.iconMemos.name,
+            icon: ICONS.memos.name,
             title: PLUGIN_NAME,
             position: "right",
             callback: () => {

@@ -10,8 +10,8 @@ import {Requests} from "@/utils/misc/requests";
 
 
 async function request(method: string, pathName: string, data?: any): Promise<any> {
-    const hostName: string = pluginConfigData.general.host;
-    const accessToken: string = pluginConfigData.general.token;
+    const hostName: string = pluginConfigData.base.host;
+    const accessToken: string = pluginConfigData.base.token;
 
     let headers = new Headers({
         'Content-Type': 'application/json; charset=UTF-8',

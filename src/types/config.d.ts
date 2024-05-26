@@ -1,4 +1,4 @@
-export interface IGeneral {
+export interface IBase {
     /**
      * Memos 版本号
      */
@@ -59,10 +59,6 @@ export interface IAdvanced {
      */
     isHref: boolean,
     /**
-     * 资源下载方案
-     */
-    resourceDownload: string | number,
-    /**
      * 是否优化视频资源
      */
     isImproveVideoStyle: boolean,
@@ -72,11 +68,15 @@ export interface IAdvanced {
     videoFormats: string
 }
 
-export interface IOld {
+export interface ISpecial {
     /**
      * 标签匹配范围
      */
-    labelMatch: string | number
+    labelMatch: string | number,
+    /**
+     * 资源下载方案
+     */
+    resourceDownload: string | number,
 }
 
 export interface IDebug {
@@ -91,8 +91,8 @@ export interface IDebug {
 }
 
 export interface IConfig {
-    general: IGeneral,
+    base: IBase,
     advanced: IAdvanced,
-    old: IOld,
+    special: ISpecial,
     debug: IDebug
 }
