@@ -1,5 +1,5 @@
-import {IItemCondition} from "@/types/controllers/plugin";
-import {SyncPlanKey, VersionKey} from "@/configs/components/select";
+import {IItemCondition} from "@/types/plugin";
+import {syncPlanKey, versionKey} from "@/constants/components/select";
 import {isEmptyValue} from "@/utils";
 import {pluginConfigData} from "@/index";
 
@@ -7,7 +7,7 @@ export class PlugConfig {
     /**
      * 检查插件配置是否正确
      */
-    static async check(){
+    static async check() {
         const items = [
             pluginConfigData.base.version,
             pluginConfigData.base.host,
@@ -16,10 +16,10 @@ export class PlugConfig {
             pluginConfigData.base.notebook,
             pluginConfigData.base.lastSyncTime,
 
+            pluginConfigData.advanced.labelMatch,
             pluginConfigData.advanced.isLinks,
             pluginConfigData.advanced.isLabelTop,
             pluginConfigData.advanced.quoteHandle,
-            pluginConfigData.advanced.resourceDownload,
             pluginConfigData.advanced.isImproveVideoStyle,
             pluginConfigData.advanced.isHref,
             pluginConfigData.advanced.imageBlockLayout,
@@ -30,7 +30,7 @@ export class PlugConfig {
 
         const itemsConditions: IItemCondition[] = [
             {
-                flag: pluginConfigData.base.syncPlan === SyncPlanKey.oneDoc,
+                flag: pluginConfigData.base.syncPlan === syncPlanKey.oneDoc,
                 value: pluginConfigData.base.docPath
             },
             {
@@ -42,8 +42,8 @@ export class PlugConfig {
                 value: pluginConfigData.advanced.videoFormats
             },
             {
-                flag: pluginConfigData.base.version === VersionKey.v1,
-                value: pluginConfigData.special.labelMatch
+                flag: pluginConfigData.base.version === versionKey.v1,
+                value: pluginConfigData.special.resourceDownload
             }
         ]
 
@@ -53,7 +53,7 @@ export class PlugConfig {
             }
         }
 
-        for (const flag in itemsConditions){
+        for (const flag in itemsConditions) {
             if (flag && (isEmptyValue(items[flag]))) {
                 return false;
             }

@@ -21,14 +21,14 @@ export function toChinaTime(timeString: string) {
  * @param a
  * @param b
  */
-export function timeIsLater(a: string, b: string) : boolean{
+export function timeIsLater(a: string, b: string): boolean {
     const aTime = new Date(a);
     const bTime = new Date(b);
 
     return aTime >= bTime;
 }
 
-export function timeIsEarly (a: string, b: string) : boolean{
+export function timeIsEarly(a: string, b: string): boolean {
     const aTime = new Date(a);
     const bTime = new Date(b);
 

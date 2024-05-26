@@ -31,6 +31,10 @@ export interface IBase {
 
 export interface IAdvanced {
     /**
+     * 标签匹配范围
+     */
+    labelMatch: string | number,
+    /**
      * 是否识别双链符号
      */
     isLinks: boolean,
@@ -69,10 +73,7 @@ export interface IAdvanced {
 }
 
 export interface ISpecial {
-    /**
-     * 标签匹配范围
-     */
-    labelMatch: string | number,
+
     /**
      * 资源下载方案
      */

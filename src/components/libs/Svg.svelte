@@ -1,5 +1,5 @@
 <script lang="ts">
-    import regexp from "../../utils/regexp";
+    import regexp from "@/utils/misc/regexp";
 
     export let icon: string;
     export let id: string = "";
@@ -8,10 +8,10 @@
 </script>
 
 <svg
-    {style}
-    data-id={id}
-    class:popover__block={regexp.id.test(id)}
-    class={className}
+        class={className}
+        class:popover__block={regexp.id.test(id)}
+        data-id={id}
+        {style}
 >
-    <use xlink:href={icon} />
+    <use xlink:href={icon}/>
 </svg>

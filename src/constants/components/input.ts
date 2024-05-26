@@ -1,4 +1,4 @@
-export enum ItemType {
+export enum itemType {
     checkbox,
     text,
     number,

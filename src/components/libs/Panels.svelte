@@ -1,9 +1,9 @@
 <!-- 面板组 -->
 
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
+    import {createEventDispatcher} from "svelte";
     import Svg from "@/components/libs/Svg.svelte";
-    import type { ITab, TabKey } from "@/types/components/tab";
+    import type {ITab, TabKey} from "@/types/components/tab";
 
     export let panels: ITab[]; // 面板标签列表
     export let focus: TabKey; // 当前选中的面板的 key
@@ -11,7 +11,7 @@
     const dispatch = createEventDispatcher();
 
     function changed(key: TabKey) {
-        dispatch("changed", { key });
+        dispatch("changed", {key});
         focus = key;
     }
 </script>
@@ -22,11 +22,11 @@
         {#each panels as panel (panel.key)}
             <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
             <li
-                data-name={panel.text}
-                class:b3-list-item--focus={panel.key === focus}
-                class="b3-list-item"
-                on:click={() => changed(panel.key)}
-                on:keydown={() => {}}
+                    data-name={panel.text}
+                    class:b3-list-item--focus={panel.key === focus}
+                    class="b3-list-item"
+                    on:click={() => changed(panel.key)}
+                    on:keydown={() => {}}
             >
                 <Svg icon={panel.icon} className="b3-list-item__graphic"/>
                 <span class="b3-list-item__text">{panel.text}</span>
@@ -41,11 +41,11 @@
 </div>
 
 <style lang="scss">
-    .config__panel {
-       height: 100%;
-    }
+  .config__panel {
+    height: 100%;
+  }
 
-    .config__panel > ul > li {
-       padding-left: 1rem;
-    }
+  .config__panel > ul > li {
+    padding-left: 1rem;
+  }
 </style>

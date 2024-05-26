@@ -5,5 +5,5 @@ export function merge<T>(...args: Partial<T>[]): T {
 }
 
 export function mergeIgnoreArray<T>(...args: Partial<T>[]): T {
-    return deepmerge.all<T>(args, { arrayMerge: (_target, source, _options) => source });
+    return deepmerge.all<T>(args, {arrayMerge: (_target, source, _options) => source});
 }

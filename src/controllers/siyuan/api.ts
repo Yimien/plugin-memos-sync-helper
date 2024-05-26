@@ -1,26 +1,26 @@
 /**
  * Copyright (c) 2023 frostime. All rights reserved.
  * https://github.com/frostime/sy-plugin-template-vite
- * 
+ *
  * See API Document in [API.md](https://github.com/siyuan-note/siyuan/blob/master/API.md)
  * API 文档见 [API_zh_CN.md](https://github.com/siyuan-note/siyuan/blob/master/API_zh_CN.md)
  */
 
-import { fetchSyncPost, IWebSocketData } from "siyuan";
+import {fetchSyncPost, IWebSocketData} from "siyuan";
 import {
-    IReslsNotebooks,
-    IResGetNotebookConf,
-    IResUpload,
+    IResBootProgress,
     IResdoOperations,
+    IResExportMdContent,
+    IResExportResources,
+    IResForwardProxy,
     IResGetBlockKramdown,
     IResGetChildBlock,
+    IResGetNotebookConf,
     IResGetTemplates,
+    IReslsNotebooks,
     IResReadDir,
-    IResExportMdContent,
-    IResBootProgress,
-    IResForwardProxy,
-    IResExportResources
-} from "@/types/api"
+    IResUpload
+} from "@/types/siyuan/api"
 
 
 export async function request(url: string, data?: any) {
@@ -40,43 +40,43 @@ export async function lsNotebooks(): Promise<IReslsNotebooks> {
 
 export async function openNotebook(notebook: NotebookId) {
     let url = '/api/notebook/openNotebook';
-    return request(url, { notebook: notebook });
+    return request(url, {notebook: notebook});
 }
 
 
 export async function closeNotebook(notebook: NotebookId) {
     let url = '/api/notebook/closeNotebook';
-    return request(url, { notebook: notebook });
+    return request(url, {notebook: notebook});
 }
 
 
 export async function renameNotebook(notebook: NotebookId, name: string) {
     let url = '/api/notebook/renameNotebook';
-    return request(url, { notebook: notebook, name: name });
+    return request(url, {notebook: notebook, name: name});
 }
 
 
 export async function createNotebook(name: string): Promise<Notebook> {
     let url = '/api/notebook/createNotebook';
-    return request(url, { name: name });
+    return request(url, {name: name});
 }
 
 
 export async function removeNotebook(notebook: NotebookId) {
     let url = '/api/notebook/removeNotebook';
-    return request(url, { notebook: notebook });
+    return request(url, {notebook: notebook});
 }
 
 
 export async function getNotebookConf(notebook: NotebookId): Promise<IResGetNotebookConf> {
-    let data = { notebook: notebook };
+    let data = {notebook: notebook};
     let url = '/api/notebook/getNotebookConf';
     return request(url, data);
 }
 
 
 export async function setNotebookConf(notebook: NotebookId, conf: NotebookConf): Promise<NotebookConf> {
-    let data = { notebook: notebook, conf: conf };
+    let data = {notebook: notebook, conf: conf};
     let url = '/api/notebook/setNotebookConf';
     return request(url, data);
 }
@@ -168,6 +168,7 @@ export async function upload(assetsDirPath: string, files: any[]): Promise<IResU
 
 // **************************************** Block ****************************************
 type DataType = "markdown" | "dom";
+
 export async function insertBlock(
     dataType: DataType, data: string,
     nextID?: BlockId, previousID?: BlockId, parentID?: BlockId
@@ -331,7 +332,7 @@ export async function render(id: DocumentId, path: string): Promise<IResGetTempl
 
 export async function renderSprig(template: string): Promise<string> {
     let url = '/api/template/renderSprig';
-    return request(url, { template: template });
+    return request(url, {template: template});
 }
 
 // **************************************** File ****************************************
@@ -370,7 +371,6 @@ export async function removeFile(path: string) {
 }
 
 
-
 export async function readDir(path: string): Promise<IResReadDir> {
     let data = {
         path: path
@@ -402,6 +402,7 @@ export async function exportResources(paths: string[], name: string): Promise<IR
 // **************************************** Convert ****************************************
 
 export type PandocArgs = string;
+
 export async function pandoc(args: PandocArgs[]) {
     let data = {
         args: args
@@ -476,6 +477,6 @@ export async function currentTime(): Promise<number> {
 /**
  * 获取持久化的本地存储数据
  */
-export async function getLocalStorage(){
+export async function getLocalStorage() {
     return request('/api/storage/getLocalStorage');
 }

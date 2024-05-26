@@ -7,10 +7,10 @@
 </script>
 
 <div
-    data-name={name}
-    class:fn__none={!display}
-    class:config__tab-container--top={top}
-    class="config__tab-container"
+        class="config__tab-container"
+        class:config__tab-container--top={top}
+        class:fn__none={!display}
+        data-name={name}
 >
-    <slot />
+    <slot/>
 </div>

@@ -1,8 +1,8 @@
-import {IResListMemos} from "@/types/controllers/memos/v2";
+import {IResListMemos} from "@/types/memos/v2";
 import {IResponse} from "@/types/utils/requests";
 
 import {pluginConfigData} from "@/index";
-import {METHOD, STATUS} from "@/configs/utils";
+import {METHOD, STATUS} from "@/constants/utils";
 import {UA} from "@/utils/misc/user-agent";
 
 import {debugMessage, isEmptyValue} from "@/utils";
@@ -21,10 +21,10 @@ async function request(method: string, pathName: string, data?: any): Promise<an
     let r = new Requests(headers);
     let url = `${hostName}${pathName}`;
     let response: IResponse;
-    let result : any;
+    let result: any;
 
     debugMessage(pluginConfigData.debug.isDebug, "请求地址", url);
-    if (!isEmptyValue(data)){
+    if (!isEmptyValue(data)) {
         debugMessage(pluginConfigData.debug.isDebug, "请求参数", data);
     }
 
@@ -33,13 +33,13 @@ async function request(method: string, pathName: string, data?: any): Promise<an
         result = response.code === STATUS.OK ? response.data : null;
     } else if (method === METHOD.POST) {
         response = await r.post(url, data);
-        result =  response.code === STATUS.OK ? response.data : null;
+        result = response.code === STATUS.OK ? response.data : null;
     } else if (method === METHOD.PUT) {
         response = await r.put(url, data);
-        result =  response.code === STATUS.OK ? response.data : null;
+        result = response.code === STATUS.OK ? response.data : null;
     } else if (method === METHOD.DELETE) {
         response = await r.delete(url, data);
-        result =  response.code === STATUS.OK ? response.data : null;
+        result = response.code === STATUS.OK ? response.data : null;
     }
 
     debugMessage(pluginConfigData.debug.isDebug, "响应结果", response);
@@ -75,7 +75,7 @@ export async function ListUsers() {
  * 获取用户的当前身份验证信息
  * @constructor
  */
-export async function GetAuthStatus(){
+export async function GetAuthStatus() {
     return await request(METHOD.POST, "/api/v1/auth/status");
 }
 
@@ -90,7 +90,7 @@ export async function GetAuthStatus(){
  * @param filter - 过滤器
  * @constructor
  */
-export async function ListMemos(pageSize?: number, pageToken?: string, filter?: any) : Promise<IResListMemos> {
+export async function ListMemos(pageSize?: number, pageToken?: string, filter?: any): Promise<IResListMemos> {
     return await request(METHOD.GET, '/api/v1/memos', {
         pageSize: pageSize,
         pageToken: pageToken,

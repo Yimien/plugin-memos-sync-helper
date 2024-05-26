@@ -1,31 +1,31 @@
 import {ITab} from "@/types/components/tab";
-import {ICONS} from "@/configs/assets/icons";
+import {ICONS} from "@/constants/assets/icons";
 
-export enum PanelKey {
+export enum panelKey {
     base,
     advanced,
     special,
     debug
 }
 
-export const panels : ITab[] =[
+export const PANELS: ITab[] = [
     {
-        key: PanelKey.base,
+        key: panelKey.base,
         text: "基础配置",
         icon: `#iconSettings`
     },
     {
-        key: PanelKey.advanced,
+        key: panelKey.advanced,
         text: "高级配置",
         icon: `#${ICONS.equalizer.name}`
     },
     {
-        key: PanelKey.special,
+        key: panelKey.special,
         text: "专用配置",
         icon: `#iconPlugin`
     },
     {
-        key: PanelKey.debug,
+        key: panelKey.debug,
         text: "调试配置",
         icon: `#iconBug`
     }

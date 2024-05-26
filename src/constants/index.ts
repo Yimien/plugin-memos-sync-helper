@@ -1,4 +1,4 @@
-export enum SYNC_STATUS {
+export enum sync_status {
     /**
      * 等待同步
      */

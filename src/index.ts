@@ -1,24 +1,20 @@
-import {
-    Plugin,
-    Dialog,
-    getFrontend
-} from "siyuan";
+import {Dialog, getFrontend, Plugin} from "siyuan";
 import "@/index.scss";
-import {lsNotebooks} from "@/api";
+import {lsNotebooks} from "@/controllers/siyuan/api";
 
 import SettingExample from "@/components/setting.svelte";
 
-import {IConfig} from "@/types/config";
+import {IConfig} from "@/types/config/default";
 import {IOption, IOptions} from "@/types/components/item";
 
-import {DEFAULT_CONFIG} from "@/configs/default";
-import {ICONS} from "@/configs/assets/icons";
+import {DEFAULT_CONFIG} from "@/constants/config/default";
+import {ICONS} from "@/constants/assets/icons";
 
 import {main} from "@/main";
 
 import {debugMessage} from "@/utils";
 import {mergeIgnoreArray} from "@/utils/misc/merge";
-import {Logger} from "@/utils/logger";
+import {Logger} from "@/utils/misc/logger";
 
 
 /**
@@ -29,7 +25,7 @@ export const PLUGIN_NAME: string = "Memos 同步助手";
 /**
  * 配置名称
  */
-export const STORAGE_NAME :string = "plugin-memos-sync-helper";
+export const STORAGE_NAME: string = "plugin-memos-sync-helper";
 
 /**
  * 配置数据
@@ -122,6 +118,19 @@ export default class PluginMemosSyncHelper extends Plugin {
 
     // **************************************** api ****************************************
 
+    /**
+     * 更新插件配置
+     * @param config - 配置数据
+     */
+    public async updateConfig(config?: IConfig): Promise<void> {
+        if (config && config !== config) {
+            pluginConfigData = config;
+        }
+        return this.saveData(STORAGE_NAME, pluginConfigData);
+    }
+
+
+    // **************************************** 自定义 ****************************************
 
     /**
      * 获取笔记本列表，并转换成下拉选项
@@ -135,7 +144,7 @@ export default class PluginMemosSyncHelper extends Plugin {
         const notebooks = responseData.notebooks;
 
         for (const notebook of notebooks) {
-            let n : IOption = {
+            let n: IOption = {
                 key: notebook.id,
                 text: notebook.name
             }
@@ -145,10 +154,6 @@ export default class PluginMemosSyncHelper extends Plugin {
         debugMessage(pluginConfigData.debug.isDebug, "转换结果", notebookOptions);
         return notebookOptions;
     }
-
-
-    // **************************************** 自定义 ****************************************
-
 
     /**
      * 自定义设置
@@ -176,23 +181,12 @@ export default class PluginMemosSyncHelper extends Plugin {
     }
 
     /**
-     * 更新插件配置
-     * @param config - 配置数据
-     */
-    public async updateConfig(config?: IConfig): Promise<void> {
-        if (config && config !== config) {
-            pluginConfigData = config;
-        }
-        return this.saveData(STORAGE_NAME, pluginConfigData);
-    }
-
-    /**
      * 批量添加图标
      * @param icons
      * @private
      */
-    private async batchAddIcons(icons: any){
-        for (const key in icons){
+    private async batchAddIcons(icons: any) {
+        for (const key in icons) {
             this.addIcons(icons[key].icon);
         }
     }

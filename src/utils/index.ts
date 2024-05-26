@@ -14,11 +14,11 @@ export function isEmptyValue(value: any) {
  * @param isTitle - 是否是标题
  */
 export function debugMessage(isShow: boolean, message: any, data?: any, isTitle: boolean = false) {
-    if (isShow){
+    if (isShow) {
         if (isTitle) {
             console.log(`========== ${message} ==========`);
         } else {
-            if (isEmptyValue(data)){
+            if (isEmptyValue(data)) {
                 console.log(`${message}`);
             } else {
                 console.log(`${message}:`);

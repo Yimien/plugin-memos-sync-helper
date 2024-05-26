@@ -1,5 +1,5 @@
 import {IResponse} from '@/types/utils/requests'
-import {METHOD} from '@/configs/utils'
+import {METHOD} from '@/constants/utils'
 import {isEmptyValue} from '@/utils'
 
 

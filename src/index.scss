@@ -1,42 +1,42 @@
 #helloPanel {
-    border: 1px rgb(189, 119, 119) dashed;
+  border: 1px rgb(189, 119, 119) dashed;
 }
 
 .plugin-sample {
-    &__custom-tab {
-        background-color: var(--b3-theme-background);
-        height: 100%;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+  &__custom-tab {
+    background-color: var(--b3-theme-background);
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-    &__custom-dock {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+  &__custom-dock {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-    &__time {
-        background: var(--b3-card-info-background);
-        border-radius: 4px;
-        padding: 2px 8px;
-    }
+  &__time {
+    background: var(--b3-card-info-background);
+    border-radius: 4px;
+    padding: 2px 8px;
+  }
 }
 
-.fn__size300{
-    width: 300px;
+.fn__size300 {
+  width: 300px;
 }
 
 :root {
-    --color1: #e3dcd6;
-    --color2: #261b22;
-    --color3: #96382b;
-    --color4: #b78450;
-    --color5: #23aca0;
-    --color6: #9d8c89;
-    --color7: #dab882;
-    --color8: #c0b2a6;
-    --color9: #95c3c3;
+  --color1: #e3dcd6;
+  --color2: #261b22;
+  --color3: #96382b;
+  --color4: #b78450;
+  --color5: #23aca0;
+  --color6: #9d8c89;
+  --color7: #dab882;
+  --color8: #c0b2a6;
+  --color9: #95c3c3;
 }

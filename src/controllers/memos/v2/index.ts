@@ -2,11 +2,11 @@ import {pluginConfigData} from "@/index";
 import {GetAuthStatus, ListMemos} from "@/controllers/memos/v2/api"
 import {debugMessage, isEmptyValue} from "@/utils";
 import {timeIsEarly, timeIsLater, toChinaTime} from "@/utils/misc/time";
-import {IResGetMemos} from "@/types/controllers/memos";
+import {IResGetMemos} from "@/types/memos";
 
 
 export class MemosService {
-    private username : string;
+    private username: string;
 
     /**
      * 初始化数据
@@ -50,7 +50,7 @@ export class MemosService {
     /**
      * 获取 Memos 数据
      */
-    public async getMemos() : Promise<IResGetMemos> {
+    public async getMemos(): Promise<IResGetMemos> {
         let allMemos = await this.getAllMemos();
 
         debugMessage(pluginConfigData.debug.isDebug, "正在处理 Memos 数据...");
@@ -61,7 +61,7 @@ export class MemosService {
             memo => timeIsEarly(toChinaTime(memo.createTime), lastSyncTime)
         );
 
-        let result : IResGetMemos = {
+        let result: IResGetMemos = {
             new: allMemos,
             old: memosCreatedBeforeLastSync
         };
@@ -80,7 +80,7 @@ export class MemosService {
         await this.initData();
 
         const lastSyncTime = pluginConfigData.base.lastSyncTime; // 上次同步时间
-        const pageSize : number = 200; // 每页最大条数
+        const pageSize: number = 200; // 每页最大条数
         let pageToken = undefined;
 
         let allMemos = [];

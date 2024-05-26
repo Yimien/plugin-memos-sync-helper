@@ -9,14 +9,14 @@
     export let text: string = ""; // Displaying Setting Text
     export let block: boolean = false; // Using Block Style
     export let isRequired: boolean = false; // 必填项
-    export let isTip : boolean = false;
+    export let isTip: boolean = false;
     export let tipTest: string = "";
 </script>
 
 <label class="fn__flex b3-label">
     <div
-        class="fn__flex-1"
-        class:visible={block}
+            class="fn__flex-1"
+            class:visible={block}
     >
         <slot name="title">
             <span>{@html title}</span>
@@ -34,14 +34,14 @@
         </div>
 
         {#if block}
-            <div class="fn__hr" />
-            <slot name="input" />
+            <div class="fn__hr"/>
+            <slot name="input"/>
         {/if}
     </div>
 
     {#if !block}
-        <span class="fn__space" />
-        <slot name="input" />
+        <span class="fn__space"/>
+        <slot name="input"/>
     {/if}
 </label>
 

@@ -1,7 +1,7 @@
 import {pluginConfigData} from "@/index";
-import {VersionKey} from "@/configs/components/select";
+import {versionKey} from "@/constants/components/select";
 import {MemosService as ServiceV2} from "./v2/index"
-import {IResGetMemos} from "@/types/controllers/memos";
+import {IResGetMemos} from "@/types/memos";
 
 
 export class MemosServer {
@@ -9,13 +9,13 @@ export class MemosServer {
     /**
      * 检查授权码
      */
-    static async checkAccessToken() : Promise<boolean> {
+    static async checkAccessToken(): Promise<boolean> {
         const version = pluginConfigData.base.version;
-        let result : boolean = false;
+        let result: boolean = false;
 
-        if (version === VersionKey.v1){
+        if (version === versionKey.v1) {
             // TODO V1
-        } else if (version === VersionKey.v2){
+        } else if (version === versionKey.v2) {
             const memosService = new ServiceV2();
             result = await memosService.checkAccessToken();
         }
@@ -25,13 +25,13 @@ export class MemosServer {
     /**
      * 检查是否存在可同步的数据
      */
-    static async checkNew() : Promise<boolean> {
+    static async checkNew(): Promise<boolean> {
         const version = pluginConfigData.base.version;
-        let result : boolean = false;
+        let result: boolean = false;
 
-        if (version === VersionKey.v1){
+        if (version === versionKey.v1) {
             // TODO V1
-        } else if (version === VersionKey.v2){
+        } else if (version === versionKey.v2) {
             const memosService = new ServiceV2();
             result = await memosService.checkNew();
         }
@@ -40,11 +40,11 @@ export class MemosServer {
 
     static async getMemos() {
         const version = pluginConfigData.base.version;
-        let result : IResGetMemos;
+        let result: IResGetMemos;
 
-        if (version === VersionKey.v1){
+        if (version === versionKey.v1) {
             // TODO V1
-        } else if (version === VersionKey.v2){
+        } else if (version === versionKey.v2) {
             const memosService = new ServiceV2();
             result = await memosService.getMemos();
         }
