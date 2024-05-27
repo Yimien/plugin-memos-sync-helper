@@ -43,7 +43,7 @@ export class Sync {
     }
 
     /**
-     * 是否在同步数据？
+     * 是否在同步数据
      */
     static isSyncing() {
         return Sync.status === sync_status.downloading;

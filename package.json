@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "deepmerge": "^4.3.1",
+    "moment": "^2.30.1",
     "ua-parser-js": "^1.0.37"
   }
 }

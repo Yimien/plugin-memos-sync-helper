@@ -16,12 +16,12 @@ export function isEmptyValue(value: any) {
 export function debugMessage(isShow: boolean, message: any, data?: any, isTitle: boolean = false) {
     if (isShow) {
         if (isTitle) {
-            console.log(`========== ${message} ==========`);
+            console.log(`【${message}】`);
         } else {
             if (isEmptyValue(data)) {
                 console.log(`${message}`);
             } else {
-                console.log(`${message}:`);
+                console.log(`${message}：`);
                 console.log(data);
             }
         }

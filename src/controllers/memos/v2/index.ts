@@ -1,8 +1,12 @@
 import {pluginConfigData} from "@/index";
 import {GetAuthStatus, ListMemos} from "@/controllers/memos/v2/api"
 import {debugMessage, isEmptyValue} from "@/utils";
-import {timeIsEarly, timeIsLater, toChinaTime} from "@/utils/misc/time";
+import {
+    toChinaTime,
+    formatTime,
+} from "@/utils/misc/time";
 import {IResGetMemos} from "@/types/memos";
+import moment from "moment";
 
 
 export class MemosService {
@@ -58,7 +62,7 @@ export class MemosService {
         const lastSyncTime = pluginConfigData.base.lastSyncTime; // 上次同步时间
 
         let memosCreatedBeforeLastSync = allMemos.filter(
-            memo => timeIsEarly(toChinaTime(memo.createTime), lastSyncTime)
+            memo => moment(toChinaTime(memo.createTime)).isBefore(formatTime(lastSyncTime))
         );
 
         let result: IResGetMemos = {
@@ -93,8 +97,10 @@ export class MemosService {
             // 调用 ListMemos 函数获取一页数据
             const resData = await ListMemos(pageSize, pageToken, filters);
 
-            // 将更新时间大于等于 lastSyncTime 的数据添加到 memos 列表中
-            const memos = resData.memos.filter(memo => timeIsLater(toChinaTime(memo.updateTime), lastSyncTime));
+            // 将更新时间晚于等于 lastSyncTime 的数据添加到 memos 列表中
+            const memos = resData.memos.filter(
+                memo => moment(toChinaTime(memo.updateTime)).isSameOrAfter(formatTime(lastSyncTime))
+            );
             allMemos.push(...memos);
 
             // 检查当前页是否还有更新时间大于等于 lastSyncTime 的数据，如果没有则退出循环

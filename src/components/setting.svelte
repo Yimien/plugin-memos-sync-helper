@@ -16,7 +16,7 @@
     } from "@/constants/components/select";
 
     import {IOptions} from "@/types/components/item.d";
-    import {IConfig} from "@/types/config/default";
+    import {IConfig} from "@/types/config/default.d";
 
     import type PluginMemosSyncHelper from "@/index";
     import {checkAccessToken, test} from "@/main";

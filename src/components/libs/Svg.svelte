@@ -1,5 +1,5 @@
 <script lang="ts">
-    import regexp from "@/utils/misc/regexp";
+    import regexp from "@/utils/regexp";
 
     export let icon: string;
     export let id: string = "";

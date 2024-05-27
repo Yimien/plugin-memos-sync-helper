@@ -11,7 +11,7 @@ import {PlugConfig} from "@/controllers/plugin/config";
 
 
 export async function checkConfig() {
-    debugMessage(pluginConfigData.debug.isDebug, "检查插件配置", "", true);
+    debugMessage(pluginConfigData.debug.isDebug, "正在检查插件配置...");
 
     const result: boolean = await PlugConfig.check();
 
@@ -19,7 +19,7 @@ export async function checkConfig() {
         await pushErrMsg("请检查插件配置是否正确！");
     }
 
-    debugMessage(pluginConfigData.debug.isDebug, "校验完成", "", true);
+    debugMessage(pluginConfigData.debug.isDebug, "检查完成");
 
     return result;
 }
@@ -28,7 +28,7 @@ export async function checkConfig() {
  * 校验授权码
  */
 export async function checkAccessToken() {
-    debugMessage(pluginConfigData.debug.isDebug, "校验授权", "", true);
+    debugMessage(pluginConfigData.debug.isDebug, "正在校验授权码...");
 
     let result = await MemosServer.checkAccessToken();
     if (result) {
@@ -37,14 +37,14 @@ export async function checkAccessToken() {
         await pushErrMsg("校验失败，请检查服务器地址和授权码是否配置正确");
     }
 
-    debugMessage(pluginConfigData.debug.isDebug, "校验完成", "", true);
+    debugMessage(pluginConfigData.debug.isDebug, "校验完成");
 }
 
 /**
  * 检查是否存在可更新的数据
  */
 export async function checkNew() {
-    debugMessage(pluginConfigData.debug.isDebug, "检查是否存在可更新的数据", "", true);
+    debugMessage(pluginConfigData.debug.isDebug, "正在检查是否存在可同步的新数据...");
 
     const checkResult = await PlugConfig.check();
 
@@ -58,7 +58,7 @@ export async function checkNew() {
         await pushMsg("检查到可同步的 Memos 数据，请手动同步");
     }
 
-    debugMessage(pluginConfigData.debug.isDebug, "检查完成", "", true);
+    debugMessage(pluginConfigData.debug.isDebug, "检查完成");
 }
 
 /**

@@ -2,6 +2,7 @@ import {pluginConfigData} from "@/index";
 import {versionKey} from "@/constants/components/select";
 import {MemosService as ServiceV2} from "./v2/index"
 import {IResGetMemos} from "@/types/memos";
+import {debugMessage} from "@/utils";
 
 
 export class MemosServer {
@@ -39,6 +40,8 @@ export class MemosServer {
     }
 
     static async getMemos() {
+        debugMessage(pluginConfigData.debug.isDebug, "数据拉取", "", true);
+
         const version = pluginConfigData.base.version;
         let result: IResGetMemos;
 
@@ -48,6 +51,9 @@ export class MemosServer {
             const memosService = new ServiceV2();
             result = await memosService.getMemos();
         }
+
+        debugMessage(pluginConfigData.debug.isDebug, "拉取完成", "", true);
+
         return result;
     }
 }

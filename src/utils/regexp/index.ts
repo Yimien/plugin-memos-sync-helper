@@ -7,3 +7,10 @@ export default {
     snapshot: /^[0-9a-f]{40}$/, // 快照对象 ID
     shorthand: /^\d{13}$/, // 收集箱项 ID
 }
+
+export const regexMemosContent = {
+    embedded: /(?<=!\[\[).*?(?=]])/g,
+    tag: /(?<=#)\S.*?(?=\s)/g,
+    href: /[a-zA-z]+:\/\/\S*/g,
+    backlinks: /(?<=\(\().*?(?=\)\))/g
+}
