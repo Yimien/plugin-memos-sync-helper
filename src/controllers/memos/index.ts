@@ -52,7 +52,7 @@ export class MemosServer {
             result = await memosService.getMemos();
         }
 
-        debugMessage(pluginConfigData.debug.isDebug, "拉取完成", "", true);
+        debugMessage(pluginConfigData.debug.isDebug, "数据拉取完成", "", true);
 
         return result;
     }

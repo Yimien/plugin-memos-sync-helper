@@ -4,10 +4,12 @@ import {pluginConfigData} from "@/index";
 import {IMemos, IRelation, IResource} from "@/types/memos/v2";
 import {stringSplit} from "@/utils/misc/string";
 import {ContentHandle} from "@/controllers/plugin/common/content-handle";
-import {contentsType} from "@/constants";
+import {contentsType, MEMOS_ASSETS} from "@/constants";
 import {regexMemosContent} from "@/utils/regexp";
 import {toChinaTime} from "@/utils/misc/time";
 import {IContent, IResHandleMemos, IResRun} from "@/types/memos/v2/handle";
+import moment from "moment/moment";
+import {ResourceHandle} from "@/controllers/plugin/common/resource-handle";
 
 /**
  * 数据处理
@@ -38,7 +40,7 @@ export class Handle {
         let memosId = Handle.getMemosId(memos);
         let title = Handle.getTitle(memos);
         let contents = await Handle.getContents(memos);
-        let resources = memos.resources; // todo 资源处理
+        let resources = Handle.getResources(memos.resources);
 
         Handle.resources = Handle.resources.concat(memos.resources);
         Handle.relations = Handle.relations.concat(memos.relations);
@@ -155,8 +157,42 @@ export class Handle {
         }
     }
 
+    static getResources(resources: IResource[]) {
+        let result = [];
+        for (let resource of resources) {
+            let md = Handle.getResourceMarkdown(resource);
+            result.push(md);
+        }
+        return result;
+    }
+
+    static getResourceMarkdown(resource: IResource) {
+        let filename = resource.filename;
+        let resourceId = resource.name.split('/').pop();
+        let timestamp = moment(toChinaTime(resource.createTime)).unix();
+        let end = filename.split('.').pop();
+        let path = `${MEMOS_ASSETS}/${resourceId}_${timestamp}.${end}`;
+        let type = resource.type.split('/')[0];
+
+        if (type == "image") {
+            return ResourceHandle.handleImage(filename, path);
+        }
+
+        if (type == "video" && pluginConfigData.advanced.isHandleVideo) {
+            let videoFormatString = pluginConfigData.advanced.videoFormats;
+            let formats = videoFormatString.split(';');
+            if (formats.includes(end)) {
+                return ResourceHandle.handleVideo(path);
+            }
+        }
+
+        return ResourceHandle.handleResource(filename, path);
+    }
+
     static async run(data: IResGetMemos) {
-        debugMessage(pluginConfigData.debug.isDebug, "开始处理数据...");
+        debugMessage(pluginConfigData.debug.isDebug, "数据处理", "", true);
+
+        debugMessage(pluginConfigData.debug.isDebug, "正在处理 Memos...");
 
         await Handle.batchHandleMemos(data.new);
 
@@ -167,8 +203,9 @@ export class Handle {
             new: Handle.new
         }
 
-        debugMessage(pluginConfigData.debug.isDebug, "数据处理结果", result);
+        debugMessage(pluginConfigData.debug.isDebug, "处理结果", result);
 
+        debugMessage(pluginConfigData.debug.isDebug, "数据处理完成", "", true);
         return result;
     }
 }

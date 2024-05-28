@@ -35,3 +35,5 @@ export enum contentsType {
      */
     backlinks
 }
+
+export const MEMOS_ASSETS = "assets/memos";
