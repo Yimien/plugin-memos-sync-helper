@@ -57,7 +57,7 @@ export class Sync {
         let svg: any;
 
         if (Sync.status === sync_status.waiting) {
-            svg = ICONS.sync.svg;
+            svg = ICONS.syncing.svg;
         } else if (Sync.status === sync_status.downloading) {
             svg = ICONS.download.svg;
         } else if (Sync.status === sync_status.completed) {

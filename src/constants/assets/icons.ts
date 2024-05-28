@@ -1,5 +1,5 @@
-import {SYMBOL_DOWNLOAD, SYMBOL_EQUALIZER, SYMBOL_MEMOS, SYMBOL_SYNC} from "@/assets/symbol";
-import {SVG_DOWNLOAD, SVG_EQUALIZER, SVG_MEMOS, SVG_SYNC} from "@/assets/svg";
+import {SYMBOL_DOWNLOAD, SYMBOL_MEMOS, SYMBOL_SYNCING} from "@/assets/symbol";
+import {SVG_DOWNLOAD, SVG_MEMOS, SVG_SYNCING} from "@/assets/svg";
 
 export const ICONS = {
     /**
@@ -13,10 +13,10 @@ export const ICONS = {
     /**
      * 检查到可同步数据
      */
-    sync: {
-        name: "iconSync",
-        icon: SYMBOL_SYNC,
-        svg: SVG_SYNC
+    syncing: {
+        name: "iconSyncing",
+        icon: SYMBOL_SYNCING,
+        svg: SVG_SYNCING
     },
     /**
      * 同步下载中
@@ -25,13 +25,5 @@ export const ICONS = {
         name: "iconDownload",
         icon: SYMBOL_DOWNLOAD,
         svg: SVG_DOWNLOAD
-    },
-    /**
-     * 高级设置
-     */
-    equalizer: {
-        name: "iconEqualizer",
-        icon: SYMBOL_EQUALIZER,
-        svg: SVG_EQUALIZER
     }
 }

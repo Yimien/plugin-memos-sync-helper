@@ -12,10 +12,6 @@ export interface IBase {
      */
     token: string,
     /**
-     * 上次同步时间
-     */
-    lastSyncTime: string,
-    /**
      * 同步方案
      */
     syncPlan: string | number,
@@ -31,53 +27,40 @@ export interface IBase {
 
 export interface IAdvanced {
     /**
-     * 标签匹配范围
+     * 是否识别超链接
      */
-    labelMatch: string | number,
+    isHandleHref: boolean,
     /**
-     * 是否识别双链符号
+     * 是否识别双向链接
      */
-    isLinks: boolean,
+    isHandleBacklinks: boolean,
     /**
      * 主题路径
      */
     subjectPath: string,
     /**
-     * 是否增加统一的上级标签
+     * 是否处理视频资源
      */
-    isLabelTop: boolean,
-    /**
-     * 上级标签名称
-     */
-    labelName: string,
-    /**
-     * 引用处理方案
-     */
-    quoteHandle: string | number,
-    /**
-     * 图片处理方案
-     */
-    imageBlockLayout: string | number,
-    /**
-     * 是否识别超链接
-     */
-    isHref: boolean,
-    /**
-     * 是否优化视频资源
-     */
-    isImproveVideoStyle: boolean,
+    isHandleVideo: boolean,
     /**
      * 支持优化的视频格式
      */
     videoFormats: string
+    /**
+     * 是否增加统一上级标签
+     */
+    isSuperLabel: boolean,
+    /**
+     * 上级标签名称
+     */
+    labelName: string,
 }
 
-export interface ISpecial {
-
+export interface IFilter {
     /**
-     * 资源下载方案
+     * 上次同步时间
      */
-    resourceDownload: string | number,
+    lastSyncTime: string,
 }
 
 export interface IDebug {
@@ -94,6 +77,6 @@ export interface IDebug {
 export interface IConfig {
     base: IBase,
     advanced: IAdvanced,
-    special: ISpecial,
+    filter: IFilter,
     debug: IDebug
 }

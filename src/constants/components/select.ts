@@ -16,49 +16,6 @@ export const VERSION_OPTIONS: IOptions = [
     }
 ]
 
-export enum quoteHandleKey {
-    blockRef,
-    blockEmbed
-}
-
-export const QUOTE_HANDLE_OPTIONS: IOptions = [
-    {
-        key: quoteHandleKey.blockRef,
-        text: "引用块"
-    },
-    {
-        key: quoteHandleKey.blockEmbed,
-        text: "嵌入块"
-    }
-]
-
-export enum labelMatchKey {
-    all,
-    lastLine
-}
-
-export const LABEL_MATCH_OPTIONS: IOptions = [
-    {
-        key: labelMatchKey.all,
-        text: "全文匹配"
-    },
-    {
-        key: labelMatchKey.lastLine,
-        text: "最后一行"
-    }
-]
-
-export enum resourceDownloadKey {
-    uid
-}
-
-export const RESOURCE_DOWNLOAD_OPTIONS: IOptions = [
-    {
-        key: resourceDownloadKey.uid,
-        text: "uid"
-    }
-]
-
 export enum syncPlanKey {
     dailyNotes,
     singleDoc,
@@ -77,21 +34,5 @@ export const SYNC_PLAN_OPTIONS: IOptions = [
     {
         key: syncPlanKey.oneDoc,
         text: "同步至同一份文档中"
-    }
-]
-
-export enum imageBlockLayoutKey {
-    direction,
-    transverse
-}
-
-export const IMAGE_BLOCK_LAYOUT_OPTIONS: IOptions = [
-    {
-        key: imageBlockLayoutKey.direction,
-        text: "纵向排列"
-    },
-    {
-        key: imageBlockLayoutKey.transverse,
-        text: "横向排列"
     }
 ]

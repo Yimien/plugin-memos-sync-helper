@@ -1,5 +1,5 @@
 import {ITab} from "@/types/components/tab";
-import {ICONS} from "@/constants/assets/icons";
+
 
 export enum panelKey {
     base,
@@ -17,12 +17,12 @@ export const PANELS: ITab[] = [
     {
         key: panelKey.advanced,
         text: "高级配置",
-        icon: `#${ICONS.equalizer.name}`
+        icon: `#iconPlugin`
     },
     {
         key: panelKey.special,
-        text: "专用配置",
-        icon: `#iconPlugin`
+        text: "过滤配置",
+        icon: `#iconFilter`
     },
     {
         key: panelKey.debug,

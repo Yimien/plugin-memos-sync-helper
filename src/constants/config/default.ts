@@ -1,38 +1,27 @@
 import {IConfig} from "@/types/config/default";
 
-import {
-    imageBlockLayoutKey,
-    labelMatchKey,
-    quoteHandleKey,
-    resourceDownloadKey,
-    syncPlanKey,
-    versionKey
-} from "@/constants/components/select"
+import {syncPlanKey, versionKey} from "@/constants/components/select"
 
 export const DEFAULT_CONFIG: IConfig = {
     base: {
         version: versionKey.v2,
         host: "",
         token: "",
-        lastSyncTime: "2021-12-08 00:00:00",
         syncPlan: syncPlanKey.dailyNotes,
         notebook: "",
         docPath: ""
     },
     advanced: {
-        labelMatch: labelMatchKey.lastLine,
-        isLinks: false,
+        isHandleHref: false,
+        isHandleBacklinks: false,
         subjectPath: "",
-        isLabelTop: false,
+        isHandleVideo: false,
+        videoFormats: "mp4",
+        isSuperLabel: false,
         labelName: "",
-        quoteHandle: quoteHandleKey.blockRef,
-        imageBlockLayout: imageBlockLayoutKey.direction,
-        isHref: false,
-        isImproveVideoStyle: false,
-        videoFormats: "mp4"
     },
-    special: {
-        resourceDownload: resourceDownloadKey.uid,
+    filter: {
+        lastSyncTime: "2021-12-08 00:00:00",
     },
     debug: {
         isDebug: false,

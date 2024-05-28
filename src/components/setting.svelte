@@ -7,10 +7,6 @@
     import {panelKey, PANELS} from "@/constants/components/panels";
     import {itemType} from "@/constants/components/input";
     import {
-        IMAGE_BLOCK_LAYOUT_OPTIONS,
-        LABEL_MATCH_OPTIONS,
-        QUOTE_HANDLE_OPTIONS,
-        RESOURCE_DOWNLOAD_OPTIONS,
         SYNC_PLAN_OPTIONS,
         VERSION_OPTIONS
     } from "@/constants/components/select";
@@ -31,6 +27,24 @@
 
     function updated() {
         plugin.updateConfig(config);
+    }
+
+    let syncPlanText = '';
+
+    $: {
+        switch (config.base.syncPlan) {
+            case SYNC_PLAN_OPTIONS[0].key:
+                syncPlanText = `请配置同步笔记本`;
+                break;
+            case SYNC_PLAN_OPTIONS[1].key:
+                syncPlanText = `请配置同步笔记本，如需保存至指定文档下需配置文档路径`;
+                break;
+            case SYNC_PLAN_OPTIONS[2].key:
+                syncPlanText = `请配置同步笔记本以及文档路径`;
+                break;
+            default:
+                syncPlanText = '';
+        }
     }
 
 
@@ -113,11 +127,7 @@
         </Item>
 
         <Item
-                text={
-                `1. ${SYNC_PLAN_OPTIONS[0].text}：需要配置笔记本，文档路径无效<br>`+
-                `2. ${SYNC_PLAN_OPTIONS[1].text}：需要配置笔记本，如需保存至指定文档下需要配置文档路径<br>`+
-                `3. ${SYNC_PLAN_OPTIONS[2].text}：需要配置笔记本和文档路径`
-                }
+                text={syncPlanText}
                 title="同步方案"
         >
             <Input
@@ -173,90 +183,21 @@
                     type={itemType.text}
             />
         </Item>
-        <Item
-                text="上次完成同步的时间，在同步完成后自动更新"
-                title="上次同步时间"
-        >
-            <Input
-                    on:changed={e => {
-                        config.base.lastSyncTime = e.detail.value;
-                        updated();
-                    }
-                }
-                    placeholder="YYYY/MM/DD HH:mm:ss"
-                    settingKey="LastSyncTime"
-                    settingValue={config.base.lastSyncTime}
-                    slot="input"
-                    type={itemType.text}
-            />
-        </Item>
     </Panel>
 
     <Panel display={PANELS[1].key === focusPanel}>
-        <Item
-                isTip={true}
-                text="自定义标签的匹配范围"
-                tipTest="本功能仅在 Memos 版本为0.21及以下时有效"
-                title="标签匹配范围"
-        >
-            <Input
-                    on:changed={e => {
-                        config.advanced.labelMatch = e.detail.value;
-                        updated();
-                    }
-                }
-                    options={LABEL_MATCH_OPTIONS}
-                    settingKey="Version"
-                    settingValue={config.advanced.labelMatch}
-                    slot="input"
-                    type={itemType.select}
-            />
-        </Item>
-        <Item
-                text="保存 Memos 的引用到思源笔记时的显示处理方案"
-                title="引用处理方案"
-        >
-            <Input
-                    on:changed={e => {
-                        config.advanced.quoteHandle = e.detail.value;
-                        updated();
-                    }}
-                    options={QUOTE_HANDLE_OPTIONS}
-                    settingKey="QuoteHandle"
-                    settingValue={config.advanced.quoteHandle}
-                    slot="input"
-                    type={itemType.select}
-            />
-        </Item>
-        <Item
-                text="保存 Memos 的图片到思源笔记时的排列处理方案"
-                title="图片块排列方案"
-        >
-            <Input
-                    on:changed={e => {
-                        config.advanced.imageBlockLayout = e.detail.value;
-                        updated();
-                    }
-                }
-                    options={IMAGE_BLOCK_LAYOUT_OPTIONS}
-                    settingKey="ImageBlockLayout"
-                    settingValue={config.advanced.imageBlockLayout}
-                    slot="input"
-                    type={itemType.select}
-            />
-        </Item>
         <Item
                 text="识别超链接并转换成可点击的样式"
                 title="识别超链接"
         >
             <Input
                     on:changed={e => {
-                        config.advanced.isHref = e.detail.value;
+                        config.advanced.isHandleHref = e.detail.value;
                         updated();
                     }
                 }
                     settingKey="Href"
-                    settingValue={config.advanced.isHref}
+                    settingValue={config.advanced.isHandleHref}
                     slot="input"
                     type={itemType.checkbox}
             />
@@ -269,12 +210,12 @@
         >
             <Input
                     on:changed={e => {
-                        config.advanced.isLinks = e.detail.value;
+                        config.advanced.isHandleBacklinks = e.detail.value;
                         updated();
                     }
                 }
                     settingKey="Links"
-                    settingValue={config.advanced.isLinks}
+                    settingValue={config.advanced.isHandleBacklinks}
                     slot="input"
                     type={itemType.checkbox}
             />
@@ -301,17 +242,52 @@
             />
         </Item>
         <Item
+                text="识别对应的格式的视频文件并转换成可点击播放的样式"
+                title="优化视频样式"
+        >
+            <Input
+                    on:changed={e => {
+                        config.advanced.isHandleVideo = e.detail.value;
+                        updated();
+                    }
+                }
+                    settingKey="ImproveVideoStyle"
+                    settingValue={config.advanced.isHandleVideo}
+                    slot="input"
+                    type={itemType.checkbox}
+            />
+        </Item>
+        <Item
+                block={true}
+                text="配置哪些格式的视频文件需要转换，使用 ';' 进行分隔"
+                title="需要优化的视频格式"
+        >
+            <Input
+                    block={true}
+                    height={100}
+                    on:changed={e => {
+                        config.advanced.videoFormats = e.detail.value;
+                        updated();
+                    }
+                }
+                    settingKey="VideoFormats"
+                    settingValue={config.advanced.videoFormats ? config.advanced.videoFormats : ""}
+                    slot="input"
+                    type={itemType.textarea}
+            />
+        </Item>
+        <Item
                 text="为所有的标签增加一个统一的上级标签"
                 title="标签管理优化"
         >
             <Input
                     on:changed={e => {
-                        config.advanced.isLabelTop = e.detail.value;
+                        config.advanced.isSuperLabel = e.detail.value;
                         updated();
                     }
                 }
                     settingKey="LabelTop"
-                    settingValue={config.advanced.isLabelTop}
+                    settingValue={config.advanced.isSuperLabel}
                     slot="input"
                     type={itemType.checkbox}
             />
@@ -335,60 +311,24 @@
                     type={itemType.text}
             />
         </Item>
-        <Item
-                text="识别对应的格式的视频文件并转换成可点击播放的样式"
-                title="优化视频样式"
-        >
-            <Input
-                    on:changed={e => {
-                        config.advanced.isImproveVideoStyle = e.detail.value;
-                        updated();
-                    }
-                }
-                    settingKey="ImproveVideoStyle"
-                    settingValue={config.advanced.isImproveVideoStyle}
-                    slot="input"
-                    type={itemType.checkbox}
-            />
-        </Item>
-        <Item
-                block={true}
-                text="配置哪些格式的视频文件需要转换"
-                title="需要优化的视频格式"
-        >
-            <Input
-                    block={true}
-                    height={100}
-                    on:changed={e => {
-                        config.advanced.videoFormats = e.detail.value;
-                        updated();
-                    }
-                }
-                    settingKey="VideoFormats"
-                    settingValue={config.advanced.videoFormats ? config.advanced.videoFormats : ""}
-                    slot="input"
-                    type={itemType.textarea}
-            />
-        </Item>
     </Panel>
 
     <Panel display={PANELS[2].key === focusPanel}>
-
         <Item
-                text="当资源（图片）无法正确显示或下载时请选择切换其它模式"
-                title="资源下载方案"
+                text="上次完成同步的时间，在同步完成后自动更新"
+                title="上次同步时间"
         >
             <Input
                     on:changed={e => {
-                        config.special.resourceDownload = e.detail.value;
+                        config.filter.lastSyncTime = e.detail.value;
                         updated();
                     }
                 }
-                    options={RESOURCE_DOWNLOAD_OPTIONS}
-                    settingKey="ResourceDownload"
-                    settingValue={config.special.resourceDownload}
+                    placeholder="YYYY/MM/DD HH:mm:ss"
+                    settingKey="LastSyncTime"
+                    settingValue={config.filter.lastSyncTime}
                     slot="input"
-                    type={itemType.select}
+                    type={itemType.text}
             />
         </Item>
     </Panel>

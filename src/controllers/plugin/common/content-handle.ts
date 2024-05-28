@@ -13,7 +13,7 @@ export class ContentHandle {
         let regex = regexMemosContent.tag;
         let result: string;
 
-        if (pluginConfigData.advanced.isLabelTop) {
+        if (pluginConfigData.advanced.isSuperLabel) {
             const labelName = pluginConfigData.advanced.labelName;
             result = content.replace(regex, (match) => `${labelName}/${match}#`);
         } else {

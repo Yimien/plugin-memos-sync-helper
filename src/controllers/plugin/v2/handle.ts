@@ -38,7 +38,7 @@ export class Handle {
         let memosId = Handle.getMemosId(memos);
         let title = Handle.getTitle(memos);
         let contents = await Handle.getContents(memos);
-        let resources = memos.resources;
+        let resources = memos.resources; // todo 资源处理
 
         Handle.resources = Handle.resources.concat(memos.resources);
         Handle.relations = Handle.relations.concat(memos.relations);
@@ -137,12 +137,12 @@ export class Handle {
             }
 
             // 双链处理
-            if (pluginConfigData.advanced.isLinks && regexMemosContent.backlinks.test(content)) {
+            if (pluginConfigData.advanced.isHandleBacklinks && regexMemosContent.backlinks.test(content)) {
                 result = await ContentHandle.handleBacklinks(content);
             }
 
             // 网址处理
-            if (pluginConfigData.advanced.isHref && regexMemosContent.href.test(content)) {
+            if (pluginConfigData.advanced.isHandleHref && regexMemosContent.href.test(content)) {
                 result = ContentHandle.handleHref(content);
             }
 

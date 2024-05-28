@@ -17,11 +17,11 @@ export class PlugConfig {
             pluginConfigData.base.lastSyncTime,
 
             pluginConfigData.advanced.labelMatch,
-            pluginConfigData.advanced.isLinks,
-            pluginConfigData.advanced.isLabelTop,
+            pluginConfigData.advanced.isHandleBacklinks,
+            pluginConfigData.advanced.isSuperLabel,
             pluginConfigData.advanced.quoteHandle,
-            pluginConfigData.advanced.isImproveVideoStyle,
-            pluginConfigData.advanced.isHref,
+            pluginConfigData.advanced.isHandleVideo,
+            pluginConfigData.advanced.isHandleHref,
             pluginConfigData.advanced.imageBlockLayout,
 
             pluginConfigData.debug.isDebug,
@@ -34,16 +34,16 @@ export class PlugConfig {
                 value: pluginConfigData.base.docPath
             },
             {
-                flag: !(isEmptyValue(pluginConfigData.advanced.isLabelTop)),
+                flag: !(isEmptyValue(pluginConfigData.advanced.isSuperLabel)),
                 value: pluginConfigData.advanced.labelName
             },
             {
-                flag: !(isEmptyValue(pluginConfigData.advanced.isImproveVideoStyle)),
+                flag: !(isEmptyValue(pluginConfigData.advanced.isHandleVideo)),
                 value: pluginConfigData.advanced.videoFormats
             },
             {
                 flag: pluginConfigData.base.version === versionKey.v1,
-                value: pluginConfigData.special.resourceDownload
+                value: pluginConfigData.filter.resourceDownload
             }
         ]
 
