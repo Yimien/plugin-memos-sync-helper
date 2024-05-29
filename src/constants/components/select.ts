@@ -29,10 +29,10 @@ export const SYNC_PLAN_OPTIONS: IOptions = [
     },
     {
         key: syncPlanKey.singleDoc,
-        text: "一条记录一份文档"
+        text: "同步为单独的文档"
     },
     {
         key: syncPlanKey.sameDoc,
-        text: "同步至同一份文档中"
+        text: "同步至同一份文档"
     }
 ]
