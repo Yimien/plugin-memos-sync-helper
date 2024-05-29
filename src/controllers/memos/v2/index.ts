@@ -1,84 +1,28 @@
 import {pluginConfigData} from "@/index";
-import {GetAuthStatus, ListMemos} from "@/controllers/memos/v2/api"
+import {GetAuthStatus, GetResourceBinary, ListMemos} from "@/controllers/memos/v2/api"
 import {debugMessage, isEmptyValue} from "@/utils";
-import {
-    toChinaTime,
-    formatTime,
-} from "@/utils/misc/time";
+import {toChinaTime, formatTime,} from "@/utils/misc/time";
 import {IResGetMemos} from "@/types/memos";
 import moment from "moment";
+import {IResource} from "@/types/memos/v2";
 
 
-export class MemosService {
-    private username: string;
+export class MemosApiService {
+    private static username: string;
 
     /**
      * 初始化数据
      * @private
      */
-    public async initData() {
+    private static async initData() {
         const userData = await this.getUserData();
         this.username = userData.name;
     }
 
     /**
-     * 获取用户数据
-     */
-    public async getUserData() {
-        const userData = await GetAuthStatus();
-        return {
-            /**
-             * 用户名称
-             */
-            name: userData.name
-        }
-    }
-
-    /**
-     * 授权校验
-     */
-    public async checkAccessToken() {
-        const userData = await GetAuthStatus();
-        return !isEmptyValue(userData);
-    }
-
-    /**
-     * 检查新数据
-     */
-    public async checkNew() {
-        const memos = await this.getAllMemos();
-        return memos.length > 0;
-    }
-
-
-    /**
      * 获取 Memos 数据
      */
-    public async getMemos(): Promise<IResGetMemos> {
-        let allMemos = await this.getAllMemos();
-
-        debugMessage(pluginConfigData.debug.isDebug, "正在整理 Memos 数据...");
-
-        const lastSyncTime = pluginConfigData.filter.lastSyncTime; // 上次同步时间
-
-        let memosCreatedBeforeLastSync = allMemos.filter(
-            memo => moment(toChinaTime(memo.createTime)).isBefore(formatTime(lastSyncTime))
-        );
-
-        let result: IResGetMemos = {
-            new: allMemos,
-            old: memosCreatedBeforeLastSync
-        };
-
-        debugMessage(pluginConfigData.debug.isDebug, "整理结果", result);
-
-        return result;
-    }
-
-    /**
-     * 获取 Memos 数据
-     */
-    public async getAllMemos() {
+    private static async getAllMemos() {
         debugMessage(pluginConfigData.debug.isDebug, "正在获取 Memos 数据...");
 
         await this.initData();
@@ -115,5 +59,68 @@ export class MemosService {
         debugMessage(pluginConfigData.debug.isDebug, "获取结果", allMemos);
 
         return allMemos;
+    }
+
+
+    // **************************************** export ****************************************
+
+
+    /**
+     * 获取用户数据
+     */
+    static async getUserData() {
+        const userData = await GetAuthStatus();
+        return {
+            /**
+             * 用户名称
+             */
+            name: userData.name
+        }
+    }
+
+    /**
+     * 授权校验
+     */
+    static async checkAccessToken() {
+        const userData = await GetAuthStatus();
+        return !isEmptyValue(userData);
+    }
+
+    /**
+     * 检查新数据
+     */
+    static async checkNew() {
+        const memos = await this.getAllMemos();
+        return memos.length > 0;
+    }
+
+    /**
+     * 获取 Memos 数据
+     */
+    static async getMemos(): Promise<IResGetMemos> {
+        let allMemos = await this.getAllMemos();
+
+        debugMessage(pluginConfigData.debug.isDebug, "正在整理 Memos 数据...");
+
+        const lastSyncTime = pluginConfigData.filter.lastSyncTime; // 上次同步时间
+
+        let memosCreatedBeforeLastSync = allMemos.filter(
+            memo => moment(toChinaTime(memo.createTime)).isBefore(formatTime(lastSyncTime))
+        );
+
+        let result: IResGetMemos = {
+            new: allMemos,
+            old: memosCreatedBeforeLastSync
+        };
+
+        debugMessage(pluginConfigData.debug.isDebug, "整理结果", result);
+
+        return result;
+    }
+
+    static async downloadResource(resource: IResource) {
+        let name = resource.name;
+        let filename: string = resource.filename;
+        return await GetResourceBinary(name, filename);
     }
 }

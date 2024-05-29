@@ -35,7 +35,7 @@ export interface IReactions {
 /**
  * Memos
  */
-export interface IMemos {
+export interface IMemo {
     name: string,
     uid: string,
     rowStatus: string,
@@ -54,10 +54,12 @@ export interface IMemos {
     reactions: IReactions[]
 }
 
+export type IMemos = IMemo[];
+
 /**
  * 列出带有分页和过滤器的备忘录
  */
 export interface IResListMemos {
-    memos: IMemos[],
+    memos: IMemo[],
     nextPageToken: string
 }

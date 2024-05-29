@@ -1,4 +1,4 @@
-import {IMemos, IRelation, IResource} from "@/types/memos/v2";
+import {IMemo, IRelation, IResource} from "@/types/memos/v2";
 
 
 // **************************************** 方法响应 ****************************************

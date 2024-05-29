@@ -1,4 +1,4 @@
-import {IMemos, IRelation, IResource} from "@/types/memos/v2/index";
+import {IMemo, IRelation, IResource} from "@/types/memos/v2/index";
 
 
 export interface IContent {
@@ -7,11 +7,11 @@ export interface IContent {
 }
 
 export interface IResHandleMemos {
-    memosId: string,
+    id: string,
+    uid: string,
     title: string,
     contents: IContent[],
-    resources: IResource[],
-    memos: IMemos
+    memos: IMemo
 }
 
 export interface IResRun {
@@ -26,7 +26,7 @@ export interface IResRun {
     /**
      * 用于批量删除
      */
-    old: IMemos[],
+    old: IMemo[],
     /**
      * 用于批量写入
      */

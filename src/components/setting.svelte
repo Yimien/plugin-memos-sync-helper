@@ -6,10 +6,7 @@
 
     import {panelKey, PANELS} from "@/constants/components/panels";
     import {itemType} from "@/constants/components/input";
-    import {
-        SYNC_PLAN_OPTIONS,
-        VERSION_OPTIONS
-    } from "@/constants/components/select";
+    import {SYNC_PLAN_OPTIONS, VERSION_OPTIONS} from "@/constants/components/select";
 
     import {IOptions} from "@/types/components/item.d";
     import {IConfig} from "@/types/config/default.d";

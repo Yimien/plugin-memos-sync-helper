@@ -19,7 +19,7 @@ export const VERSION_OPTIONS: IOptions = [
 export enum syncPlanKey {
     dailyNotes,
     singleDoc,
-    oneDoc
+    sameDoc
 }
 
 export const SYNC_PLAN_OPTIONS: IOptions = [
@@ -32,7 +32,7 @@ export const SYNC_PLAN_OPTIONS: IOptions = [
         text: "一条记录一份文档"
     },
     {
-        key: syncPlanKey.oneDoc,
+        key: syncPlanKey.sameDoc,
         text: "同步至同一份文档中"
     }
 ]

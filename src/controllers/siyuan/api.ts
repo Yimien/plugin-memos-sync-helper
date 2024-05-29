@@ -83,6 +83,8 @@ export async function setNotebookConf(notebook: NotebookId, conf: NotebookConf):
 
 
 // **************************************** File Tree ****************************************
+
+
 export async function createDocWithMd(notebook: NotebookId, path: string, markdown: string): Promise<DocumentId> {
     let data = {
         notebook: notebook,
@@ -154,7 +156,9 @@ export async function getIDsByHPath(notebook: NotebookId, path: string): Promise
     return request(url, data);
 }
 
+
 // **************************************** Asset Files ****************************************
+
 
 export async function upload(assetsDirPath: string, files: any[]): Promise<IResUpload> {
     let form = new FormData();
@@ -166,7 +170,10 @@ export async function upload(assetsDirPath: string, files: any[]): Promise<IResU
     return request(url, form);
 }
 
+
 // **************************************** Block ****************************************
+
+
 type DataType = "markdown" | "dom";
 
 export async function insertBlock(
@@ -273,6 +280,7 @@ export async function getChildBlocks(id: BlockId): Promise<IResGetChildBlock[]> 
     return request(url, data);
 }
 
+
 export async function transferBlockRef(fromID: BlockId, toID: BlockId, refIDs: BlockId[]) {
     let data = {
         fromID: fromID,
@@ -283,7 +291,10 @@ export async function transferBlockRef(fromID: BlockId, toID: BlockId, refIDs: B
     return request(url, data);
 }
 
+
 // **************************************** Attributes ****************************************
+
+
 export async function setBlockAttrs(id: BlockId, attrs: { [key: string]: string }) {
     let data = {
         id: id,
@@ -302,7 +313,9 @@ export async function getBlockAttrs(id: BlockId): Promise<{ [key: string]: strin
     return request(url, data);
 }
 
+
 // **************************************** SQL ****************************************
+
 
 export async function sql(sql: string): Promise<any[]> {
     let sqldata = {
@@ -312,13 +325,16 @@ export async function sql(sql: string): Promise<any[]> {
     return request(url, sqldata);
 }
 
+
 export async function getBlockByID(blockId: string): Promise<Block> {
     let sqlScript = `select * from blocks where id ='${blockId}'`;
     let data = await sql(sqlScript);
     return data[0];
 }
 
+
 // **************************************** Template ****************************************
+
 
 export async function render(id: DocumentId, path: string): Promise<IResGetTemplates> {
     let data = {
@@ -335,7 +351,9 @@ export async function renderSprig(template: string): Promise<string> {
     return request(url, {template: template});
 }
 
+
 // **************************************** File ****************************************
+
 
 export async function getFile(path: string): Promise<any> {
     let data = {
@@ -350,6 +368,7 @@ export async function getFile(path: string): Promise<any> {
     }
 }
 
+
 export async function putFile(path: string, isDir: boolean, file: any) {
     let form = new FormData();
     form.append('path', path);
@@ -361,6 +380,7 @@ export async function putFile(path: string, isDir: boolean, file: any) {
     let url = '/api/file/putFile';
     return request(url, form);
 }
+
 
 export async function removeFile(path: string) {
     let data = {
@@ -382,6 +402,7 @@ export async function readDir(path: string): Promise<IResReadDir> {
 
 // **************************************** Export ****************************************
 
+
 export async function exportMdContent(id: DocumentId): Promise<IResExportMdContent> {
     let data = {
         id: id
@@ -389,6 +410,7 @@ export async function exportMdContent(id: DocumentId): Promise<IResExportMdConte
     let url = '/api/export/exportMdContent';
     return request(url, data);
 }
+
 
 export async function exportResources(paths: string[], name: string): Promise<IResExportResources> {
     let data = {
@@ -399,7 +421,9 @@ export async function exportResources(paths: string[], name: string): Promise<IR
     return request(url, data);
 }
 
+
 // **************************************** Convert ****************************************
+
 
 export type PandocArgs = string;
 
@@ -411,13 +435,10 @@ export async function pandoc(args: PandocArgs[]) {
     return request(url, data);
 }
 
+
 // **************************************** Notification ****************************************
 
-// /api/notification/pushMsg
-// {
-//     "msg": "test",
-//     "timeout": 7000
-//   }
+
 export async function pushMsg(msg: string, timeout: number = 7000) {
     let payload = {
         msg: msg,
@@ -426,6 +447,7 @@ export async function pushMsg(msg: string, timeout: number = 7000) {
     let url = "/api/notification/pushMsg";
     return request(url, payload);
 }
+
 
 export async function pushErrMsg(msg: string, timeout: number = 7000) {
     let payload = {
@@ -436,7 +458,10 @@ export async function pushErrMsg(msg: string, timeout: number = 7000) {
     return request(url, payload);
 }
 
+
 // **************************************** Network ****************************************
+
+
 export async function forwardProxy(
     url: string, method: string = 'GET', payload: any = {},
     headers: any[] = [], timeout: number = 7000, contentType: string = "text/html"
@@ -455,6 +480,7 @@ export async function forwardProxy(
 
 
 // **************************************** System ****************************************
+
 
 export async function bootProgress(): Promise<IResBootProgress> {
     return request('/api/system/bootProgress', {});

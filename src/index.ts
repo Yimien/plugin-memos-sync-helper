@@ -1,31 +1,17 @@
 import {Dialog, getFrontend, Plugin} from "siyuan";
 import "@/index.scss";
-import {lsNotebooks} from "@/controllers/siyuan/api";
-
 import SettingExample from "@/components/setting.svelte";
-
+import {PLUGIN_NAME, STORAGE_NAME} from "@/constants";
+import {ICONS} from "@/constants/assets/icons";
+import {DEFAULT_CONFIG} from "@/constants/config/default";
 import {IConfig} from "@/types/config/default";
 import {IOption, IOptions} from "@/types/components/item";
-
-import {DEFAULT_CONFIG} from "@/constants/config/default";
-import {ICONS} from "@/constants/assets/icons";
-
+import {lsNotebooks} from "@/controllers/siyuan/api";
+import {debugMessage} from "@/utils";
+import {Logger} from "@/utils/misc/logger";
+import {mergeIgnoreArray} from "@/utils/misc/merge";
 import {main} from "@/main";
 
-import {debugMessage} from "@/utils";
-import {mergeIgnoreArray} from "@/utils/misc/merge";
-import {Logger} from "@/utils/misc/logger";
-
-
-/**
- * 插件名称
- */
-export const PLUGIN_NAME: string = "Memos 同步助手";
-
-/**
- * 配置名称
- */
-export const STORAGE_NAME: string = "plugin-memos-sync-helper";
 
 /**
  * 配置数据

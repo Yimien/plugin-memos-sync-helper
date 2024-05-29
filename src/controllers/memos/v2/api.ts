@@ -1,50 +1,11 @@
 import {IResListMemos} from "@/types/memos/v2";
-import {IResponse} from "@/types/utils/requests";
 
 import {pluginConfigData} from "@/index";
-import {METHOD, STATUS} from "@/constants/utils";
-import {UA} from "@/utils/misc/user-agent";
+import {METHOD} from "@/constants/utils/request";
 
-import {debugMessage, isEmptyValue} from "@/utils";
-import {Requests} from "@/utils/misc/requests";
+import {isEmptyValue} from "@/utils";
+import {Request} from "@/utils/request";
 
-
-async function request(method: string, pathName: string, data?: any): Promise<any> {
-    const hostName: string = pluginConfigData.base.host;
-    const accessToken: string = pluginConfigData.base.token;
-
-    let headers = new Headers({
-        'Content-Type': 'application/json; charset=UTF-8',
-        'User-Agent': UA.ua,
-        'Authorization': `Bearer ${accessToken}`
-    })
-    let r = new Requests(headers);
-    let url = `${hostName}${pathName}`;
-    let response: IResponse;
-    let result: any;
-
-    debugMessage(pluginConfigData.debug.isDebug, "请求地址", url);
-    if (!isEmptyValue(data)) {
-        debugMessage(pluginConfigData.debug.isDebug, "请求参数", data);
-    }
-
-    if (method === METHOD.GET) {
-        response = await r.get(url, data);
-        result = response.code === STATUS.OK ? response.data : null;
-    } else if (method === METHOD.POST) {
-        response = await r.post(url, data);
-        result = response.code === STATUS.OK ? response.data : null;
-    } else if (method === METHOD.PUT) {
-        response = await r.put(url, data);
-        result = response.code === STATUS.OK ? response.data : null;
-    } else if (method === METHOD.DELETE) {
-        response = await r.delete(url, data);
-        result = response.code === STATUS.OK ? response.data : null;
-    }
-
-    debugMessage(pluginConfigData.debug.isDebug, "响应结果", response);
-    return result;
-}
 
 /**
  * 转换过滤器
@@ -64,7 +25,7 @@ function changeFilter(filter: any) {
  * @constructor
  */
 export async function ListUsers() {
-    return await request(METHOD.GET, '/api/v1/users');
+    return await Request.send(METHOD.GET, '/api/v1/users');
 }
 
 
@@ -76,7 +37,7 @@ export async function ListUsers() {
  * @constructor
  */
 export async function GetAuthStatus() {
-    return await request(METHOD.POST, "/api/v1/auth/status");
+    return await Request.send(METHOD.POST, "/api/v1/auth/status");
 }
 
 
@@ -91,9 +52,27 @@ export async function GetAuthStatus() {
  * @constructor
  */
 export async function ListMemos(pageSize?: number, pageToken?: string, filter?: any): Promise<IResListMemos> {
-    return await request(METHOD.GET, '/api/v1/memos', {
+    return await Request.send(METHOD.GET, '/api/v1/memos', {
         pageSize: pageSize,
         pageToken: pageToken,
         filter: changeFilter(filter)
+    });
+}
+
+
+// **************************************** ResourceService ****************************************
+
+
+/**
+ * 按名称返回资源二进制文件
+ * @param name
+ * @param filename
+ * @constructor /file/resources/35
+ */
+export async function GetResourceBinary(name: string, filename: string) {
+    let url = `${pluginConfigData.base.host}/file/${name}/${filename}`;
+    return await fetch(url, {
+        method: METHOD.GET,
+        headers: Request.getHeaders()
     });
 }

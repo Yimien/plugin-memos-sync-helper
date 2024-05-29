@@ -1,8 +1,7 @@
 import {pluginConfigData} from "@/index";
 import {versionKey} from "@/constants/components/select";
-import {MemosService as ServiceV2} from "./v2/index"
+import {MemosApiService as V2} from "./v2/index"
 import {IResGetMemos} from "@/types/memos";
-import {debugMessage} from "@/utils";
 
 
 export class MemosServer {
@@ -11,14 +10,14 @@ export class MemosServer {
      * 检查授权码
      */
     static async checkAccessToken(): Promise<boolean> {
-        const version = pluginConfigData.base.version;
         let result: boolean = false;
 
+        const version = pluginConfigData.base.version;
+
         if (version === versionKey.v1) {
-            // TODO V1
+            // todo v1
         } else if (version === versionKey.v2) {
-            const memosService = new ServiceV2();
-            result = await memosService.checkAccessToken();
+            result = await V2.checkAccessToken();
         }
         return result;
     }
@@ -27,33 +26,31 @@ export class MemosServer {
      * 检查是否存在可同步的数据
      */
     static async checkNew(): Promise<boolean> {
-        const version = pluginConfigData.base.version;
         let result: boolean = false;
 
+        const version = pluginConfigData.base.version;
+
         if (version === versionKey.v1) {
-            // TODO V1
+            // todo v1
         } else if (version === versionKey.v2) {
-            const memosService = new ServiceV2();
-            result = await memosService.checkNew();
+            result = await V2.checkNew();
         }
         return result;
     }
 
+    /**
+     * 拉取 Memos 数据
+     */
     static async getMemos() {
-        debugMessage(pluginConfigData.debug.isDebug, "数据拉取", "", true);
-
-        const version = pluginConfigData.base.version;
         let result: IResGetMemos;
 
+        const version = pluginConfigData.base.version;
+
         if (version === versionKey.v1) {
-            // TODO V1
+            // todo v1
         } else if (version === versionKey.v2) {
-            const memosService = new ServiceV2();
-            result = await memosService.getMemos();
+            result = await V2.getMemos();
         }
-
-        debugMessage(pluginConfigData.debug.isDebug, "数据拉取完成", "", true);
-
         return result;
     }
 }

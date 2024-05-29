@@ -1,39 +1,14 @@
-export enum sync_status {
-    /**
-     * 等待同步
-     */
-    waiting,
-    /**
-     * 同步下载中
-     */
-    downloading,
-    /**
-     * 同步完成
-     */
-    completed
-}
+/**
+ * 插件名称
+ */
+export const PLUGIN_NAME: string = "Memos 同步助手";
 
-export enum contentsType {
-    /**
-     * 文本
-     */
-    text,
-    /**
-     * 嵌入内容
-     */
-    embedded,
-    /**
-     * 网址
-     */
-    href,
-    /**
-     * 标签
-     */
-    tag,
-    /**
-     * 双链
-     */
-    backlinks
-}
+/**
+ * 配置名称
+ */
+export const STORAGE_NAME: string = "plugin-memos-sync-helper";
 
+/**
+ * 资源路径
+ */
 export const MEMOS_ASSETS = "assets/memos";
