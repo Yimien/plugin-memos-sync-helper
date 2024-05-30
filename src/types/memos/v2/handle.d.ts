@@ -14,7 +14,7 @@ export interface IResHandleMemos {
     memos: IMemo
 }
 
-export interface IResRun {
+export interface IResDataHandleRunV2 {
     /**
      * 用于批量下载
      */

@@ -5,9 +5,10 @@ import {DataHandle} from "@/controllers/plugin/v2/data-handle";
 import {debugMessage} from "@/utils";
 import {pluginConfigData} from "@/index";
 import {IResource} from "@/types/memos/v2";
-import {IResRun} from "@/types/memos/v2/handle";
+import {IResDataHandleRunV2} from "@/types/memos/v2/handle";
 import {syncPlanKey} from "@/constants/components/select";
-import {SingleDoc} from "@/controllers/plugin/common/save/single-doc";
+import {SingleDoc} from "@/controllers/plugin/v2/data-save/single-doc";
+import {SameDoc} from "@/controllers/plugin/v2/data-save/same-doc";
 
 
 export class PluginSync {
@@ -23,13 +24,13 @@ export class PluginSync {
      * 将数据保存进思源
      * @param data
      */
-    static async saveToSiYuan(data: IResRun) {
+    static async saveToSiYuan(data: IResDataHandleRunV2) {
         if (pluginConfigData.base.syncPlan === syncPlanKey.singleDoc) {
             // 一条记录，一份文档
             await SingleDoc.runSync(data);
         } else if (pluginConfigData.base.syncPlan === syncPlanKey.sameDoc) {
             // 所有记录，一份文档
-
+            await SameDoc.runSync(data);
         } else {
             // Daily Notes
 
@@ -54,7 +55,7 @@ export class PluginSync {
         // 数据处理
         debugMessage(pluginConfigData.debug.isDebug, "2. 数据处理", "", true);
 
-        let handleResult: IResRun = await DataHandle.run(allMemos);
+        let handleResult: IResDataHandleRunV2 = await DataHandle.run(allMemos);
 
         debugMessage(pluginConfigData.debug.isDebug, "2. 数据处理完成", "", true);
 

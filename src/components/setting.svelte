@@ -27,17 +27,21 @@
     }
 
     let syncPlanText = '';
+    let dcPathIsRequired = false;
 
     $: {
         switch (config.base.syncPlan) {
             case SYNC_PLAN_OPTIONS[0].key:
                 syncPlanText = `请配置同步笔记本`;
+                dcPathIsRequired = false;
                 break;
             case SYNC_PLAN_OPTIONS[1].key:
                 syncPlanText = `请配置同步笔记本，如需保存至指定文档下需配置文档路径`;
+                dcPathIsRequired = false;
                 break;
             case SYNC_PLAN_OPTIONS[2].key:
                 syncPlanText = `请配置同步笔记本以及文档路径`;
+                dcPathIsRequired = true;
                 break;
             default:
                 syncPlanText = '';
@@ -160,6 +164,7 @@
             />
         </Item>
         <Item
+                isRequired={dcPathIsRequired}
                 block={true}
                 isTip={true}
                 text="配置目标文档的路径"

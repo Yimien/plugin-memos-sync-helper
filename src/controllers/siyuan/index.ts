@@ -1,12 +1,13 @@
-import {createDocWithMd, sql} from "./api";
+import {createDocWithMd, getIDsByHPath, sql} from "./api";
 import {pluginConfigData} from "@/index";
 import {isEmptyValue} from "@/utils";
+import {IResdoOperations} from "@/types/siyuan/api";
 
 
 export class SiYuanApiService {
     /**
      * 根据文档名称获取文档块
-     * @param name - 根据文档名称获取文档块
+     * @param name - 文档名称
      */
     static async getDocumentBlockByName(name: string): Promise<Block[]> {
         let sqlScript = `SELECT * FROM blocks WHERE content='${name}' && type='d'`;
@@ -14,7 +15,7 @@ export class SiYuanApiService {
     }
 
     /**
-     * 根据名称获取对应的文档ID，若不存在，自动创建
+     * 根据文档名称获取对应的文档ID，若不存在，自动创建
      * @param name - 文档名称
      */
     static async getDocumentIdByName(name: string): Promise<string> {
@@ -39,14 +40,47 @@ export class SiYuanApiService {
         return documentId
     }
 
-    static async getAttr(name: string, value: string) {
+    /**
+     * 根据人类可读路径获取文档ID
+     * @param notebookId
+     * @param path
+     */
+    static async getDocumentIdByHPath(notebookId: string, path: string): Promise<string> {
+        let responseData = await getIDsByHPath(notebookId, path);
+
+        if (!isEmptyValue(responseData) && responseData.length > 0) {
+            return responseData[0];
+        }
+
+        // 自动创建
+        return await createDocWithMd(notebookId, path, "");
+    }
+
+    /**
+     * 根据属性名和属性值获取属性信息
+     * @param name
+     * @param value
+     */
+    static async getAttributes(name: string, value: string) {
         let sqlScript = `SELECT * FROM attributes WHERE name='${name}' && value='${value}'`;
         return await sql(sqlScript);
     }
 
+    /**
+     * 根据属性名获取属性信息
+     * @param name
+     */
     static async getAttrByName(name: string) {
         let sqlScript = `SELECT * FROM attributes WHERE name='${name}'`;
         return await sql(sqlScript);
+    }
+
+    /**
+     * 解析响应参数，获取对应的 block Id
+     * @param response
+     */
+    static getBlockId(response : IResdoOperations[]) {
+        return response[0].doOperations[0].id;
     }
 }
 

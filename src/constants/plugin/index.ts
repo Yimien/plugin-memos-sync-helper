@@ -24,9 +24,3 @@ export enum contentsType {
      */
     resource
 }
-
-
-export const CUSTOM_ATTR = {
-    memoId: "custom-memo-id",
-    memoUid: "custom-memo-uid"
-}

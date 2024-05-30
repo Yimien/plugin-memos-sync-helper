@@ -7,7 +7,7 @@ import {Handle} from "@/controllers/plugin/common/handle";
 import {contentsType} from "@/constants/plugin";
 import {regexMemosContent} from "@/utils/regexp";
 import {toChinaTime} from "@/utils/misc/time";
-import {IContent, IResHandleMemos, IResRun} from "@/types/memos/v2/handle";
+import {IContent, IResHandleMemos, IResDataHandleRunV2} from "@/types/memos/v2/handle";
 import moment from "moment/moment";
 import {MEMOS_ASSETS} from "@/constants";
 
@@ -249,7 +249,7 @@ export class DataHandle {
 
         await dh.handleMemos(data.new);
 
-        let result: IResRun = {
+        let result: IResDataHandleRunV2 = {
             resources: dh.resources,
             relations: dh.relations,
             old: data.old,

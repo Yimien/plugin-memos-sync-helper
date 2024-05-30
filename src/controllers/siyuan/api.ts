@@ -198,6 +198,7 @@ export async function prependBlock(dataType: DataType, data: string, parentID: B
         data: data,
         parentID: parentID
     }
+    console.log(payload);
     let url = '/api/block/prependBlock';
     return request(url, payload);
 }
@@ -229,6 +230,9 @@ export async function deleteBlock(id: BlockId): Promise<IResdoOperations[]> {
     let data = {
         id: id
     }
+    console.log("删除参数");
+    console.log(data);
+
     let url = '/api/block/deleteBlock';
     return request(url, data);
 }
