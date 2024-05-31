@@ -1,6 +1,6 @@
 import {IConfig} from "@/types/config/default";
 
-import {syncPlanKey, versionKey} from "@/constants/components/select"
+import {memosSortKey, syncPlanKey, versionKey} from "@/constants/components/select"
 
 export const DEFAULT_CONFIG: IConfig = {
     base: {
@@ -9,7 +9,8 @@ export const DEFAULT_CONFIG: IConfig = {
         token: "",
         syncPlan: syncPlanKey.dailyNotes,
         notebook: "",
-        docPath: ""
+        docPath: "",
+        memosSort: memosSortKey.asc
     },
     advanced: {
         isHandleHref: false,

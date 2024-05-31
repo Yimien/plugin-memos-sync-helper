@@ -1,10 +1,8 @@
 import {IResListMemos} from "@/types/memos/v2";
-
-import {pluginConfigData} from "@/index";
-import {METHOD} from "@/constants/utils/request";
-
-import {isEmptyValue} from "@/utils";
 import {Request} from "@/utils/request";
+import {METHOD} from "@/constants/utils/request";
+import {isEmptyValue} from "@/utils";
+
 
 
 /**
@@ -70,9 +68,5 @@ export async function ListMemos(pageSize?: number, pageToken?: string, filter?: 
  * @constructor /file/resources/35
  */
 export async function GetResourceBinary(name: string, filename: string) {
-    let url = `${pluginConfigData.base.host}/file/${name}/${filename}`;
-    return await fetch(url, {
-        method: METHOD.GET,
-        headers: Request.getHeaders()
-    });
+    return await Request.send(METHOD.GET, `/file/${name}/${filename}`);
 }

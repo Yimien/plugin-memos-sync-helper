@@ -6,7 +6,7 @@ export interface IContent {
     content: string
 }
 
-export interface IResHandleMemos {
+export interface IResHandleMemo {
     id: string,
     uid: string,
     title: string,
@@ -14,7 +14,7 @@ export interface IResHandleMemos {
     memos: IMemo
 }
 
-export interface IResDataHandleRunV2 {
+export interface IResDataHandleRun {
     /**
      * 用于批量下载
      */
@@ -30,5 +30,5 @@ export interface IResDataHandleRunV2 {
     /**
      * 用于批量写入
      */
-    new: IResHandleMemos[]
+    new: IResHandleMemo[]
 }

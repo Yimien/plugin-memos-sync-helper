@@ -1,14 +1,31 @@
 import {DataSave} from "@/controllers/plugin/v2/data-save/index";
-import {IResDataHandleRunV2, IResHandleMemos} from "@/types/memos/v2/handle";
+import {IResDataHandleRun, IResHandleMemo} from "@/types/memos/v2/handle";
 import {pluginConfigData} from "@/index";
-import {getChildBlocks, prependBlock,} from "@/controllers/siyuan/api";
+import {appendBlock, getChildBlocks, prependBlock,} from "@/controllers/siyuan/api";
 import {debugMessage, isEmptyValue} from "@/utils";
 import {SiYuanApiService} from "@/controllers/siyuan";
+import {deleteMode} from "@/constants/plugin";
+import {DataHandle} from "@/controllers/plugin/v2/data-handle";
+import {IResdoOperations} from "@/types/siyuan/api";
+import {memosSortKey} from "@/constants/components/select";
 
 
 export class SameDoc extends DataSave{
 
-    async save(newMemo: IResHandleMemos): Promise<void> {
+    constructor(data: IResDataHandleRun) {
+        super(data);
+        this.nowDeleteMode = deleteMode.blockId;
+    }
+
+    protected async batchSave(): Promise<void> {
+        DataHandle.sortMemos(this.data.new, true);
+
+        for (let newMemo of this.data.new) {
+            await this.save(newMemo);
+        }
+    }
+
+    async save(newMemo: IResHandleMemo): Promise<void> {
         debugMessage(pluginConfigData.debug.isDebug, "正在写入", newMemo);
 
         let notebookId = pluginConfigData.base.notebook;
@@ -22,7 +39,17 @@ export class SameDoc extends DataSave{
         }
 
         let title = `- ${newMemo.title}`;
-        let response = await prependBlock("markdown", title, pageId);
+        let response: IResdoOperations[];
+
+        if (pluginConfigData.base.memosSort === memosSortKey.asc) {
+            response = await appendBlock("markdown", title, pageId);
+        } else if (pluginConfigData.base.memosSort === memosSortKey.desc) {
+            response = await prependBlock("markdown", title, pageId);
+        } else {
+            debugMessage(pluginConfigData.debug.isDebug, `排序错误`);
+            return ;
+        }
+
         if (isEmptyValue(response) || response.length === 0) {
             debugMessage(pluginConfigData.debug.isDebug, `获取列表块失败`);
             return ;
@@ -40,22 +67,14 @@ export class SameDoc extends DataSave{
         let contents = newMemo.contents;
         await super.saveContents(titleBlockId, contents);
 
-        debugMessage(pluginConfigData.debug.isDebug, `正在更新字典...`);
-
         await super.updateDict(titleBlockId, newMemo);
 
-        debugMessage(pluginConfigData.debug.isDebug, `更新完成！`);
-
-        debugMessage(pluginConfigData.debug.isDebug, `正在设置块属性...`);
-
         await super.setCustomAttrs(titleBlockId, newMemo);
-
-        debugMessage(pluginConfigData.debug.isDebug, `设置完成！`);
 
         debugMessage(pluginConfigData.debug.isDebug, `Memos/${newMemo.id} 写入完成`);
     }
 
-    static async runSync(data: IResDataHandleRunV2) {
+    static async runSync(data: IResDataHandleRun) {
         let sd = new SameDoc(data);
         await sd.main();
     }

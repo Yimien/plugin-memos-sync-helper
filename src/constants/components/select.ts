@@ -36,3 +36,25 @@ export const SYNC_PLAN_OPTIONS: IOptions = [
         text: "同步至同一份文档"
     }
 ]
+
+export enum memosSortKey{
+    /**
+     * 降序
+     */
+    desc,
+    /**
+     * 升序
+     */
+    asc
+}
+
+export const  MEMOS_SORT_OPTIONS: IOptions = [
+    {
+        key: memosSortKey.desc,
+        text: "降序"
+    },
+    {
+        key: memosSortKey.asc,
+        text: "升序"
+    }
+]

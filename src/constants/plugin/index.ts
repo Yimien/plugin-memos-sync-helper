@@ -24,3 +24,8 @@ export enum contentsType {
      */
     resource
 }
+
+export enum deleteMode {
+    blockId,
+    path
+}

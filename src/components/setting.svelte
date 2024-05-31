@@ -6,7 +6,7 @@
 
     import {panelKey, PANELS} from "@/constants/components/panels";
     import {itemType} from "@/constants/components/input";
-    import {SYNC_PLAN_OPTIONS, VERSION_OPTIONS} from "@/constants/components/select";
+    import {MEMOS_SORT_OPTIONS, SYNC_PLAN_OPTIONS, VERSION_OPTIONS} from "@/constants/components/select";
 
     import {IOptions} from "@/types/components/item.d";
     import {IConfig} from "@/types/config/default.d";
@@ -183,6 +183,24 @@
                     settingValue={config.base.docPath}
                     slot="input"
                     type={itemType.text}
+            />
+        </Item>
+
+        <Item
+                title="排序"
+                text="根据更新日期排序"
+        >
+            <Input
+                    slot="input"
+                    type={itemType.select}
+                    settingKey="MemosSort"
+                    settingValue={config.base.memosSort}
+                    options={MEMOS_SORT_OPTIONS}
+                    on:changed={e => {
+                        config.base.memosSort = e.detail.value;
+                        updated();
+                    }
+                }
             />
         </Item>
     </Panel>

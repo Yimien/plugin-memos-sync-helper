@@ -22,7 +22,11 @@ export interface IBase {
     /**
      * 文档路径
      */
-    docPath: string
+    docPath: string,
+    /**
+     * 排序
+     */
+    memosSort: string | number
 }
 
 export interface IAdvanced {

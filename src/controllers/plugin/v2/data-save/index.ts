@@ -1,21 +1,18 @@
 import {DataSaveBase} from "@/controllers/plugin/common/save";
-import {IResHandleMemos, IResDataHandleRunV2, IContent} from "@/types/memos/v2/handle";
-import {appendBlock, deleteBlock, setBlockAttrs, updateBlock} from "@/controllers/siyuan/api";
+import {IResHandleMemo, IResDataHandleRun, IContent} from "@/types/memos/v2/handle";
+import {appendBlock, setBlockAttrs, updateBlock} from "@/controllers/siyuan/api";
 import {SiYuanApiService} from "@/controllers/siyuan";
-import {contentsType} from "@/constants/plugin";
-import {PluginServer} from "@/controllers/plugin";
+import {contentsType, deleteMode} from "@/constants/plugin";
 import {debugMessage, isEmptyValue} from "@/utils";
 import {pluginConfigData} from "@/index";
 import {IResdoOperations} from "@/types/siyuan/api";
 
 
 export abstract class DataSave extends DataSaveBase {
-    protected data : IResDataHandleRunV2;
+    protected data : IResDataHandleRun;
     protected memoUidLinkBlockId: {[memosId: string]: string};
 
-    abstract save(newMemo: IResHandleMemos): Promise<void>;
-
-    constructor(data: IResDataHandleRunV2) {
+    protected constructor(data: IResDataHandleRun) {
         super();
         this.data = data;
         this.memoUidLinkBlockId = {};
@@ -37,7 +34,22 @@ export abstract class DataSave extends DataSaveBase {
         debugMessage(pluginConfigData.debug.isDebug, "MemoUid: BlockId", this.memoUidLinkBlockId);
     }
 
+
     protected async updateDeleteList() {
+        if (this.nowDeleteMode === deleteMode.blockId) {
+             this.updateDeleteListById();
+        } else if (this.nowDeleteMode === deleteMode.path) {
+             await this.updateDeleteListByPath();
+        }
+        debugMessage(pluginConfigData.debug.isDebug, "删除列表", this.deleteList);
+    }
+
+
+    /**
+     * 根据 ID 更新删除列表
+     * @protected
+     */
+    protected updateDeleteListById() {
         for (let memo of this.data.old) {
             let memoId = this.getMemoId(memo.name);
             let blockId = this.memoIdLinkBlockId[memoId];
@@ -48,16 +60,25 @@ export abstract class DataSave extends DataSaveBase {
                 this.deleteList.push(blockId);
             }
         }
-        debugMessage(pluginConfigData.debug.isDebug, "删除列表", this.deleteList);
     }
 
 
     /**
-     * 排序
+     * 根据路径更新删除列表
      * @protected
      */
-    protected async sortNewMemos() : Promise<void> {
-        PluginServer.sortMemos(this.data.new);
+    protected async updateDeleteListByPath() {
+        for (let memo of this.data.old) {
+            let memoId = this.getMemoId(memo.name);
+            let response = await SiYuanApiService.getAttributes("custom-memo-id", memoId);
+            if (isEmptyValue(response) || response.length === 0) {
+                debugMessage(pluginConfigData.debug.isDebug, "未找到对应删除数据", memoId);
+            } else {
+                debugMessage(pluginConfigData.debug.isDebug, "已找到对应删除数据", memoId);
+                let path = response[0].path;
+                this.deleteList.push(path);
+            }
+        }
     }
 
 
@@ -73,13 +94,6 @@ export abstract class DataSave extends DataSaveBase {
         await this.handleEmbeddedContents();
 
         debugMessage(pluginConfigData.debug.isDebug, "嵌入内容处理完成！");
-    }
-
-
-    protected async batchSave() : Promise<void> {
-        for (let newMemo of this.data.new) {
-            await this.save(newMemo);
-        }
     }
 
 
@@ -106,12 +120,16 @@ export abstract class DataSave extends DataSaveBase {
      * @param newMemo
      * @protected
      */
-    protected async setCustomAttrs(blockId: string, newMemo: IResHandleMemos) {
+    protected async setCustomAttrs(blockId: string, newMemo: IResHandleMemo) {
+        debugMessage(pluginConfigData.debug.isDebug, `正在设置块属性...`);
+
         let attrs = {
             "custom-memo-id": newMemo.id,
             "custom-memo-uid": newMemo.uid
         }
         await setBlockAttrs(blockId, attrs);
+
+        debugMessage(pluginConfigData.debug.isDebug, `设置完成！`);
     }
 
 
@@ -121,9 +139,13 @@ export abstract class DataSave extends DataSaveBase {
      * @param newMemo
      * @protected
      */
-    protected async updateDict(blockId: string, newMemo: IResHandleMemos) {
+    protected async updateDict(blockId: string, newMemo: IResHandleMemo) {
+        debugMessage(pluginConfigData.debug.isDebug, `正在更新字典...`);
+
         this.memoIdLinkBlockId[newMemo.id] = blockId;
         this.memoUidLinkBlockId[newMemo.uid] = blockId;
+
+        debugMessage(pluginConfigData.debug.isDebug, `更新完成！`);
     }
 
 
@@ -163,21 +185,6 @@ export abstract class DataSave extends DataSaveBase {
         let content = `{{select * from blocks where id="${relatedBlockId}"}}`;
         await updateBlock("markdown", content, blockId);
     }
-
-
-    // **************************************** 数据清理 ****************************************
-
-
-    /**
-     * 删除旧数据
-     */
-    async deleteOldMemos(): Promise<void> {
-        for (let blockId of this.deleteList) {
-            let r = await deleteBlock(blockId);
-            debugMessage(pluginConfigData.debug.isDebug, "删除结果", r);
-        }
-    }
-
 
     // **************************************** 其它 ****************************************
 

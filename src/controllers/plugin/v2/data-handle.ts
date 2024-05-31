@@ -7,7 +7,7 @@ import {Handle} from "@/controllers/plugin/common/handle";
 import {contentsType} from "@/constants/plugin";
 import {regexMemosContent} from "@/utils/regexp";
 import {toChinaTime} from "@/utils/misc/time";
-import {IContent, IResHandleMemos, IResDataHandleRunV2} from "@/types/memos/v2/handle";
+import {IContent, IResHandleMemo, IResDataHandleRun} from "@/types/memos/v2/handle";
 import moment from "moment/moment";
 import {MEMOS_ASSETS} from "@/constants";
 
@@ -17,7 +17,7 @@ import {MEMOS_ASSETS} from "@/constants";
 export class DataHandle {
     relations: IRelation[];
     resources: IResource[];
-    newMemos: IResHandleMemos[];
+    newMemos: IResHandleMemo[];
 
     constructor() {
         this.resources = [];
@@ -58,7 +58,7 @@ export class DataHandle {
             }
         }
 
-        let result: IResHandleMemos = {
+        let result: IResHandleMemo = {
             id: memoId,
             uid: memo.uid,
             title: title,
@@ -234,7 +234,7 @@ export class DataHandle {
      * @param memosList
      * @param asc - 默认升序
      */
-    static sortMemos(memosList: IResHandleMemos[], asc: boolean) {
+    static sortMemos(memosList: IResHandleMemo[], asc: boolean) {
         memosList.sort((a, b) => {
             const timeA = new Date(a.memos.updateTime).getTime();
             const timeB = new Date(b.memos.updateTime).getTime();
@@ -249,7 +249,7 @@ export class DataHandle {
 
         await dh.handleMemos(data.new);
 
-        let result: IResDataHandleRunV2 = {
+        let result: IResDataHandleRun = {
             resources: dh.resources,
             relations: dh.relations,
             old: data.old,

@@ -1,7 +1,8 @@
 import {SiYuanApiService} from "@/controllers/siyuan";
-import {appendBlock} from "@/controllers/siyuan/api";
+import {appendBlock, deleteBlock, removeDoc} from "@/controllers/siyuan/api";
 import {pluginConfigData} from "@/index";
 import {debugMessage, isEmptyValue} from "@/utils";
+import {deleteMode} from "@/constants/plugin";
 
 
 export abstract class DataSaveBase {
@@ -23,14 +24,15 @@ export abstract class DataSaveBase {
     protected memoIdLinkBlockId: {[memosId: string]: string};
 
     /**
+     * 清理模式
+     * @protected
+     */
+    protected nowDeleteMode: string | number;
+
+    /**
      * 更新删除列表
      */
     protected abstract updateDeleteList(): Promise<void>;
-
-    /**
-     * 排序新数据
-     */
-    protected abstract sortNewMemos(): Promise<void>;
 
     /**
      * 批量保存
@@ -41,11 +43,6 @@ export abstract class DataSaveBase {
      * 批量处理引用
      */
     protected abstract handleRelations(): Promise<void>;
-
-    /**
-     * 删除旧数据
-     */
-    protected abstract deleteOldMemos(): Promise<void>;
 
 
     protected constructor() {
@@ -83,13 +80,6 @@ export abstract class DataSaveBase {
         await this.updateDeleteList();
 
         debugMessage(pluginConfigData.debug.isDebug, "更新完成！");
-
-        // 排序
-        debugMessage(pluginConfigData.debug.isDebug, "正在排序新数据...");
-
-        await this.sortNewMemos();
-
-        debugMessage(pluginConfigData.debug.isDebug, "排序完成！");
     }
 
 
@@ -167,9 +157,31 @@ export abstract class DataSaveBase {
         // 清理旧数据
         debugMessage(pluginConfigData.debug.isDebug, "正在清理旧数据...");
 
-        await this.deleteOldMemos();
+        if (this.nowDeleteMode === deleteMode.blockId) {
+            await this.batchDeleteById();
+        } else if (this.nowDeleteMode === deleteMode.path) {
+            await this.batchDeleteByPath();
+        }
 
         debugMessage(pluginConfigData.debug.isDebug, "清理完成！");
+    }
+
+    /**
+     * 根据 BlockId 删除旧数据
+     */
+    async batchDeleteById() : Promise<void> {
+        for (let blockId of this.deleteList) {
+            await deleteBlock(blockId);
+        }
+    }
+
+    /**
+     * 根据路径删除旧数据
+     */
+    async batchDeleteByPath() : Promise<void> {
+        for (let path of this.deleteList) {
+            await removeDoc(pluginConfigData.base.notebook, path);
+        }
     }
 }
 
