@@ -1,34 +1,22 @@
 import {IMemo, IRelation, IResource} from "@/types/memos/v2/index";
+import {INewMemoBase, IResHandleDataBase, IContent} from "@/types/memos";
 
 
-export interface IContent {
-    type: string | number,
-    content: string
-}
-
-export interface IResHandleMemo {
+export interface INewMemoV2 extends INewMemoBase {
     id: string,
     uid: string,
     title: string,
-    contents: IContent[],
-    memos: IMemo
+    updateTime: string,
+    contents: IContent[], // 加上逗号
+    memo: IMemo
 }
 
-export interface IResDataHandleRun {
-    /**
-     * 用于批量下载
-     */
+export type INewMemosV2 = INewMemoV2[];
+
+
+export interface IResHandleDataV2 extends IResHandleDataBase {
     resources: IResource[],
-    /**
-     * 用于批量关联
-     */
     relations: IRelation[],
-    /**
-     * 用于批量删除
-     */
-    old: IMemo[],
-    /**
-     * 用于批量写入
-     */
-    new: IResHandleMemo[]
+    oldMemos: IMemo[],
+    newMemos: INewMemosV2
 }

@@ -1,7 +1,8 @@
-import {createDocWithMd, getIDsByHPath, sql} from "./api";
+import {appendBlock, createDocWithMd, getIDsByHPath, getNotebookConf, prependBlock, renderSprig, sql} from "./api";
 import {pluginConfigData} from "@/index";
 import {isEmptyValue} from "@/utils";
 import {IResdoOperations} from "@/types/siyuan/api";
+import {formatDate} from "@/utils/misc/time";
 
 
 export class SiYuanApiService {
@@ -81,6 +82,36 @@ export class SiYuanApiService {
      */
     static getBlockId(response : IResdoOperations[]) {
         return response[0].doOperations[0].id;
+    }
+
+    static async getDailyNotePath(notebookId: string, datetime: string) {
+        // 读取笔记本配置
+        let responseData = await getNotebookConf(notebookId);
+
+        if (isEmptyValue(responseData)) {
+            return;
+        }
+
+        let dailyNoteSavePath: string = responseData.conf.dailyNoteSavePath;
+
+        let dateString = formatDate(datetime);
+        let sprig = `toDate "2006-01-02" "${dateString}"`;
+        dailyNoteSavePath = dailyNoteSavePath.replace(/now/g, sprig);
+
+        return await renderSprig(dailyNoteSavePath);
+    }
+
+
+    static async appendDailyNoteBlockByDatetime(notebookId: string, data: string, datetime: string): Promise<IResdoOperations[]> {
+        let hpath = await SiYuanApiService.getDailyNotePath(notebookId, datetime);
+        let pageId = await SiYuanApiService.getDocumentIdByHPath(notebookId, hpath);
+        return await appendBlock("markdown", data, pageId);
+    }
+
+    static async prependDailyNoteBlockByDatetime(notebookId: string, data: string, datetime: string): Promise<IResdoOperations[]> {
+        let hpath = await SiYuanApiService.getDailyNotePath(notebookId, datetime);
+        let pageId = await SiYuanApiService.getDocumentIdByHPath(notebookId, hpath);
+        return await prependBlock("markdown", data, pageId);
     }
 }
 

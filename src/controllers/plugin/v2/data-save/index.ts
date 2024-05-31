@@ -1,21 +1,44 @@
 import {DataSaveBase} from "@/controllers/plugin/common/save";
-import {IResHandleMemo, IResDataHandleRun, IContent} from "@/types/memos/v2/handle";
-import {appendBlock, setBlockAttrs, updateBlock} from "@/controllers/siyuan/api";
+import {INewMemoV2, IResHandleDataV2} from "@/types/memos/v2/handle";
+import {
+    appendBlock,
+    getChildBlocks,
+    setBlockAttrs,
+    updateBlock
+} from "@/controllers/siyuan/api";
 import {SiYuanApiService} from "@/controllers/siyuan";
-import {contentsType, deleteMode} from "@/constants/plugin";
+import {contentsType} from "@/constants/plugin";
 import {debugMessage, isEmptyValue} from "@/utils";
 import {pluginConfigData} from "@/index";
-import {IResdoOperations} from "@/types/siyuan/api";
+import {IResdoOperations, IResGetChildBlock} from "@/types/siyuan/api";
+import {IContent} from "@/types/memos";
 
 
 export abstract class DataSave extends DataSaveBase {
-    protected data : IResDataHandleRun;
+
+    /**
+     * 自定义属性名称
+     * @protected
+     */
+    protected CUSTOM_MEMO_UID = "custom-memo-uid";
+
+    /**
+     * MemoUid : BlockId
+     * @protected
+     */
     protected memoUidLinkBlockId: {[memosId: string]: string};
 
-    protected constructor(data: IResDataHandleRun) {
-        super();
-        this.data = data;
+    /**
+     * BlockId : 嵌入内容（uid）
+     * @protected
+     */
+    protected blockIdLinkEmbeddedContent: {};
+
+
+    protected constructor(data: IResHandleDataV2) {
+        super(data);
         this.memoUidLinkBlockId = {};
+        this.blockIdLinkEmbeddedContent = {};
     }
 
 
@@ -29,28 +52,17 @@ export abstract class DataSave extends DataSaveBase {
     protected async initDict() : Promise<void> {
         await super.initDict();
 
-        let response = await SiYuanApiService.getAttrByName("custom-memo-uid");
-        this.generateDict(response, this.memoUidLinkBlockId);
+        await this.initDictByAttrName(this.CUSTOM_MEMO_UID, this.memoUidLinkBlockId);
         debugMessage(pluginConfigData.debug.isDebug, "MemoUid: BlockId", this.memoUidLinkBlockId);
     }
 
 
-    protected async updateDeleteList() {
-        if (this.nowDeleteMode === deleteMode.blockId) {
-             this.updateDeleteListById();
-        } else if (this.nowDeleteMode === deleteMode.path) {
-             await this.updateDeleteListByPath();
-        }
-        debugMessage(pluginConfigData.debug.isDebug, "删除列表", this.deleteList);
-    }
-
-
     /**
-     * 根据 ID 更新删除列表
+     * 更新删除列表 - ID
      * @protected
      */
-    protected updateDeleteListById() {
-        for (let memo of this.data.old) {
+    protected async updateDeleteListById() {
+        for (let memo of this.data.oldMemos) {
             let memoId = this.getMemoId(memo.name);
             let blockId = this.memoIdLinkBlockId[memoId];
             if (isEmptyValue(blockId)) {
@@ -64,13 +76,13 @@ export abstract class DataSave extends DataSaveBase {
 
 
     /**
-     * 根据路径更新删除列表
+     * 更新删除列表 - 路径
      * @protected
      */
     protected async updateDeleteListByPath() {
-        for (let memo of this.data.old) {
+        for (let memo of this.data.oldMemos) {
             let memoId = this.getMemoId(memo.name);
-            let response = await SiYuanApiService.getAttributes("custom-memo-id", memoId);
+            let response = await SiYuanApiService.getAttributes(this.CUSTOM_MEMO_ID, memoId);
             if (isEmptyValue(response) || response.length === 0) {
                 debugMessage(pluginConfigData.debug.isDebug, "未找到对应删除数据", memoId);
             } else {
@@ -96,6 +108,34 @@ export abstract class DataSave extends DataSaveBase {
         debugMessage(pluginConfigData.debug.isDebug, "嵌入内容处理完成！");
     }
 
+    /**
+     * 保存为文档
+     * @param newMemo
+     * @protected
+     */
+    protected async saveSingleDocument(newMemo: INewMemoV2) {
+        let pageId = await this.getPageId(newMemo);
+
+        if (isEmptyValue(pageId)) {
+            debugMessage(pluginConfigData.debug.isDebug, `获取页面失败！`);
+            return;
+        }
+
+        let contents = newMemo.contents;
+
+        if (contents[0].type === contentsType.embedded) {
+            let response: IResGetChildBlock[] = await getChildBlocks(pageId);
+            if (!isEmptyValue(response) && response.length > 0) {
+                let blockId = response[0].id;
+                this.blockIdLinkEmbeddedContent[blockId] = contents[0].content;
+            }
+        }
+
+        let newContents = contents.slice(1);
+        await this.saveContents(pageId, newContents);
+
+        await this.saveAfter(pageId, newMemo);
+    }
 
     /**
      * 批量写入内容
@@ -120,13 +160,12 @@ export abstract class DataSave extends DataSaveBase {
      * @param newMemo
      * @protected
      */
-    protected async setCustomAttrs(blockId: string, newMemo: IResHandleMemo) {
+    protected async setCustomAttrs(blockId: string, newMemo: INewMemoV2) {
         debugMessage(pluginConfigData.debug.isDebug, `正在设置块属性...`);
 
-        let attrs = {
-            "custom-memo-id": newMemo.id,
-            "custom-memo-uid": newMemo.uid
-        }
+        let attrs = {};
+        attrs[this.CUSTOM_MEMO_ID] = newMemo.id;
+        attrs[this.CUSTOM_MEMO_UID] = newMemo.uid;
         await setBlockAttrs(blockId, attrs);
 
         debugMessage(pluginConfigData.debug.isDebug, `设置完成！`);
@@ -139,7 +178,7 @@ export abstract class DataSave extends DataSaveBase {
      * @param newMemo
      * @protected
      */
-    protected async updateDict(blockId: string, newMemo: IResHandleMemo) {
+    protected async updateDict(blockId: string, newMemo: INewMemoV2) {
         debugMessage(pluginConfigData.debug.isDebug, `正在更新字典...`);
 
         this.memoIdLinkBlockId[newMemo.id] = blockId;
@@ -149,6 +188,10 @@ export abstract class DataSave extends DataSaveBase {
     }
 
 
+    /**
+     * 批量处理引用
+     * @protected
+     */
     protected async handleRelations() : Promise<void> {
         for (let relation of this.data.relations) {
             let memoId = this.getMemoId(relation.memo);

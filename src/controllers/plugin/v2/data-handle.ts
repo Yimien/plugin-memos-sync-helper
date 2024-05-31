@@ -1,5 +1,5 @@
 import {debugMessage, isEmptyValue} from "@/utils";
-import {IResGetMemos} from "@/types/memos";
+import {IContent, IResGetMemos} from "@/types/memos";
 import {pluginConfigData} from "@/index";
 import {IMemo, IMemos, IRelation, IResource} from "@/types/memos/v2";
 import {stringSplit} from "@/utils/misc/string";
@@ -7,7 +7,7 @@ import {Handle} from "@/controllers/plugin/common/handle";
 import {contentsType} from "@/constants/plugin";
 import {regexMemosContent} from "@/utils/regexp";
 import {toChinaTime} from "@/utils/misc/time";
-import {IContent, IResHandleMemo, IResDataHandleRun} from "@/types/memos/v2/handle";
+import {INewMemoV2, IResHandleDataV2} from "@/types/memos/v2/handle";
 import moment from "moment/moment";
 import {MEMOS_ASSETS} from "@/constants";
 
@@ -17,7 +17,7 @@ import {MEMOS_ASSETS} from "@/constants";
 export class DataHandle {
     relations: IRelation[];
     resources: IResource[];
-    newMemos: IResHandleMemo[];
+    newMemos: INewMemoV2[];
 
     constructor() {
         this.resources = [];
@@ -43,11 +43,11 @@ export class DataHandle {
     private async handelMemo(memo: IMemo) {
         debugMessage(pluginConfigData.debug.isDebug, "开始处理 Memos");
 
-        let memoId = this.getMemoId(memo);
-        let title = this.getTitle(memo);
-        let contents = await this.getContents(memo);
+        let memoId: string = this.getMemoId(memo);
+        let updateTime: string = toChinaTime(memo.updateTime);
+        let title: string = this.getTitle(memo);
+        let contents: IContent[] = await this.getContents(memo);
         this.getResources(contents, memo.resources);
-        // this.relations = [...new Set([...this.relations, ...memo.relations])];
         this.resources = this.resources.concat(memo.resources);
         for (let relation of memo.relations) {
             const exists = this.relations.some(r =>
@@ -58,12 +58,13 @@ export class DataHandle {
             }
         }
 
-        let result: IResHandleMemo = {
+        let result: INewMemoV2 = {
             id: memoId,
             uid: memo.uid,
             title: title,
+            updateTime: updateTime,
             contents: contents,
-            memos: memo
+            memo: memo
         };
 
         debugMessage(pluginConfigData.debug.isDebug, "处理结果", result);
@@ -234,10 +235,10 @@ export class DataHandle {
      * @param memosList
      * @param asc - 默认升序
      */
-    static sortMemos(memosList: IResHandleMemo[], asc: boolean) {
+    static sortMemos(memosList: INewMemoV2[], asc: boolean) {
         memosList.sort((a, b) => {
-            const timeA = new Date(a.memos.updateTime).getTime();
-            const timeB = new Date(b.memos.updateTime).getTime();
+            const timeA = new Date(a.memo.updateTime).getTime();
+            const timeB = new Date(b.memo.updateTime).getTime();
             return asc ? timeA - timeB : timeB - timeA;
         });
     }
@@ -249,11 +250,11 @@ export class DataHandle {
 
         await dh.handleMemos(data.new);
 
-        let result: IResDataHandleRun = {
+        let result: IResHandleDataV2 = {
             resources: dh.resources,
             relations: dh.relations,
-            old: data.old,
-            new: dh.newMemos
+            oldMemos: data.old,
+            newMemos: dh.newMemos
         }
 
         debugMessage(pluginConfigData.debug.isDebug, "数据处理结果", result);

@@ -9,8 +9,12 @@ export function toChinaTime(timeString: string) {
     return moment(timeString).utcOffset('+08:00').format('YYYY-MM-DD HH:mm:ss');
 }
 
-export function formatTime(timeString: string) {
+export function formatDateTime(timeString: string) {
     return moment(timeString).format('YYYY-MM-DD HH:mm:ss');
+}
+
+export function formatDate(timeString: string) {
+    return moment(timeString).format('YYYY-MM-DD');
 }
 
 /**
