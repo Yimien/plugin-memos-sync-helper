@@ -85,7 +85,7 @@ export class DataHandle {
      * @param memos
      */
     private getTitle(memos: IMemo) {
-        return `${toChinaTime(memos.updateTime)}・${this.getMemoId(memos)}`
+        return `${toChinaTime(memos.updateTime)}・#${this.getMemoId(memos)}`
     }
 
     /**
