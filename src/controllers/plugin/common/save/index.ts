@@ -188,13 +188,16 @@ export abstract class DataSaveBase {
         let notebookId = pluginConfigData.base.notebook;
         let path = pluginConfigData.base.docPath;
         let response: IResdoOperations[];
-        let title = newMemo.title;
+        let title = `- ${newMemo.title}`;
 
+        // 获取页面ID
         let pageId = await SiYuanApiService.getDocumentIdByHPath(notebookId, path);
         if (isEmptyValue(pageId)) {
+            debugMessage(pluginConfigData.debug.isDebug, "文档ID获取失败", pageId);
             return ;
         }
 
+        // 添加标题
         if (pluginConfigData.base.memosSort === memosSortKey.asc) {
             response = await appendBlock("markdown", title, pageId);
         } else if (pluginConfigData.base.memosSort === memosSortKey.desc) {
@@ -208,7 +211,7 @@ export abstract class DataSaveBase {
 
     protected async saveDailyNotes(newMemo: any) {
         let notebookId = pluginConfigData.base.notebook;
-        let title = newMemo.title;
+        let title = `- ${newMemo.title}`;
         let datetime = newMemo.updateTime;
         let response: IResdoOperations[];
         if (pluginConfigData.base.memosSort === memosSortKey.asc) {
@@ -223,6 +226,7 @@ export abstract class DataSaveBase {
 
     protected async saveBlocks(response: IResdoOperations[], newMemo: any) {
         if (isEmptyValue(response) || response.length === 0) {
+            debugMessage(pluginConfigData.debug.isDebug, "列表块ID获取失败", response)
             return ;
         }
 
@@ -231,6 +235,7 @@ export abstract class DataSaveBase {
         let childBlocks = await getChildBlocks(ListBlockId);
 
         if (isEmptyValue(childBlocks) || childBlocks.length === 0) {
+            debugMessage(pluginConfigData.debug.isDebug, "标题块ID获取失败", childBlocks)
             return ;
         }
 

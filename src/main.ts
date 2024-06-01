@@ -21,6 +21,7 @@ class PlugConfig {
             pluginConfigData.base.token,
             pluginConfigData.base.syncPlan,
             pluginConfigData.base.notebook,
+            pluginConfigData.base.memosSort,
 
             pluginConfigData.advanced.isHandleBacklinks,
             pluginConfigData.advanced.isSuperLabel,
@@ -56,8 +57,8 @@ class PlugConfig {
         }
 
         // 判断某种条件的必填项是否存在
-        for (const flag in itemsConditions) {
-            if (flag && (isEmptyValue(items[flag]))) {
+        for (const itemsCondition of itemsConditions) {
+            if (itemsCondition.flag && isEmptyValue(itemsCondition.value)) {
                 return false;
             }
         }

@@ -26,26 +26,41 @@
         plugin.updateConfig(config);
     }
 
-    let syncPlanText = '';
-    let dcPathIsRequired = false;
+    let syncPlanText = ''; // 同步方案的说明文字
+    let docPathIsShow = true;
+    let docPathIsRequired = false; // 文档路径是否必须
+    let docPathText = ""; // 文档路径的说明文字
+
+    let subjectPathIsShow = true; // 主题路径是否显示
+    let videoFormatsIsShow = true; // 需要优化的视频格式
+    let labelNameIsShow = true; // 上级标签名称
 
     $: {
         switch (config.base.syncPlan) {
             case SYNC_PLAN_OPTIONS[0].key:
                 syncPlanText = `请配置同步笔记本`;
-                dcPathIsRequired = false;
+                docPathIsShow = false;
+                docPathIsRequired = false;
                 break;
             case SYNC_PLAN_OPTIONS[1].key:
                 syncPlanText = `请配置同步笔记本，如需保存至指定文档下需配置文档路径`;
-                dcPathIsRequired = false;
+                docPathIsShow = true;
+                docPathIsRequired = false;
+                docPathText = "将同步数据保存在指定路径的文档下级"
                 break;
             case SYNC_PLAN_OPTIONS[2].key:
                 syncPlanText = `请配置同步笔记本以及文档路径`;
-                dcPathIsRequired = true;
+                docPathIsShow = true;
+                docPathIsRequired = true;
+                docPathText = "将同步数据保存在指定路径的文档中"
                 break;
             default:
                 syncPlanText = '';
         }
+
+        subjectPathIsShow = config.advanced.isHandleBacklinks;
+        videoFormatsIsShow = config.advanced.isHandleVideo;
+        labelNameIsShow = config.advanced.isSuperLabel;
     }
 
 
@@ -58,137 +73,136 @@
 >
     <Panel display={PANELS[0].key === focusPanel}>
         <Item
-                text="校验授权码是否失效"
-                title="授权码校验"
+                title="校验"
+                text="校验 Access Token 是否失效"
         >
             <Input
-                    on:clicked={ checkAccessToken }
-                    settingKey="Check"
-                    settingValue="校验"
                     slot="input"
                     type={itemType.button}
+                    settingKey="Check"
+                    settingValue="校验"
+                    on:clicked={ checkAccessToken }
             />
         </Item>
         <Item
-                text="当前服务器上运行的 Memos 版本"
                 title="Memos 版本"
+                text="当前服务器上运行的 Memos 版本"
         >
             <Input
+                    slot="input"
+                    type={itemType.select}
+                    settingKey="Version"
+                    settingValue={config.base.version}
+                    options={VERSION_OPTIONS}
                     on:changed={e => {
                         config.base.version = e.detail.value;
                         updated();
                     }
                 }
-                    options={VERSION_OPTIONS}
-                    settingKey="Version"
-                    settingValue={config.base.version}
-                    slot="input"
-                    type={itemType.select}
             />
         </Item>
         <Item
+                title="服务器地址"
+                text="访问 Memos 的地址"
                 block={true}
                 isRequired={true}
-                text="访问 Memos 的网址"
-                title="服务器地址"
         >
             <Input
+                    slot="input"
+                    type={itemType.text}
+                    settingKey="Host"
+                    settingValue={config.base.host}
+                    placeholder="支持域名和IP地址，注意不要以 '/' 结尾"
                     block={true}
                     on:changed={e => {
                         config.base.host = e.detail.value;
                         updated();
                     }
                 }
-                    placeholder="支持域名和IP地址，注意不要以 '/' 结尾"
-                    settingKey="Host"
-                    settingValue={config.base.host}
-                    slot="input"
-                    type={itemType.text}
             />
         </Item>
         <Item
+                title="Access Token"
+                text="请在 Memos 设置页面获取"
                 block={true}
                 isRequired={true}
-                text="用户授权认证"
-                title="授权码"
         >
             <Input
+                    slot="input"
+                    type={itemType.text}
+                    settingKey="Token"
+                    settingValue={config.base.token}
+                    placeholder="在 Memos 的‘我的账号’页面自行创建"
                     block={true}
                     on:changed={e => {
                         config.base.token = e.detail.value;
                         updated();
                     }
                 }
-                    placeholder="在 Memos 的‘我的账号’页面自行创建"
-                    settingKey="Token"
-                    settingValue={config.base.token}
-                    slot="input"
-                    type={itemType.text}
             />
         </Item>
 
         <Item
-                text={syncPlanText}
                 title="同步方案"
+                text={syncPlanText}
         >
             <Input
+                    slot="input"
+                    type={itemType.select}
+                    settingKey="SyncPlan"
+                    settingValue={config.base.syncPlan}
+                    options={SYNC_PLAN_OPTIONS}
                     on:changed={e => {
                         config.base.syncPlan = e.detail.value;
                         updated();
                     }
                 }
-                    options={SYNC_PLAN_OPTIONS}
-                    settingKey="SyncPlan"
-                    settingValue={config.base.syncPlan}
-                    slot="input"
-                    type={itemType.select}
             />
         </Item>
 
         <Item
-                isRequired={true}
-                text="选择保存数据的笔记本"
                 title="同步笔记本"
+                text="保存同步数据的笔记本"
+                isRequired={true}
         >
             <Input
+                    slot="input"
+                    type={itemType.select}
+                    settingKey="notebook"
+                    settingValue={config.base.notebook}
+                    options={notebookOptions}
                     on:changed={e => {
                         config.base.notebook = e.detail.value;
                         updated();
                     }
                 }
-                    options={notebookOptions}
-                    settingKey="notebook"
-                    settingValue={config.base.notebook}
-                    slot="input"
-                    type={itemType.select}
             />
         </Item>
         <Item
-                isRequired={dcPathIsRequired}
-                block={true}
-                isTip={true}
-                text="配置目标文档的路径"
-                tipTest={`当${SYNC_PLAN_OPTIONS[2].text}时，此项必填`}
                 title="文档路径"
+                text={docPathText}
+                block={true}
+                isRequired={docPathIsRequired}
+                isShow={docPathIsShow}
         >
             <Input
+                    slot="input"
+                    type={itemType.text}
+                    settingKey="docPath"
+                    settingValue={config.base.docPath}
+                    placeholder="请以'/'开头进行填写"
                     block={true}
                     on:changed={e => {
                         config.base.docPath = e.detail.value;
                         updated();
                     }
                 }
-                    placeholder="请以'/'开头进行填写"
-                    settingKey="docPath"
-                    settingValue={config.base.docPath}
-                    slot="input"
-                    type={itemType.text}
             />
         </Item>
 
         <Item
-                title="排序"
-                text="根据更新日期排序"
+                title="数据排序"
+                text="根据更新日期对同步的数据进行升序或降序排序"
         >
             <Input
                     slot="input"
@@ -207,82 +221,90 @@
 
     <Panel display={PANELS[1].key === focusPanel}>
         <Item
-                text="识别超链接并转换成可点击的样式"
                 title="识别超链接"
+                text="识别超链接并转换成可点击的样式"
         >
             <Input
+                    slot="input"
+                    type={itemType.checkbox}
+                    settingKey="Href"
+                    settingValue={config.advanced.isHandleHref}
                     on:changed={e => {
                         config.advanced.isHandleHref = e.detail.value;
                         updated();
                     }
                 }
-                    settingKey="Href"
-                    settingValue={config.advanced.isHandleHref}
-                    slot="input"
-                    type={itemType.checkbox}
             />
         </Item>
         <Item
-                isTip={true}
-                text="识别双向链接符号并自动关联对应文档"
-                tipTest="只支持文档块的匹配"
                 title="识别双向链接符号"
+                text="识别双向链接符号并自动关联对应文档"
+                isTip={true}
+                tipTest="只支持文档块的匹配"
         >
             <Input
+                    slot="input"
+                    type={itemType.checkbox}
+                    settingKey="Links"
+                    settingValue={config.advanced.isHandleBacklinks}
                     on:changed={e => {
                         config.advanced.isHandleBacklinks = e.detail.value;
                         updated();
                     }
                 }
-                    settingKey="Links"
-                    settingValue={config.advanced.isHandleBacklinks}
-                    slot="input"
-                    type={itemType.checkbox}
             />
         </Item>
         <Item
-                block={true}
-                isTip={true}
-                text="配置保存识别双向链接时自动创建的文档路径"
-                tipTest="若本项为空，则自动创建的文档会直接保存在同步笔记本下"
                 title="主题路径"
+                text="配置保存识别双向链接时自动创建的文档路径"
+                isTip={true}
+                tipTest="若本项为空，则自动创建的文档会直接保存在同步笔记本下"
+                block={true}
+                isRequired={true}
+                isShow={subjectPathIsShow}
         >
             <Input
+                    slot="input"
+                    type={itemType.text}
+                    settingKey="SubjectPath"
+                    settingValue={config.advanced.subjectPath}
+                    placeholder="请以'/'开头进行填写"
                     block={true}
                     on:changed={e => {
                         config.advanced.subjectPath = e.detail.value;
                         updated();
                     }
                 }
-                    placeholder="请以'/'开头进行填写"
-                    settingKey="SubjectPath"
-                    settingValue={config.advanced.subjectPath}
-                    slot="input"
-                    type={itemType.text}
             />
         </Item>
         <Item
-                text="识别对应的格式的视频文件并转换成可点击播放的样式"
                 title="优化视频样式"
+                text="识别对应的格式的视频文件并转换成可点击播放的样式"
         >
             <Input
+                    slot="input"
+                    type={itemType.checkbox}
+                    settingKey="ImproveVideoStyle"
+                    settingValue={config.advanced.isHandleVideo}
                     on:changed={e => {
                         config.advanced.isHandleVideo = e.detail.value;
                         updated();
                     }
                 }
-                    settingKey="ImproveVideoStyle"
-                    settingValue={config.advanced.isHandleVideo}
-                    slot="input"
-                    type={itemType.checkbox}
             />
         </Item>
         <Item
-                block={true}
-                text="配置哪些格式的视频文件需要转换，使用 ';' 进行分隔"
                 title="需要优化的视频格式"
+                text="配置哪些格式的视频文件需要转换，使用英文分号 ';' 进行分隔"
+                block={true}
+                isRequired={true}
+                isShow={videoFormatsIsShow}
         >
             <Input
+                    slot="input"
+                    type={itemType.textarea}
+                    settingKey="VideoFormats"
+                    settingValue={config.advanced.videoFormats ? config.advanced.videoFormats : ""}
                     block={true}
                     height={100}
                     on:changed={e => {
@@ -290,112 +312,111 @@
                         updated();
                     }
                 }
-                    settingKey="VideoFormats"
-                    settingValue={config.advanced.videoFormats ? config.advanced.videoFormats : ""}
-                    slot="input"
-                    type={itemType.textarea}
             />
         </Item>
         <Item
-                text="为所有的标签增加一个统一的上级标签"
                 title="标签管理优化"
+                text="为所有的标签增加一个统一的上级标签"
         >
             <Input
+                    slot="input"
+                    type={itemType.checkbox}
+                    settingKey="LabelTop"
+                    settingValue={config.advanced.isSuperLabel}
                     on:changed={e => {
                         config.advanced.isSuperLabel = e.detail.value;
                         updated();
                     }
                 }
-                    settingKey="LabelTop"
-                    settingValue={config.advanced.isSuperLabel}
-                    slot="input"
-                    type={itemType.checkbox}
             />
         </Item>
         <Item
-                isTip={true}
-                text="配置上级标签的名称"
-                tipTest="当打开标签管理优化开关时，此项必填"
                 title="上级标签名称"
+                text="配置上级标签的名称"
+                isRequired={true}
+                isShow={labelNameIsShow}
         >
             <Input
+                    slot="input"
+                    type={itemType.text}
+                    settingKey="LabelName"
+                    settingValue={config.advanced.labelName}
+                    placeholder="请确认开头和结尾没有'/'"
                     on:changed={e => {
                         config.advanced.labelName = e.detail.value;
                         updated();
                     }
                 }
-                    placeholder="请确认开头和结尾没有'/'"
-                    settingKey="LabelName"
-                    settingValue={config.advanced.labelName}
-                    slot="input"
-                    type={itemType.text}
             />
         </Item>
     </Panel>
 
     <Panel display={PANELS[2].key === focusPanel}>
         <Item
-                text="上次完成同步的时间，在同步完成后自动更新"
                 title="上次同步时间"
+                text="上次完成同步的时间，在同步完成后自动更新"
+
         >
             <Input
+                    slot="input"
+                    type={itemType.text}
+                    settingKey="LastSyncTime"
+                    settingValue={config.filter.lastSyncTime}
+                    placeholder="YYYY/MM/DD HH:mm:ss"
                     on:changed={e => {
                         config.filter.lastSyncTime = e.detail.value;
                         updated();
                     }
                 }
-                    placeholder="YYYY/MM/DD HH:mm:ss"
-                    settingKey="LastSyncTime"
-                    settingValue={config.filter.lastSyncTime}
-                    slot="input"
-                    type={itemType.text}
             />
         </Item>
     </Panel>
 
     <Panel display={PANELS[3].key === focusPanel}>
         <Item
-                text="开启后将在控制台输出执行日志"
                 title="调试模式"
+                text="开启后将在控制台输出执行日志"
         >
             <Input
+                    slot="input"
+                    type={itemType.checkbox}
+                    settingKey="Debug"
+                    settingValue={config.debug.isDebug}
                     on:changed={e => {
                         config.debug.isDebug = e.detail.value;
                         updated();
                     }
                 }
-                    settingKey="Debug"
-                    settingValue={config.debug.isDebug}
-                    slot="input"
-                    type={itemType.checkbox}
             />
         </Item>
         <Item
                 text="禁用后，在调试时将不会自动更新上次同步时间"
                 title="允许更新上次同步时间"
+                isShow={config.debug.isDebug}
         >
             <Input
+                    slot="input"
+                    type={itemType.checkbox}
+                    settingKey="autoUpdateTime"
+                    settingValue={config.debug.isAutoUpdateTime}
                     on:changed={e => {
                         config.debug.isAutoUpdateTime = e.detail.value;
                         updated();
                     }
                 }
-                    settingKey="autoUpdateTime"
-                    settingValue={config.debug.isAutoUpdateTime}
-                    slot="input"
-                    type={itemType.checkbox}
             />
         </Item>
         <Item
-                text="测试功能"
                 title="测试"
+                text="测试功能"
+                isShow={config.debug.isDebug}
         >
             <Input
-                    on:clicked={ test }
-                    settingKey="Test"
-                    settingValue="测试"
                     slot="input"
                     type={itemType.button}
+                    settingKey="Test"
+                    settingValue="测试"
+                    on:clicked={ test }
             />
         </Item>
     </Panel>

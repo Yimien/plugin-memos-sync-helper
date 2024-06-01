@@ -11,8 +11,10 @@
     export let isRequired: boolean = false; // 必填项
     export let isTip: boolean = false;
     export let tipTest: string = "";
+    export let isShow: boolean = true;
 </script>
 
+{#if isShow}
 <label class="fn__flex b3-label">
     <div
             class="fn__flex-1"
@@ -44,6 +46,7 @@
         <slot name="input"/>
     {/if}
 </label>
+{/if}
 
 <style lang="scss">
   .visible {
