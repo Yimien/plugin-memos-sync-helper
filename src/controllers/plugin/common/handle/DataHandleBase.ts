@@ -189,6 +189,7 @@ export abstract class DataHandleBase {
             // 标签处理
             if (regexMemosContent.tag.test(content)) {
                 result = Handle.handleTags(content);
+                result = Handle.handleTagBlock(result);
             }
             regexMemosContent.tag.lastIndex = 0;
 

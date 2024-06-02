@@ -23,6 +23,11 @@ export class Handle {
         return result;
     }
 
+    static handleTagBlock(content: string) {
+        const regex = /([^#]*)(#)/; // 捕获组1匹配所有非#字符，捕获组2匹配#
+        return content.replace(regex, "\$1\n\$2");
+    }
+
     /**
      * 网址处理
      * @param content
