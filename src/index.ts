@@ -10,7 +10,7 @@ import {lsNotebooks} from "@/controllers/siyuan/api";
 import {debugMessage} from "@/utils";
 import {Logger} from "@/utils/misc/logger";
 import {mergeIgnoreArray} from "@/utils/misc/merge";
-import {main} from "@/main";
+import {checkNew, main} from "@/main";
 
 
 /**
@@ -60,10 +60,12 @@ export default class PluginMemosSyncHelper extends Plugin {
             title: PLUGIN_NAME,
             position: "right",
             callback: () => {
-                main();
+                main(this);
             }
         });
+    }
 
+    async onLayoutReady() {
         // 读取配置数据
         this.loadData(STORAGE_NAME)
             .then(config => {
@@ -71,12 +73,9 @@ export default class PluginMemosSyncHelper extends Plugin {
             })
             .catch(error => this.logger.error(error))
             .finally(async () => {
-
+                await checkNew();
             });
 
-    }
-
-    onLayoutReady() {
         // console.log("onLayoutReady");
     }
 
@@ -113,6 +112,7 @@ export default class PluginMemosSyncHelper extends Plugin {
             pluginConfigData = config;
         }
         return this.saveData(STORAGE_NAME, pluginConfigData);
+
     }
 
 

@@ -7,8 +7,11 @@ import {lsNotebooks, pushErrMsg, pushMsg} from "@/controllers/siyuan/api";
 import {MemosServer} from "@/controllers/memos";
 import {debugMessage, isEmptyValue} from "@/utils";
 import {isMobile, pluginConfigData, topBarElement} from "@/index";
-import {MemosApiServiceV1} from "@/controllers/memos/v1";
 import {PluginMaster} from "@/controllers/plugin";
+import {IConfig} from "@/types/config/default";
+import moment from "moment";
+import type PluginMemosSyncHelper from "@/index";
+
 
 
 class PlugConfig {
@@ -96,11 +99,28 @@ class Sync {
     /**
      * 同步成功
      */
-    static syncSuccess() {
+    static async syncSuccess(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
+        debugMessage(pluginConfigData.debug.isDebug, "正在修改同步状态以及图标……");
         Sync.status = sync_status.completed;
         Sync.updateIcon();
+        debugMessage(pluginConfigData.debug.isDebug, "修改完成！");
 
         // todo 修改上次同步时间
+        if (pluginConfigData.debug.isDebug && pluginConfigData.debug.isAutoUpdateTime === false) {
+            return;
+        }
+        debugMessage(pluginConfigData.debug.isDebug, "正在修改上次同步时间……");
+        let config : IConfig = pluginConfigData;
+
+        await new Promise(() => {
+            setTimeout(() => {
+                config.filter.lastSyncTime = moment().format("YYYY-MM-DD HH:mm:ss");
+                debugMessage(pluginConfigData.debug.isDebug, "配置", config);
+            }, 1000);
+        });
+
+        await plugin.updateConfig(config);
+        debugMessage(pluginConfigData.debug.isDebug, "上次同步时间修改完成！");
     }
 
     /**
@@ -220,20 +240,19 @@ export async function checkNew() {
 export async function test() {
     debugMessage(pluginConfigData.debug.isDebug, "开始测试", "", true);
 
-    await MemosApiServiceV1.getMemos();
 
     debugMessage(pluginConfigData.debug.isDebug, "测试结束", "", true);
 }
 
 
-export async function main() {
+export async function main(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
     try {
         // 防抖处理
         if (Sync.isSyncing()) {
             await pushMsg("同步中，请稍候");
             return;
         } else {
-            await pushMsg("开始同步……");
+            await pushMsg("正在检查插件配置……");
             Sync.startSync();
         }
 
@@ -243,10 +262,12 @@ export async function main() {
             return;
         }
 
+        await pushMsg("同步开始……");
+
         // 同步
         await PluginMaster.runSync();
 
-        Sync.syncSuccess();
+        await Sync.syncSuccess(plugin);
         await pushMsg("同步成功");
     } catch (error) {
         Sync.syncError();

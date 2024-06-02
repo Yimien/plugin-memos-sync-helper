@@ -430,7 +430,7 @@ export abstract class DataSaveBase {
 
         let attrs = {};
         attrs[CUSTOM_MEMO_ID] = newMemo.id;
-        // attrs[CUSTOM_MEMO_UID] = newMemo.uid;
+        attrs[CUSTOM_MEMO_UID] = newMemo.uid;
         await setBlockAttrs(blockId, attrs);
 
         debugMessage(pluginConfigData.debug.isDebug, `设置完成！`);
