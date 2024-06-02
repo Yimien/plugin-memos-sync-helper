@@ -1,49 +1,29 @@
-import {MemosServer} from "@/controllers/memos";
 import {pushMsg, putFile} from "@/controllers/siyuan/api";
 import {IResGetMemos} from "@/types/memos";
-import {DataHandle} from "@/controllers/plugin/v2/data-handle";
+import {DataHandleV2} from "@/controllers/plugin/v2/data-handle";
 import {debugMessage, isEmptyValue} from "@/utils";
 import {pluginConfigData} from "@/index";
-import {IResource} from "@/types/memos/v2";
-import {IResHandleDataV2} from "@/types/memos/v2/handle";
-import {syncPlanKey} from "@/constants/components/select";
-import {SingleDoc} from "@/controllers/plugin/v2/data-save/single-doc";
-import {SameDoc} from "@/controllers/plugin/v2/data-save/same-doc";
-import {MemosApiService} from "@/controllers/memos/v2";
-import {DailyNotes} from "@/controllers/plugin/v2/data-save/daily-notes";
+import {IResourceV2} from "@/types/memos/v2";
+import {IResDataHandleRunV2} from "@/types/plugin/v2/handle";
+import {MemosApiServiceV2} from "@/controllers/memos/v2";
+import {DataSaveV2} from "@/controllers/plugin/v2/data-save";
 
 
-export class PluginSync {
+export class PluginV2 {
     /**
      * 下载资源
      * @param resources
      */
-    static async downloadResource(resources: IResource[]) {
+    static async downloadResources(resources: IResourceV2[]) {
         for (let resource of resources) {
-            let responseData = await MemosApiService.downloadResource(resource);
-            if (isEmptyValue(responseData)) {
-                debugMessage(pluginConfigData.debug.isDebug, "下载失败", resource.name);
+            let response = await MemosApiServiceV2.downloadResource(resource);
+            if (isEmptyValue(response)) {
+                debugMessage(pluginConfigData.debug.isDebug, "下载失败", response);
                 continue;
             }
-            let path = DataHandle.getResourcePath(resource);
-            await putFile(path, false, responseData);
-        }
-    }
-
-    /**
-     * 将数据保存进思源
-     * @param data
-     */
-    static async saveToSiYuan(data: IResHandleDataV2) {
-        if (pluginConfigData.base.syncPlan === syncPlanKey.singleDoc) {
-            // 一条记录，一份文档
-            await SingleDoc.runSync(data);
-        } else if (pluginConfigData.base.syncPlan === syncPlanKey.sameDoc) {
-            // 所有记录，一份文档
-            await SameDoc.runSync(data);
-        } else {
-            // Daily Notes
-            await DailyNotes.runSync(data);
+            let fileBlob = await response.blob();
+            let path = `data/${DataHandleV2.getResourcePathString(resource)}`;
+            await putFile(path, false, fileBlob);
         }
     }
 
@@ -52,7 +32,7 @@ export class PluginSync {
         // 数据拉取
         debugMessage(pluginConfigData.debug.isDebug, "数据拉取", "", true);
 
-        let allMemos: IResGetMemos = await MemosServer.getMemos();
+        let allMemos: IResGetMemos = await MemosApiServiceV2.getMemos();
 
         debugMessage(pluginConfigData.debug.isDebug, "数据拉取完成", "", true);
 
@@ -65,21 +45,21 @@ export class PluginSync {
         // 数据处理
         debugMessage(pluginConfigData.debug.isDebug, "数据处理", "", true);
 
-        let handleResult: IResHandleDataV2 = await DataHandle.run(allMemos);
+        let resHandleData : IResDataHandleRunV2 = await DataHandleV2.run(allMemos);
 
         debugMessage(pluginConfigData.debug.isDebug, "数据处理完成", "", true);
 
         // 资源下载
         debugMessage(pluginConfigData.debug.isDebug, "资源下载", "", true);
 
-        // await this.downloadResource(handleResult.resources);
+        await this.downloadResources(resHandleData.resources);
 
         debugMessage(pluginConfigData.debug.isDebug, "资源下载完成", "", true);
 
         // 数据保存
         debugMessage(pluginConfigData.debug.isDebug, "数据同步", "", true);
 
-        await this.saveToSiYuan(handleResult);
+        await DataSaveV2.run(resHandleData);
 
         debugMessage(pluginConfigData.debug.isDebug, "数据同步完成", "", true);
     }

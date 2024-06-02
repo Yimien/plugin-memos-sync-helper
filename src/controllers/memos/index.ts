@@ -1,6 +1,7 @@
 import {pluginConfigData} from "@/index";
 import {versionKey} from "@/constants/components/select";
-import {MemosApiService as V2} from "./v2/index"
+import {MemosApiServiceV1} from "./v1/index"
+import {MemosApiServiceV2} from "./v2/index"
 import {IResGetMemos} from "@/types/memos";
 
 
@@ -15,9 +16,9 @@ export class MemosServer {
         const version = pluginConfigData.base.version;
 
         if (version === versionKey.v1) {
-            // todo v1
+            result = await MemosApiServiceV1.checkAccessToken();
         } else if (version === versionKey.v2) {
-            result = await V2.checkAccessToken();
+            result = await MemosApiServiceV2.checkAccessToken();
         }
         return result;
     }
@@ -31,9 +32,9 @@ export class MemosServer {
         const version = pluginConfigData.base.version;
 
         if (version === versionKey.v1) {
-            // todo v1
+            result = await MemosApiServiceV1.checkNew();
         } else if (version === versionKey.v2) {
-            result = await V2.checkNew();
+            result = await MemosApiServiceV2.checkNew();
         }
         return result;
     }
@@ -41,15 +42,15 @@ export class MemosServer {
     /**
      * 拉取 Memos 数据
      */
-    static async getMemos() {
+    static async getMemos() : Promise<IResGetMemos> {
         let result: IResGetMemos;
 
         const version = pluginConfigData.base.version;
 
         if (version === versionKey.v1) {
-            // todo v1
+            result = await MemosApiServiceV1.getMemos();
         } else if (version === versionKey.v2) {
-            result = await V2.getMemos();
+            result = await MemosApiServiceV2.getMemos();
         }
         return result;
     }

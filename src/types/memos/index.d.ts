@@ -1,38 +1,21 @@
-import {IContent} from "@/types/memos/v2/handle";
+import {IMemoV1, IRelationV1, IResourceV1} from "@/types/memos/v1";
+import {IMemoV2, IRelationV2, IResourceV2} from "@/types/memos/v2";
 
 
 export interface IResGetMemos {
-    /**
-     * 用于新增的数据
-     */
     new: any[],
-
-    /**
-     * 用于删除的数据
-     */
     old: any[]
 }
 
-export interface IContent {
-    type: string | number,
-    content: string
-}
+export type IResource = IResourceV1 | IResourceV2;
 
-export interface INewMemoBase {
-    id: string,
-    uid: string,
-    title: string,
-    updateTime: string,
-    contents: IContent[], // 加上逗号
-    memo: any[]
-}
+export type IResources = IResourceV1[] | IResourceV2[];
 
+export type IRelation = IRelationV1 | IRelationV2;
 
-export type INewMemosBase = INewMemoBase[];
+export type IRelations = IRelationV1[] | IRelationV2[];
 
-export interface IResHandleDataBase {
-    resources: any[],
-    relations: any[],
-    oldMemos: any[],
-    newMemos: INewMemosBase
-}
+export type IMemo = IMemoV1 | IMemoV2;
+
+export type IMemos = IMemoV1[] | IMemoV2[];
+

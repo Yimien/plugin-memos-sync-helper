@@ -1,7 +1,4 @@
-/**
- * 资源
- */
-export interface IResource {
+export interface IResourceV2 {
     name: string,
     uid: string,
     createTime: string,
@@ -13,10 +10,7 @@ export interface IResource {
     memo: string
 }
 
-/**
- * 引用
- */
-export interface IRelation {
+export interface IRelationV2 {
     memo: string,
     relatedMemo: string,
     type: string
@@ -25,7 +19,7 @@ export interface IRelation {
 /**
  * 评论
  */
-export interface IReactions {
+export interface IReactionV2 {
     id: number,
     creator: string,
     contentId: string,
@@ -35,7 +29,7 @@ export interface IReactions {
 /**
  * Memos
  */
-export interface IMemo {
+export interface IMemoV2 {
     name: string,
     uid: string,
     rowStatus: string,
@@ -49,17 +43,7 @@ export interface IMemo {
     tags: any,
     pinned: boolean,
     parentId?: number,
-    resources: IResource[],
-    relations: IRelation[],
-    reactions: IReactions[]
-}
-
-export type IMemos = IMemo[];
-
-/**
- * 列出带有分页和过滤器的备忘录
- */
-export interface IResListMemos {
-    memos: IMemo[],
-    nextPageToken: string
+    resources: IResourceV2[],
+    relations: IRelationV2[],
+    reactions: IReactionV2[]
 }

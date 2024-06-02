@@ -5,9 +5,10 @@ import {syncPlanKey} from "@/constants/components/select";
 import {IItemCondition} from "@/types/plugin";
 import {lsNotebooks, pushErrMsg, pushMsg} from "@/controllers/siyuan/api";
 import {MemosServer} from "@/controllers/memos";
-import {PluginServer} from "@/controllers/plugin";
 import {debugMessage, isEmptyValue} from "@/utils";
 import {isMobile, pluginConfigData, topBarElement} from "@/index";
+import {MemosApiServiceV1} from "@/controllers/memos/v1";
+import {PluginMaster} from "@/controllers/plugin";
 
 
 class PlugConfig {
@@ -219,6 +220,8 @@ export async function checkNew() {
 export async function test() {
     debugMessage(pluginConfigData.debug.isDebug, "开始测试", "", true);
 
+    await MemosApiServiceV1.getMemos();
+
     debugMessage(pluginConfigData.debug.isDebug, "测试结束", "", true);
 }
 
@@ -241,7 +244,7 @@ export async function main() {
         }
 
         // 同步
-        await PluginServer.run();
+        await PluginMaster.runSync();
 
         Sync.syncSuccess();
         await pushMsg("同步成功");

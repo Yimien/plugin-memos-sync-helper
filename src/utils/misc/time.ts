@@ -9,12 +9,14 @@ export function toChinaTime(timeString: string) {
     return moment(timeString).utcOffset('+08:00').format('YYYY-MM-DD HH:mm:ss');
 }
 
-export function formatDateTime(timeString: string) {
-    return moment(timeString).format('YYYY-MM-DD HH:mm:ss');
+export function formatDateTime(timeString: string | number) {
+    const timestamp = typeof timeString === 'number' ? timeString * 1000 : timeString;
+    return moment(timestamp).format('YYYY-MM-DD HH:mm:ss');
 }
 
-export function formatDate(timeString: string) {
-    return moment(timeString).format('YYYY-MM-DD');
+export function formatDate(timeString: string | number) {
+    const timestamp = typeof timeString === 'number' ? timeString * 1000 : timeString;
+    return moment(timestamp).format('YYYY-MM-DD');
 }
 
 /**

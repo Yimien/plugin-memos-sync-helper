@@ -1,13 +1,13 @@
 import {pluginConfigData} from "@/index";
-import {GetAuthStatus, GetResourceBinary, ListMemos} from "@/controllers/memos/v2/api"
+import {DownloadResourceByName, GetAuthStatus, GetResourceBinary, ListMemos} from "@/controllers/memos/v2/api"
 import {debugMessage, isEmptyValue} from "@/utils";
 import {toChinaTime, formatDateTime,} from "@/utils/misc/time";
 import {IResGetMemos} from "@/types/memos";
 import moment from "moment";
-import {IResource} from "@/types/memos/v2";
+import {IResourceV2} from "@/types/memos/v2";
 
 
-export class MemosApiService {
+export class MemosApiServiceV2 {
     private static username: string;
 
     /**
@@ -118,9 +118,8 @@ export class MemosApiService {
         return result;
     }
 
-    static async downloadResource(resource: IResource) {
+    static async downloadResource(resource: IResourceV2) {
         let name = resource.name;
-        let filename: string = resource.filename;
-        return await GetResourceBinary(name, filename);
+        return await DownloadResourceByName(name);
     }
 }

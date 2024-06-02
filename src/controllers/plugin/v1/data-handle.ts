@@ -1,34 +1,36 @@
 import {debugMessage} from "@/utils";
 import {IResGetMemos} from "@/types/memos";
 import {pluginConfigData} from "@/index";
-import {IMemoV2, IResourceV2} from "@/types/memos/v2";
-import {formatDateTime, toChinaTime} from "@/utils/misc/time";
-import {IResDataHandleRunV2} from "@/types/plugin/v2/handle";
-import moment from "moment/moment";
+import {formatDateTime} from "@/utils/misc/time";
 import {MEMOS_ASSETS} from "@/constants";
 import {IContents} from "@/types/plugin";
+import {IMemoV1, IResourceV1} from "@/types/memos/v1";
+import {IResDataHandleRunV1} from "@/types/plugin/v1/handle";
 import {DataHandleBase} from "@/controllers/plugin/common/handle/DataHandleBase";
 
 
-export class DataHandleV2 extends DataHandleBase{
+/**
+ * 数据处理
+ */
+export class DataHandleV1 extends DataHandleBase{
 
-    protected getMemoId(memo: IMemoV2) {
-        return memo.name.split('/').pop();
+    protected getMemoId(memo: IMemoV1): string {
+        return memo.id.toString();
     }
 
-    protected getMemoUid(memo: IMemoV2): string {
-        return memo.uid;
+    protected getMemoUid(memo: IMemoV1): string {
+        return memo.name;
     }
 
-    protected getUpdateTime(memo: IMemoV2): string {
-        return formatDateTime(toChinaTime(memo.updateTime));
+    protected getUpdateTime(memo: IMemoV1): string {
+        return formatDateTime(memo.updatedTs);
     }
 
-    protected handleRelations(memo: IMemoV2): void {
-        let relations = memo.relations;
+    protected handleRelations(memo: IMemoV1): void {
+        let relations = memo.relationList;
         for (let relation of relations) {
             const exists = this.relations.some(r =>
-                relation.memo === r.memoId && relation.relatedMemo === r.relatedMemoId
+                relation.memoId === r.memoId && relation.relatedMemoId === r.relatedMemoId
             );
             if (!exists) {
                 this.relations.push(relation);
@@ -36,16 +38,16 @@ export class DataHandleV2 extends DataHandleBase{
         }
     }
 
-    protected handleResources(memo: IMemoV2, contents: IContents): void {
-        let resources = memo.resources;
+    protected handleResources(memo: IMemoV1, contents: IContents): void {
+        let resources = memo.resourceList;
         this.getResourceContents(contents, resources);
         this.resources = this.resources.concat(resources);
     }
 
-    protected getResourcePath(resource: IResourceV2): string {
+    protected getResourcePath(resource: IResourceV1) {
         let filename = resource.filename;
-        let resourceId = resource.name.split('/').pop();
-        let timestamp = moment(toChinaTime(resource.createTime)).unix();
+        let resourceId = resource.id.toString();
+        let timestamp = resource.updatedTs;
         let end = filename.split('.').pop();
         return `${MEMOS_ASSETS}/${resourceId}_${timestamp}.${end}`;
     }
@@ -58,20 +60,20 @@ export class DataHandleV2 extends DataHandleBase{
      * 获取路径
      * @param resource
      */
-    static getResourcePathString(resource: IResourceV2) {
-        let db = new DataHandleV2();
+    static getResourcePathString(resource: IResourceV1) {
+        let db = new DataHandleV1();
         return db.getResourcePath(resource);
     }
 
 
-    static async run(data: IResGetMemos) : Promise<IResDataHandleRunV2> {
+    static async run(data: IResGetMemos) : Promise<IResDataHandleRunV1> {
         debugMessage(pluginConfigData.debug.isDebug, "数据处理", "", true);
 
-        let dh = new DataHandleV2();
+        let dh = new DataHandleV1();
 
         await dh.handleMemos(data.new);
 
-        let result: IResDataHandleRunV2 = {
+        let result: IResDataHandleRunV1 = {
             resources: dh.resources,
             relations: dh.relations,
             oldMemos: data.old,
@@ -79,7 +81,6 @@ export class DataHandleV2 extends DataHandleBase{
         }
 
         debugMessage(pluginConfigData.debug.isDebug, "数据处理结果", result);
-
         return result;
     }
 }

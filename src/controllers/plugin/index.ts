@@ -1,16 +1,16 @@
 import {pluginConfigData} from "@/index";
 import {versionKey} from "@/constants/components/select";
-import {PluginSync as V2} from "@/controllers/plugin/v2";
+import {PluginV1} from "@/controllers/plugin/v1";
+import {PluginV2} from "@/controllers/plugin/v2";
 
 
-export class PluginServer {
-    static async run() {
+export class PluginMaster {
+    static async runSync() {
         const memosVersion = pluginConfigData.base.version; // memos 版本
-
         if (memosVersion === versionKey.v1) {
-            // todo v1
+            await PluginV1.run();
         } else if (memosVersion === versionKey.v2) {
-            await V2.run();
+            await PluginV2.run();
         }
     }
 }

@@ -25,6 +25,11 @@ export enum contentsType {
     resource
 }
 
+export const resourceType = {
+    image: "image",
+    video: "video"
+}
+
 export enum deleteMode {
     blockId,
     path

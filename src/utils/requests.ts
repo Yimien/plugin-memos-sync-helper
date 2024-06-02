@@ -4,7 +4,7 @@ import {UA} from "@/utils/misc/user-agent";
 import {pluginConfigData} from "@/index";
 
 
-export class Request {
+export class Requests {
 
     /**
      * 移除请求参数的空值
@@ -46,7 +46,7 @@ export class Request {
      * @param pathName - 请求地址
      * @param data - 请求参数
      */
-    static async get(pathName: string, data: any) {
+    static async get(pathName: string, data?: any) {
         // 净化请求参数
         await this.removeEmptyValues(data);
 

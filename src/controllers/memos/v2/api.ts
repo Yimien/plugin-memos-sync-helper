@@ -1,8 +1,7 @@
-import {IResListMemos} from "@/types/memos/v2";
-import {Request} from "@/utils/request";
 import {METHOD} from "@/constants/utils/request";
 import {isEmptyValue} from "@/utils";
-
+import {Requests} from "@/utils/requests";
+import {IResListMemos} from "@/types/memos/v2/api";
 
 
 /**
@@ -23,7 +22,7 @@ function changeFilter(filter: any) {
  * @constructor
  */
 export async function ListUsers() {
-    return await Request.send(METHOD.GET, '/api/v1/users');
+    return await Requests.send(METHOD.GET, '/api/v1/users');
 }
 
 
@@ -35,7 +34,7 @@ export async function ListUsers() {
  * @constructor
  */
 export async function GetAuthStatus() {
-    return await Request.send(METHOD.POST, "/api/v1/auth/status");
+    return await Requests.send(METHOD.POST, "/api/v1/auth/status");
 }
 
 
@@ -50,7 +49,7 @@ export async function GetAuthStatus() {
  * @constructor
  */
 export async function ListMemos(pageSize?: number, pageToken?: string, filter?: any): Promise<IResListMemos> {
-    return await Request.send(METHOD.GET, '/api/v1/memos', {
+    return await Requests.send(METHOD.GET, '/api/v1/memos', {
         pageSize: pageSize,
         pageToken: pageToken,
         filter: changeFilter(filter)
@@ -68,5 +67,9 @@ export async function ListMemos(pageSize?: number, pageToken?: string, filter?: 
  * @constructor /file/resources/35
  */
 export async function GetResourceBinary(name: string, filename: string) {
-    return await Request.send(METHOD.GET, `/file/${name}/${filename}`);
+    return await Requests.send(METHOD.GET, `/file/${name}/${filename}`);
+}
+
+export async function DownloadResourceByName(name: string) {
+    return await Requests.get(`/file/${name}`);
 }
