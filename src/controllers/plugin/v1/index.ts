@@ -5,7 +5,7 @@ import {DataHandleV1} from "@/controllers/plugin/v1/data-handle";
 import {IResGetMemos} from "@/types/memos";
 import {IResourceV1} from "@/types/memos/v1";
 import {IResDataHandleRunV1} from "@/types/plugin/v1/handle";
-import {debugMessage} from "@/utils";
+import {debugMessage, isEmptyValue} from "@/utils";
 import {STATUS} from "@/constants/utils/request";
 import {DataSaveV1} from "@/controllers/plugin/v1/data-save";
 
@@ -17,6 +17,10 @@ export class PluginV1 {
      */
     static async downloadResource(resources: IResourceV1[]) {
         for (let resource of resources) {
+            if (!isEmptyValue(resource.externalLink)) {
+                continue;
+            }
+
             let uid = resource.uid;
             let response = await MemosApiServiceV1.downloadResource(uid);
             if (response.status !== STATUS.OK) {

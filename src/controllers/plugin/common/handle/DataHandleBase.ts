@@ -220,8 +220,16 @@ export abstract class DataHandleBase {
      */
     protected getResourceMarkdown(resource: IResource) {
         let filename = resource.filename;
-        let end = filename.split('.').pop();
-        let path = this.getResourcePath(resource);
+        let path = "";
+        let end = "";
+
+        if (isEmptyValue(resource.externalLink)) {
+            path = this.getResourcePath(resource);
+            end = filename.split('.').pop();
+        } else {
+            path = resource.externalLink;
+            end = resource.externalLink.split('.').pop();
+        }
         let type = resource.type.split('/')[0];
 
         if (type == resourceType.image) {
