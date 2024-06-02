@@ -38,7 +38,7 @@ export abstract class DataHandleBase {
      * @protected
      */
     protected async handelMemo(memo: any) {
-        debugMessage(pluginConfigData.debug.isDebug, "开始处理 Memos");
+        debugMessage(pluginConfigData.debug.isDebug, "开始处理 Memos", memo);
 
         let memoId: string = this.getMemoId(memo);
         let memoUid: string = this.getMemoUid(memo);
@@ -115,21 +115,16 @@ export abstract class DataHandleBase {
         let content = '';
 
         let splits = stringSplit(memo.content, '\n'); // 拆分源数据
-        debugMessage(pluginConfigData.debug.isDebug, `内容切分`, splits);
 
         let regex = regexMemosContent.embedded;
         for (let m of splits) {
             // 判断是否是嵌入内容
             const isEmbedded = regex.test(m);
-            debugMessage(pluginConfigData.debug.isDebug, `m`, m);
-            debugMessage(pluginConfigData.debug.isDebug, `测试结果`, isEmbedded);
             if (isEmbedded) {
-                debugMessage(pluginConfigData.debug.isDebug, `判断结果：是嵌入块`);
                 this.saveContents(contents, content, contentsType.text);
                 this.saveContents(contents, m, contentsType.embedded);
                 content = "";
             } else {
-                debugMessage(pluginConfigData.debug.isDebug, `判断结果：不是嵌入块`);
                 content += m;
                 if (m !== splits[splits.length - 1]) {
                     content += '\n';
@@ -141,7 +136,6 @@ export abstract class DataHandleBase {
             regex.lastIndex = 0;
         }
         await this.handleContent(contents);
-
         return contents;
     }
 
@@ -187,7 +181,7 @@ export abstract class DataHandleBase {
             regexMemosContent.backlinks.lastIndex = 0;
 
             // 网址处理
-            if (pluginConfigData.advanced.isHandleHref && regexMemosContent.href.test(content)) {
+            if (pluginConfigData.advanced.isHandleHref && regexMemosContent.href.test(content) && !regexMemosContent.mdLink.test(content)) {
                 result = Handle.handleHref(content);
             }
             regexMemosContent.href.lastIndex = 0;

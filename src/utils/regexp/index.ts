@@ -12,5 +12,6 @@ export const regexMemosContent = {
     embedded: /(?<=!\[\[).*?(?=]])/g,
     tag: /(?<=#)[^\s#].*?(?=\s)/g,
     href: /[a-zA-z]+:\/\/\S*/g,
-    backlinks: /(?<=\(\().*?(?=\)\))/g
+    backlinks: /(?<=\(\().*?(?=\)\))/g,
+    mdLink: /\[.*?]\([a-zA-z]+:\/\/\S*\)/g
 }
