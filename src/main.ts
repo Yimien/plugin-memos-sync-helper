@@ -6,11 +6,10 @@ import {IItemCondition} from "@/types/plugin";
 import {lsNotebooks, pushErrMsg, pushMsg} from "@/controllers/siyuan/api";
 import {MemosServer} from "@/controllers/memos";
 import {debugMessage, isEmptyValue} from "@/utils";
-import {isMobile, pluginConfigData, topBarElement} from "@/index";
+import PluginMemosSyncHelper, {isMobile, pluginConfigData, topBarElement} from "@/index";
 import {PluginMaster} from "@/controllers/plugin";
 import {IConfig} from "@/types/config/default";
 import moment from "moment";
-import type PluginMemosSyncHelper from "@/index";
 
 
 
@@ -105,17 +104,18 @@ class Sync {
         Sync.updateIcon();
         debugMessage(pluginConfigData.debug.isDebug, "修改完成！");
 
-        // todo 修改上次同步时间
+        // 修改上次同步时间
         if (pluginConfigData.debug.isDebug && pluginConfigData.debug.isAutoUpdateTime === false) {
             return;
         }
         debugMessage(pluginConfigData.debug.isDebug, "正在修改上次同步时间……");
         let config : IConfig = pluginConfigData;
 
-        await new Promise(() => {
+        await new Promise<void>((resolve) => {
             setTimeout(() => {
                 config.filter.lastSyncTime = moment().format("YYYY-MM-DD HH:mm:ss");
                 debugMessage(pluginConfigData.debug.isDebug, "配置", config);
+                resolve(); // 标志 Promise 的状态已经改变
             }, 1000);
         });
 
@@ -228,7 +228,7 @@ export async function checkNew() {
     let result = await MemosServer.checkNew();
     if (result) {
         Sync.canSync();
-        await pushMsg("检查到可同步的 Memos 数据，请手动同步");
+        await pushMsg("检查到可同步的新数据");
     }
 
     debugMessage(pluginConfigData.debug.isDebug, "检查完成");

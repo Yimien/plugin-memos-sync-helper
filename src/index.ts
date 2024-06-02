@@ -112,7 +112,6 @@ export default class PluginMemosSyncHelper extends Plugin {
             pluginConfigData = config;
         }
         return this.saveData(STORAGE_NAME, pluginConfigData);
-
     }
 
 
