@@ -28,7 +28,7 @@ export class DataHandleV2 extends DataHandleBase{
         let relations = memo.relations;
         for (let relation of relations) {
             const exists = this.relations.some(r =>
-                relation.memo === r.memoId && relation.relatedMemo === r.relatedMemoId
+                relation.memo === r.memo && relation.relatedMemo === r.relatedMemo
             );
             if (!exists) {
                 this.relations.push(relation);

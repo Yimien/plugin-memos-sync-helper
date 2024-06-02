@@ -1,6 +1,8 @@
 import {DataSaveBase} from "@/controllers/plugin/common/save/DataSaveBase";
 import {IMemoV2} from "@/types/memos/v2";
 import {IResDataHandleRunV2} from "@/types/plugin/v2/handle";
+import {debugMessage} from "@/utils";
+import {pluginConfigData} from "@/index";
 
 
 export class DataSaveV2 extends DataSaveBase {
@@ -10,6 +12,7 @@ export class DataSaveV2 extends DataSaveBase {
     }
 
     protected async handleRelations() : Promise<void> {
+        debugMessage(pluginConfigData.debug.isDebug, "需处理的引用列表", this.data.relations);
         for (let relation of this.data.relations) {
             let memoId = relation.memo.split('/').pop();
             let relatedMemoId = relation.relatedMemo.split('/').pop();
