@@ -73,3 +73,7 @@ export async function GetResourceBinary(name: string, filename: string) {
 export async function DownloadResourceByName(name: string) {
     return await Requests.get(`/file/${name}`);
 }
+
+export async function GetMemo(id: string | number) {
+    return await Requests.send(METHOD.GET, `/api/v1/memos/${id}`);
+}

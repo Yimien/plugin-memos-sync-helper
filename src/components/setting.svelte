@@ -13,6 +13,7 @@
 
     import type PluginMemosSyncHelper from "@/index";
     import {checkAccessToken, test} from "@/main";
+    import {repair} from "@/controllers/plugin/common/fun/repair";
 
 
     export let plugin: InstanceType<typeof PluginMemosSyncHelper>;
@@ -220,6 +221,18 @@
     </Panel>
 
     <Panel display={PANELS[1].key === focusPanel}>
+        <Item
+                title="修复"
+                text="修复旧版插件同步的数据以兼容嵌入内容功能"
+        >
+            <Input
+                    slot="input"
+                    type={itemType.button}
+                    settingKey="Repair"
+                    settingValue="修复"
+                    on:clicked={ repair }
+            />
+        </Item>
         <Item
                 title="识别超链接"
                 text="识别超链接并转换成可点击的样式"

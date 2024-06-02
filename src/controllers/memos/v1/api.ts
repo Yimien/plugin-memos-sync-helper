@@ -24,3 +24,7 @@ export async function GetMemosWithFilters(data?: IParamGetMemosWithFilters) : Pr
 export async function downloadResourceByUid(uid: string | number) {
     return await Requests.get(`/o/r/${uid}`);
 }
+
+export async function GetMemoById(id : string | number) {
+    return await Requests.send(METHOD.GET, `/api/v1/memo/${id}`);
+}

@@ -9,7 +9,7 @@ import {
 } from "@/controllers/siyuan/api";
 import {pluginConfigData} from "@/index";
 import {debugMessage, isEmptyValue} from "@/utils";
-import {contentsType, deleteMode} from "@/constants/plugin";
+import {contentsType, CUSTOM_MEMO_ID, CUSTOM_MEMO_UID, deleteMode} from "@/constants/plugin";
 import {IContent, INewMemo} from "@/types/plugin";
 import {IResdoOperations, IResGetChildBlock} from "@/types/siyuan/api";
 import {memosSortKey, syncPlanKey} from "@/constants/components/select";
@@ -18,17 +18,6 @@ import {DataHandleBase} from "@/controllers/plugin/common/handle/DataHandleBase"
 
 export abstract class DataSaveBase {
 
-    /**
-     * 自定义属性名称
-     * @protected
-     */
-    protected CUSTOM_MEMO_ID : string = "custom-memo-id";
-
-    /**
-     * 自定义属性名称
-     * @protected
-     */
-    protected CUSTOM_MEMO_UID = "custom-memo-uid";
 
     /**
      * MemoId : BlockId
@@ -115,9 +104,9 @@ export abstract class DataSaveBase {
      * @protected
      */
     protected async initDict(): Promise<void> {
-        await this.initDictByAttrName(this.CUSTOM_MEMO_ID, this.memoIdLinkBlockId)
+        await this.initDictByAttrName(CUSTOM_MEMO_ID, this.memoIdLinkBlockId)
         debugMessage(pluginConfigData.debug.isDebug, "MemoId: BlockId", this.memoIdLinkBlockId);
-        await this.initDictByAttrName(this.CUSTOM_MEMO_UID, this.memoUidLinkBlockId);
+        await this.initDictByAttrName(CUSTOM_MEMO_UID, this.memoUidLinkBlockId);
         debugMessage(pluginConfigData.debug.isDebug, "MemoUid: BlockId", this.memoUidLinkBlockId);
     }
 
@@ -176,7 +165,7 @@ export abstract class DataSaveBase {
     protected async updateDeleteListByPath() {
         for (let memo of this.data.oldMemos) {
             let memoId = this.getMemoId(memo);
-            let response = await SiYuanApiService.getAttributes(this.CUSTOM_MEMO_ID, memoId);
+            let response = await SiYuanApiService.getAttributes(CUSTOM_MEMO_ID, memoId);
             if (isEmptyValue(response) || response.length === 0) {
                 debugMessage(pluginConfigData.debug.isDebug, "未找到对应删除数据", memoId);
             } else {
@@ -440,8 +429,8 @@ export abstract class DataSaveBase {
         debugMessage(pluginConfigData.debug.isDebug, `正在设置块属性...`);
 
         let attrs = {};
-        attrs[this.CUSTOM_MEMO_ID] = newMemo.id;
-        attrs[this.CUSTOM_MEMO_UID] = newMemo.uid;
+        attrs[CUSTOM_MEMO_ID] = newMemo.id;
+        // attrs[CUSTOM_MEMO_UID] = newMemo.uid;
         await setBlockAttrs(blockId, attrs);
 
         debugMessage(pluginConfigData.debug.isDebug, `设置完成！`);

@@ -34,3 +34,7 @@ export enum deleteMode {
     blockId,
     path
 }
+
+export const CUSTOM_MEMO_ID = "custom-memo-id";
+
+export const CUSTOM_MEMO_UID = "custom-memo-uid";
