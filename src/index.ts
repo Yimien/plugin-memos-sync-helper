@@ -147,8 +147,8 @@ export default class PluginMemosSyncHelper extends Plugin {
         let dialog = new Dialog({
             title: PLUGIN_NAME,
             content: `<div id="SettingPanel" style="height: 100%;"></div>`,
-            width: "850px",
-            height: "720px",
+            width: "900px",
+            height: "700px",
             destroyCallback: (options) => {
                 console.log("destroyCallback", options);
                 //You'd better destroy the component when the dialog is closed
