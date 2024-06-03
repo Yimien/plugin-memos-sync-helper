@@ -150,7 +150,7 @@ export default class PluginMemosSyncHelper extends Plugin {
             width: "900px",
             height: "700px",
             destroyCallback: (options) => {
-                console.log("destroyCallback", options);
+                debugMessage(pluginConfigData.debug.isDebug, "destroyCallback", options);
                 //You'd better destroy the component when the dialog is closed
                 panel.$destroy();
             }

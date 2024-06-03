@@ -422,7 +422,7 @@
         <Item
                 title="测试"
                 text="测试功能"
-                isShow={config.debug.isDebug}
+                isShow={false}
         >
             <Input
                     slot="input"

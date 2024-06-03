@@ -85,8 +85,6 @@ class Sync {
         Sync.status = sync_status.downloading;
         Sync.backupIcon();
         Sync.updateIcon();
-        console.log(this.iconBefore);
-        console.log(topBarElement.innerHTML);
     }
 
     /**
@@ -207,6 +205,7 @@ export async function checkNew() {
     const checkResult = await PlugConfig.check();
 
     if (!checkResult) {
+        debugMessage(pluginConfigData.debug.isDebug, "请检查插件配置！");
         return;
     }
 
@@ -237,6 +236,7 @@ export async function main(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
             await pushMsg("同步中，请稍候");
             return;
         } else {
+            await pushMsg("正在进行同步前检查");
             Sync.startSync();
         }
 
@@ -250,7 +250,7 @@ export async function main(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
         const hasNew = await MemosServer.checkNew();
         if (hasNew) {
             // 同步
-            await pushMsg("同步开始");
+            await pushMsg("开始同步");
             await PluginMaster.runSync();
             await pushMsg("同步完成！");
         } else {
