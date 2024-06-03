@@ -3,7 +3,7 @@
 
 ### 功能介绍
 
-> 将 Memos 的数据同步到思源笔记。[<<更新日志](https://github.com/Yimien/plugin-memos-sync/blob/main/CHANGELOG.md)
+> 将 Memos 的数据同步到思源笔记。[<<更新日志](https://github.com/Yimien/plugin-memos-sync-helper/blob/main/CHANGELOG.md)
 
 1. 支持将 Memos 的数据同步到思源笔记中，包括但不限于文本、图片、标签、引用等。
 2. 支持新版 V1 API（原V2），兼容旧版 V1 API。
