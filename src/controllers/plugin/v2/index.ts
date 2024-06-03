@@ -1,4 +1,4 @@
-import {pushMsg, putFile} from "@/controllers/siyuan/api";
+import {putFile} from "@/controllers/siyuan/api";
 import {IResGetMemos} from "@/types/memos";
 import {DataHandleV2} from "@/controllers/plugin/v2/data-handle";
 import {debugMessage, isEmptyValue} from "@/utils";
@@ -35,12 +35,6 @@ export class PluginV2 {
         let allMemos: IResGetMemos = await MemosApiServiceV2.getMemos();
 
         debugMessage(pluginConfigData.debug.isDebug, "数据拉取完成", "", true);
-
-        // 判断是否有新数据
-        if (allMemos.new.length <= 0) {
-            await pushMsg("暂无新数据！");
-            return;
-        }
 
         // 数据处理
         debugMessage(pluginConfigData.debug.isDebug, "数据处理", "", true);

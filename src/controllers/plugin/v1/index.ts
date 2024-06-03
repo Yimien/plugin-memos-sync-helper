@@ -1,5 +1,5 @@
 import {pluginConfigData} from "@/index";
-import {pushMsg, putFile} from "@/controllers/siyuan/api";
+import {putFile} from "@/controllers/siyuan/api";
 import {MemosApiServiceV1} from "@/controllers/memos/v1";
 import {DataHandleV1} from "@/controllers/plugin/v1/data-handle";
 import {IResGetMemos} from "@/types/memos";
@@ -41,12 +41,6 @@ export class PluginV1 {
         let allMemos: IResGetMemos = await MemosApiServiceV1.getMemos();
 
         debugMessage(pluginConfigData.debug.isDebug, "数据拉取完成", "", true);
-
-        // 判断是否有新数据
-        if (allMemos.new.length <= 0) {
-            await pushMsg("暂无新数据！");
-            return;
-        }
 
         // 数据处理
         debugMessage(pluginConfigData.debug.isDebug, "数据处理", "", true);

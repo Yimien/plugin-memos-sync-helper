@@ -85,6 +85,8 @@ class Sync {
         Sync.status = sync_status.downloading;
         Sync.backupIcon();
         Sync.updateIcon();
+        console.log(this.iconBefore);
+        console.log(topBarElement.innerHTML);
     }
 
     /**
@@ -98,29 +100,9 @@ class Sync {
     /**
      * 同步成功
      */
-    static async syncSuccess(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
-        debugMessage(pluginConfigData.debug.isDebug, "正在修改同步状态以及图标……");
+    static syncSuccess() {
         Sync.status = sync_status.completed;
         Sync.updateIcon();
-        debugMessage(pluginConfigData.debug.isDebug, "修改完成！");
-
-        // 修改上次同步时间
-        if (pluginConfigData.debug.isDebug && pluginConfigData.debug.isAutoUpdateTime === false) {
-            return;
-        }
-        debugMessage(pluginConfigData.debug.isDebug, "正在修改上次同步时间……");
-        let config : IConfig = pluginConfigData;
-
-        await new Promise<void>((resolve) => {
-            setTimeout(() => {
-                config.filter.lastSyncTime = moment().format("YYYY-MM-DD HH:mm:ss");
-                debugMessage(pluginConfigData.debug.isDebug, "配置", config);
-                resolve(); // 标志 Promise 的状态已经改变
-            }, 1000);
-        });
-
-        await plugin.updateConfig(config);
-        debugMessage(pluginConfigData.debug.isDebug, "上次同步时间修改完成！");
     }
 
     /**
@@ -146,11 +128,14 @@ class Sync {
         let svg: any;
 
         if (Sync.status === sync_status.waiting) {
-            svg = ICONS.syncing.svg;
+            // svg = ICONS.syncing.svg;
+            svg = `<svg><use xlink:href="#${ICONS.syncing.name}"></use></svg>`
         } else if (Sync.status === sync_status.downloading) {
-            svg = ICONS.download.svg;
+            // svg = ICONS.download.svg;
+            svg = `<svg><use xlink:href="#${ICONS.download.name}"></use></svg>`;
         } else if (Sync.status === sync_status.completed) {
-            svg = ICONS.memos.svg;
+            // svg = ICONS.memos.svg;
+            svg = `<svg><use xlink:href="#${ICONS.memos.name}"></use></svg>`;
         }
 
         if (isMobile) {
@@ -252,23 +237,47 @@ export async function main(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
             await pushMsg("同步中，请稍候");
             return;
         } else {
-            await pushMsg("正在检查插件配置……");
             Sync.startSync();
         }
 
         // 检查配置项
-        const checkResult = await checkConfig();
-        if (!checkResult) {
+        const configIsOk = await checkConfig();
+        if (!configIsOk) {
+            Sync.syncError();
             return;
         }
 
-        await pushMsg("同步开始……");
+        const hasNew = await MemosServer.checkNew();
+        if (hasNew) {
+            // 同步
+            await pushMsg("同步开始");
+            await PluginMaster.runSync();
+            await pushMsg("同步完成！");
+        } else {
+            await pushMsg("暂无新数据！");
+        }
 
-        // 同步
-        await PluginMaster.runSync();
+        // 修改上次同步时间
+        if (!(pluginConfigData.debug.isDebug && pluginConfigData.debug.isAutoUpdateTime === false)) {
+            debugMessage(pluginConfigData.debug.isDebug, "正在修改上次同步时间……");
 
-        await Sync.syncSuccess(plugin);
-        await pushMsg("同步成功");
+            let config : IConfig = pluginConfigData;
+
+            await new Promise<void>((resolve) => {
+                setTimeout(() => {
+                    config.filter.lastSyncTime = moment().format("YYYY-MM-DD HH:mm:ss");
+                    debugMessage(pluginConfigData.debug.isDebug, "配置", config);
+                    resolve(); // 标志 Promise 的状态已经改变
+                }, 1000);
+            });
+
+            await plugin.updateConfig(config);
+
+            debugMessage(pluginConfigData.debug.isDebug, "上次同步时间修改完成！");
+        }
+
+        Sync.syncSuccess();
+
     } catch (error) {
         Sync.syncError();
         await pushErrMsg(`${STORAGE_NAME}：${error}`);
