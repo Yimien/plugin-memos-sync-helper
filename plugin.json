@@ -6,16 +6,12 @@
   "minAppVersion": "3.0.12",
   "backends": [
     "windows",
-    "linux",
-    "darwin",
-    "ios",
-    "android"
+    "docker",
+    "darwin"
   ],
   "frontends": [
     "desktop",
-    "mobile",
     "browser-desktop",
-    "browser-mobile",
     "desktop-window"
   ],
   "displayName": {
@@ -28,7 +24,7 @@
   },
   "readme": {
     "en_US": "README.md",
-    "zh_CN": "README_zh_CN.md"
+    "zh_CN": "README.md"
   },
   "funding": {
     "custom": [
