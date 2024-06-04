@@ -88,6 +88,8 @@
         <Item
                 title="Memos 版本"
                 text="当前服务器上运行的 Memos 版本"
+                isTip={true}
+                tipTest="v0.22及以上版本 API 不适用于 docker 端思源笔记"
         >
             <Input
                     slot="input"
