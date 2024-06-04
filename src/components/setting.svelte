@@ -6,7 +6,7 @@
 
     import {panelKey, PANELS} from "@/constants/components/panels";
     import {itemType} from "@/constants/components/input";
-    import {MEMOS_SORT_OPTIONS, SYNC_PLAN_OPTIONS, VERSION_OPTIONS} from "@/constants/components/select";
+    import {MEMOS_SORT_OPTIONS, SYNC_PLAN_OPTIONS, syncPlanKey, VERSION_OPTIONS} from "@/constants/components/select";
 
     import {IOptions} from "@/types/components/item.d";
     import {IConfig} from "@/types/config/default.d";
@@ -206,6 +206,8 @@
         <Item
                 title="数据排序"
                 text="根据更新日期对同步的数据进行升序或降序排序"
+                isTip={true}
+                tipTest="当同步方案为 {SYNC_PLAN_OPTIONS[1].text} 时，本功能不生效"
         >
             <Input
                     slot="input"
