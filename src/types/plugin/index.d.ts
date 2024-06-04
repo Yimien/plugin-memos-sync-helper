@@ -2,6 +2,7 @@ import {INewMemoV1, IResDataHandleRunV1} from "@/types/plugin/v1/handle";
 import {INewMemoV2, IResDataHandleRunV2} from "@/types/plugin/v2/handle";
 
 export interface IItemCondition {
+    text: string,
     flag: boolean,
     value: any
 }

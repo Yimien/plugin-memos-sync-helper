@@ -33,28 +33,42 @@ class PlugConfig {
 
             pluginConfigData.filter.lastSyncTime,
 
-            pluginConfigData.debug.isDebug,
-            pluginConfigData.debug.isAutoUpdateTime
+            pluginConfigData.debug.isDebug
         ]
 
         const itemsConditions: IItemCondition[] = [
             {
+                text: "文档路径",
                 flag: pluginConfigData.base.syncPlan === syncPlanKey.sameDoc,
                 value: pluginConfigData.base.docPath
             },
             {
-                flag: !(isEmptyValue(pluginConfigData.advanced.isSuperLabel)),
+                text: "主题路径",
+                flag: pluginConfigData.advanced.isHandleBacklinks,
+                value: pluginConfigData.advanced.subjectPath
+            },
+            {
+                text: "上级标签名称",
+                flag: pluginConfigData.advanced.isSuperLabel,
                 value: pluginConfigData.advanced.labelName
             },
             {
-                flag: !(isEmptyValue(pluginConfigData.advanced.isHandleVideo)),
+                text: "需要优化的视频样式",
+                flag: pluginConfigData.advanced.isHandleVideo,
                 value: pluginConfigData.advanced.videoFormats
+            },
+            {
+                text: "是否允许自动更新上次同步时间",
+                flag: pluginConfigData.debug.isDebug,
+                value: pluginConfigData.debug.isAutoUpdateTime
             }
         ]
+        debugMessage(pluginConfigData.debug.isDebug, "插件配置", pluginConfigData);
 
         // 判断必填项是否存在
         for (const item of items) {
             if (isEmptyValue(item)) {
+                debugMessage(pluginConfigData.debug.isDebug, "验证失败", item);
                 return false;
             }
         }
@@ -62,6 +76,7 @@ class PlugConfig {
         // 判断某种条件的必填项是否存在
         for (const itemsCondition of itemsConditions) {
             if (itemsCondition.flag && isEmptyValue(itemsCondition.value)) {
+                debugMessage(pluginConfigData.debug.isDebug, "验证失败", itemsCondition.text);
                 return false;
             }
         }
