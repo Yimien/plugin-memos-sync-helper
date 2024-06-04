@@ -115,26 +115,37 @@ export abstract class DataHandleBase {
         let content = '';
 
         let splits = stringSplit(memo.content, '\n'); // 拆分源数据
-
+        // debugMessage(pluginConfigData.debug.isDebug, "内容根据换行符拆分成列表", splits);
         let regex = regexMemosContent.embedded;
-        for (let m of splits) {
+        for (let i = 0; i < splits.length; i++) {
+            let m = splits[i];
             // 判断是否是嵌入内容
             const isEmbedded = regex.test(m);
+            // debugMessage(pluginConfigData.debug.isDebug, "m", m);
+            // debugMessage(pluginConfigData.debug.isDebug, "content", content);
             if (isEmbedded) {
+                // debugMessage(pluginConfigData.debug.isDebug, "是嵌入块", m);
                 this.saveContents(contents, content, contentsType.text);
                 this.saveContents(contents, m, contentsType.embedded);
                 content = "";
             } else {
+                // debugMessage(pluginConfigData.debug.isDebug, "不是嵌入块", m);
                 content += m;
-                if (m !== splits[splits.length - 1]) {
-                    content += '\n';
-                } else {
+                if (i === splits.length -1) {
+                    // 最后一条数据
                     this.saveContents(contents, content, contentsType.text);
+                    // debugMessage(pluginConfigData.debug.isDebug, "保存进列表");
+                } else {
+                    content += '\n';
+                    // debugMessage(pluginConfigData.debug.isDebug, "添加换行符", content);
                 }
                 // Handle.saveContents(contents, m, contentsType.text);
+                // debugMessage(pluginConfigData.debug.isDebug, "content", content);
             }
             regex.lastIndex = 0;
+            // debugMessage(pluginConfigData.debug.isDebug, "----------");
         }
+        // debugMessage(pluginConfigData.debug.isDebug, "contents", contents);
         await this.handleContent(contents);
         return contents;
     }
