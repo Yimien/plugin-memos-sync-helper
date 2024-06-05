@@ -85,12 +85,14 @@ class PlugConfig {
         // 文档路径
         if (!isEmptyValue(pluginConfigData.base.docPath)
             && pluginConfigData.base.docPath.charAt(0) !== '/') {
+            debugMessage(pluginConfigData.debug.isDebug, "文档路径应当以'/'开头");
             return false;
         }
 
         // 主题路径
         if (!isEmptyValue(pluginConfigData.advanced.subjectPath)
             && pluginConfigData.advanced.subjectPath.charAt(0) !== '/') {
+            debugMessage(pluginConfigData.debug.isDebug, "主题路径当以'/'开头");
             return false;
         }
 
@@ -98,6 +100,7 @@ class PlugConfig {
         if (!isEmptyValue(pluginConfigData.advanced.labelName)
             && (pluginConfigData.advanced.labelName.charAt(0) === '/'
             || pluginConfigData.advanced.labelName.charAt(pluginConfigData.advanced.labelName.length - 1) === '/')) {
+            debugMessage(pluginConfigData.debug.isDebug, "标签名称不应以'/'开头或结尾");
             return false;
         }
 
