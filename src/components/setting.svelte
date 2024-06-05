@@ -6,7 +6,7 @@
 
     import {panelKey, PANELS} from "@/constants/components/panels";
     import {itemType} from "@/constants/components/input";
-    import {MEMOS_SORT_OPTIONS, SYNC_PLAN_OPTIONS, syncPlanKey, VERSION_OPTIONS} from "@/constants/components/select";
+    import {MEMOS_SORT_OPTIONS, SYNC_PLAN_OPTIONS, VERSION_OPTIONS} from "@/constants/components/select";
 
     import {IOptions} from "@/types/components/item.d";
     import {IConfig} from "@/types/config/default.d";
@@ -44,7 +44,7 @@
                 docPathIsRequired = false;
                 break;
             case SYNC_PLAN_OPTIONS[1].key:
-                syncPlanText = `请配置同步笔记本，如需保存至指定文档下需配置文档路径`;
+                syncPlanText = `请配置同步笔记本，如需保存至指定文档下请配置文档路径`;
                 docPathIsShow = true;
                 docPathIsRequired = false;
                 docPathText = "将同步数据保存在指定路径的文档下级"
@@ -74,8 +74,8 @@
 >
     <Panel display={PANELS[0].key === focusPanel}>
         <Item
-                title="校验"
-                text="校验 Access Token 是否失效"
+                title="Access Token 校验"
+                text="校验 Access Token 是否有效"
         >
             <Input
                     slot="input"
@@ -86,10 +86,10 @@
             />
         </Item>
         <Item
-                title="Memos 版本"
+                title="memos 版本"
                 text="当前服务器上运行的 Memos 版本"
                 isTip={true}
-                tipTest="v0.22及以上版本 API 不适用于 docker 端思源笔记"
+                tipTest="v0.22及以上版本不适用于docker版思源笔记"
         >
             <Input
                     slot="input"
@@ -106,7 +106,7 @@
         </Item>
         <Item
                 title="服务器地址"
-                text="访问 Memos 的地址"
+                text="访问 memos 的地址"
                 block={true}
                 isRequired={true}
         >
@@ -126,7 +126,7 @@
         </Item>
         <Item
                 title="Access Token"
-                text="请在 Memos 设置页面获取"
+                text="请在 memos 设置页面获取"
                 block={true}
                 isRequired={true}
         >
@@ -135,7 +135,6 @@
                     type={itemType.text}
                     settingKey="Token"
                     settingValue={config.base.token}
-                    placeholder="在 Memos 的‘我的账号’页面自行创建"
                     block={true}
                     on:changed={e => {
                         config.base.token = e.detail.value;
@@ -277,7 +276,6 @@
                 isTip={true}
                 tipTest="若本项为空，则自动创建的文档会直接保存在同步笔记本下"
                 block={true}
-                isRequired={true}
                 isShow={subjectPathIsShow}
         >
             <Input

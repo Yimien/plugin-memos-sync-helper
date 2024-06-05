@@ -43,11 +43,6 @@ class PlugConfig {
                 value: pluginConfigData.base.docPath
             },
             {
-                text: "主题路径",
-                flag: pluginConfigData.advanced.isHandleBacklinks,
-                value: pluginConfigData.advanced.subjectPath
-            },
-            {
                 text: "上级标签名称",
                 flag: pluginConfigData.advanced.isSuperLabel,
                 value: pluginConfigData.advanced.labelName
@@ -63,7 +58,6 @@ class PlugConfig {
                 value: pluginConfigData.debug.isAutoUpdateTime
             }
         ]
-        debugMessage(pluginConfigData.debug.isDebug, "插件配置", pluginConfigData);
 
         // 判断必填项是否存在
         for (const item of items) {
@@ -79,6 +73,32 @@ class PlugConfig {
                 debugMessage(pluginConfigData.debug.isDebug, "验证失败", itemsCondition.text);
                 return false;
             }
+        }
+
+        // 服务器路径
+        if (!isEmptyValue(pluginConfigData.base.host)
+            && pluginConfigData.base.host.charAt(pluginConfigData.base.host.length - 1) === '/') {
+            debugMessage(pluginConfigData.debug.isDebug, "服务器路径不应以'/'结尾");
+            return false;
+        }
+
+        // 文档路径
+        if (!isEmptyValue(pluginConfigData.base.docPath)
+            && pluginConfigData.base.docPath.charAt(0) !== '/') {
+            return false;
+        }
+
+        // 主题路径
+        if (!isEmptyValue(pluginConfigData.advanced.subjectPath)
+            && pluginConfigData.advanced.subjectPath.charAt(0) !== '/') {
+            return false;
+        }
+
+        // 标签名称
+        if (!isEmptyValue(pluginConfigData.advanced.labelName)
+            && (pluginConfigData.advanced.labelName.charAt(0) === '/'
+            || pluginConfigData.advanced.labelName.charAt(pluginConfigData.advanced.labelName.length - 1) === '/')) {
+            return false;
         }
 
         // 判断同步笔记本是否存在
