@@ -8,6 +8,7 @@ import {GetMemoById} from "@/controllers/memos/v1/api";
 import {IMemoV2} from "@/types/memos/v2";
 import {GetMemo} from "@/controllers/memos/v2/api";
 import {IMemoV1} from "@/types/memos/v1";
+import {API_V2_LIST} from "@/constants/memos";
 
 
 let isRepair = false;
@@ -47,7 +48,7 @@ export async function repair() {
             // debugMessage(pluginConfigData.debug.isDebug, "memo", memo);
         }
 
-    } else if (pluginConfigData.base.version === versionKey.v2) {
+    } else if (API_V2_LIST.includes(pluginConfigData.base.version)) {
         for (let m of memosIdLinkBlockIdList) {
             let memo : IMemoV2 = await GetMemo(m.memoId);
             if (isEmptyValue(memo)) {

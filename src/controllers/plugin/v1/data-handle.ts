@@ -2,7 +2,6 @@ import {debugMessage} from "@/utils";
 import {IResGetMemos} from "@/types/memos";
 import {pluginConfigData} from "@/index";
 import {formatDateTime} from "@/utils/misc/time";
-import {MEMOS_ASSETS} from "@/constants";
 import {IContents} from "@/types/plugin";
 import {IMemoV1, IResourceV1} from "@/types/memos/v1";
 import {IResDataHandleRunV1} from "@/types/plugin/v1/handle";
@@ -49,7 +48,7 @@ export class DataHandleV1 extends DataHandleBase{
         let resourceId = resource.id.toString();
         let timestamp = resource.updatedTs;
         let end = filename.split('.').pop();
-        return `${MEMOS_ASSETS}/${resourceId}_${timestamp}.${end}`;
+        return `${pluginConfigData.base.resourceSavePath}/${resourceId}_${timestamp}.${end}`;
     }
 
 

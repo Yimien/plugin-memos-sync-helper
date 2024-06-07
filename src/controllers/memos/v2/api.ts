@@ -67,7 +67,7 @@ export async function ListMemos(pageSize?: number, pageToken?: string, filter?: 
  * @constructor /file/resources/35
  */
 export async function GetResourceBinary(name: string, filename: string) {
-    return await Requests.send(METHOD.GET, `/file/${name}/${filename}`);
+    return await Requests.get(`/file/${name}/${filename}`);
 }
 
 export async function DownloadResourceByName(name: string) {

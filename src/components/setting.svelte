@@ -183,7 +183,6 @@
         <Item
                 title="文档路径"
                 text={docPathText}
-                block={true}
                 isRequired={docPathIsRequired}
                 isShow={docPathIsShow}
         >
@@ -193,9 +192,28 @@
                     settingKey="docPath"
                     settingValue={config.base.docPath}
                     placeholder="请以'/'开头进行填写"
-                    block={true}
                     on:changed={e => {
                         config.base.docPath = e.detail.value;
+                        updated();
+                    }
+                }
+            />
+        </Item>
+
+        <Item
+                title="资源保存路径"
+                text="保存 memos 资源的路径"
+                isRequired={true}
+                isShow={true}
+        >
+            <Input
+                    slot="input"
+                    type={itemType.text}
+                    settingKey="resourceSavePath"
+                    settingValue={config.base.resourceSavePath}
+                    placeholder="开头和结尾请不要保存'/'"
+                    on:changed={e => {
+                        config.base.resourceSavePath = e.detail.value;
                         updated();
                     }
                 }
@@ -424,7 +442,7 @@
         <Item
                 title="测试"
                 text="测试功能"
-                isShow={false}
+                isShow={true}
         >
             <Input
                     slot="input"

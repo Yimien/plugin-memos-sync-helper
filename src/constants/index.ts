@@ -11,4 +11,4 @@ export const STORAGE_NAME: string = "plugin-memos-sync-helper";
 /**
  * 资源路径
  */
-export const MEMOS_ASSETS = "assets/memos";
+export const MEMOS_ASSETS = "assets/memos/resources";

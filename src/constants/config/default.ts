@@ -4,12 +4,13 @@ import {memosSortKey, syncPlanKey, versionKey} from "@/constants/components/sele
 
 export const DEFAULT_CONFIG: IConfig = {
     base: {
-        version: versionKey.v2,
+        version: versionKey.stable,
         host: "",
         token: "",
         syncPlan: syncPlanKey.dailyNotes,
         notebook: "",
         docPath: "",
+        resourceSavePath: "assets/memos/resources",
         memosSort: memosSortKey.asc
     },
     advanced: {

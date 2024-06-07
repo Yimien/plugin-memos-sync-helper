@@ -24,6 +24,7 @@ class PlugConfig {
             pluginConfigData.base.token,
             pluginConfigData.base.syncPlan,
             pluginConfigData.base.notebook,
+            pluginConfigData.base.resourceSavePath,
             pluginConfigData.base.memosSort,
 
             pluginConfigData.advanced.isHandleBacklinks,
@@ -59,6 +60,34 @@ class PlugConfig {
             }
         ]
 
+        const stringIsOk =[
+            {
+                value: pluginConfigData.base.host,
+                text: "服务器路径",
+                check: [null, false]
+            },
+            {
+                value: pluginConfigData.base.docPath,
+                text: "文档路径",
+                check: [true, false]
+            },
+            {
+                value: pluginConfigData.base.resourceSavePath,
+                text: "资源保存路径",
+                check: [false, false]
+            },
+            {
+                value: pluginConfigData.advanced.subjectPath,
+                text: "主题路径",
+                check: [true, false]
+            },
+            {
+                value: pluginConfigData.advanced.labelName,
+                text: "标签名称",
+                check: [false, false]
+            }
+        ]
+
         // 判断必填项是否存在
         for (const item of items) {
             if (isEmptyValue(item)) {
@@ -75,33 +104,28 @@ class PlugConfig {
             }
         }
 
-        // 服务器路径
-        if (!isEmptyValue(pluginConfigData.base.host)
-            && pluginConfigData.base.host.charAt(pluginConfigData.base.host.length - 1) === '/') {
-            debugMessage(pluginConfigData.debug.isDebug, "服务器路径不应以'/'结尾");
-            return false;
-        }
+        for (let item of stringIsOk){
+            if (item.check[0] !== null) {
+                if (item.check[0] === true && item.value.charAt(0) !== '/') {
+                    debugMessage(pluginConfigData.debug.isDebug, `${item.text} 应当以'/'开头`);
+                    return false;
+                }
+                if (item.check[0] === false && item.value.charAt(0) === '/') {
+                    debugMessage(pluginConfigData.debug.isDebug, `${item.text} 不应以'/'开头`);
+                    return false;
+                }
+            }
 
-        // 文档路径
-        if (!isEmptyValue(pluginConfigData.base.docPath)
-            && pluginConfigData.base.docPath.charAt(0) !== '/') {
-            debugMessage(pluginConfigData.debug.isDebug, "文档路径应当以'/'开头");
-            return false;
-        }
-
-        // 主题路径
-        if (!isEmptyValue(pluginConfigData.advanced.subjectPath)
-            && pluginConfigData.advanced.subjectPath.charAt(0) !== '/') {
-            debugMessage(pluginConfigData.debug.isDebug, "主题路径当以'/'开头");
-            return false;
-        }
-
-        // 标签名称
-        if (!isEmptyValue(pluginConfigData.advanced.labelName)
-            && (pluginConfigData.advanced.labelName.charAt(0) === '/'
-            || pluginConfigData.advanced.labelName.charAt(pluginConfigData.advanced.labelName.length - 1) === '/')) {
-            debugMessage(pluginConfigData.debug.isDebug, "标签名称不应以'/'开头或结尾");
-            return false;
+            if (item.check[1] !== null) {
+                if (item.check[1] === true && item.value.charAt(item.value.length - 1) !== '/') {
+                    debugMessage(pluginConfigData.debug.isDebug, `${item.text} 应当以'/'结尾`);
+                    return false;
+                }
+                if (item.check[1] === false && item.value.charAt(item.value.length - 1) === '/') {
+                    debugMessage(pluginConfigData.debug.isDebug, `${item.text} 不应以'/'结尾`);
+                    return false;
+                }
+            }
         }
 
         // 判断同步笔记本是否存在
@@ -261,7 +285,6 @@ export async function checkNew() {
  */
 export async function test() {
     debugMessage(pluginConfigData.debug.isDebug, "开始测试", "", true);
-
 
     debugMessage(pluginConfigData.debug.isDebug, "测试结束", "", true);
 }

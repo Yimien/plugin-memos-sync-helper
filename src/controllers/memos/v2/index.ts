@@ -5,6 +5,7 @@ import {toChinaTime, formatDateTime,} from "@/utils/misc/time";
 import {IResGetMemos} from "@/types/memos";
 import moment from "moment";
 import {IResourceV2} from "@/types/memos/v2";
+import {versionKey} from "@/constants/components/select";
 
 
 export class MemosApiServiceV2 {
@@ -119,7 +120,10 @@ export class MemosApiServiceV2 {
     }
 
     static async downloadResource(resource: IResourceV2) {
-        let name = resource.name;
-        return await DownloadResourceByName(name);
+        if (pluginConfigData.base.version === versionKey.v0_22_0) {
+            return await DownloadResourceByName(resource.name);
+        } else {
+            return await GetResourceBinary(resource.name, resource.filename);
+        }
     }
 }

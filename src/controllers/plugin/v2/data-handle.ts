@@ -5,7 +5,6 @@ import {IMemoV2, IResourceV2} from "@/types/memos/v2";
 import {formatDateTime, toChinaTime} from "@/utils/misc/time";
 import {IResDataHandleRunV2} from "@/types/plugin/v2/handle";
 import moment from "moment/moment";
-import {MEMOS_ASSETS} from "@/constants";
 import {IContents} from "@/types/plugin";
 import {DataHandleBase} from "@/controllers/plugin/common/handle/DataHandleBase";
 
@@ -47,7 +46,7 @@ export class DataHandleV2 extends DataHandleBase{
         let resourceId = resource.name.split('/').pop();
         let timestamp = moment(toChinaTime(resource.createTime)).unix();
         let end = filename.split('.').pop();
-        return `${MEMOS_ASSETS}/${resourceId}_${timestamp}.${end}`;
+        return `${pluginConfigData.base.resourceSavePath}/${resourceId}_${timestamp}.${end}`;
     }
 
 
@@ -65,8 +64,6 @@ export class DataHandleV2 extends DataHandleBase{
 
 
     static async run(data: IResGetMemos) : Promise<IResDataHandleRunV2> {
-        debugMessage(pluginConfigData.debug.isDebug, "数据处理", "", true);
-
         let dh = new DataHandleV2();
 
         await dh.handleMemos(data.new);

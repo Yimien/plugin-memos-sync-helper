@@ -3,6 +3,7 @@ import {versionKey} from "@/constants/components/select";
 import {MemosApiServiceV1} from "./v1/index"
 import {MemosApiServiceV2} from "./v2/index"
 import {IResGetMemos} from "@/types/memos";
+import {API_V2_LIST} from "@/constants/memos";
 
 
 export class MemosServer {
@@ -17,7 +18,7 @@ export class MemosServer {
 
         if (version === versionKey.v1) {
             result = await MemosApiServiceV1.checkAccessToken();
-        } else if (version === versionKey.v2) {
+        } else if (API_V2_LIST.includes(version)) {
             result = await MemosApiServiceV2.checkAccessToken();
         }
         return result;
@@ -33,7 +34,7 @@ export class MemosServer {
 
         if (version === versionKey.v1) {
             result = await MemosApiServiceV1.checkNew();
-        } else if (version === versionKey.v2) {
+        } else if (API_V2_LIST.includes(version)) {
             result = await MemosApiServiceV2.checkNew();
         }
         return result;
@@ -49,7 +50,7 @@ export class MemosServer {
 
         if (version === versionKey.v1) {
             result = await MemosApiServiceV1.getMemos();
-        } else if (version === versionKey.v2) {
+        } else if (API_V2_LIST.includes(version)) {
             result = await MemosApiServiceV2.getMemos();
         }
         return result;

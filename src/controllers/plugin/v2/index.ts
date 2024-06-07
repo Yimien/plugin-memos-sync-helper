@@ -17,8 +17,8 @@ export class PluginV2 {
     static async downloadResources(resources: IResourceV2[]) {
         for (let resource of resources) {
             let response = await MemosApiServiceV2.downloadResource(resource);
+            debugMessage(pluginConfigData.debug.isDebug, "响应结果", response);
             if (isEmptyValue(response)) {
-                debugMessage(pluginConfigData.debug.isDebug, "下载失败", response);
                 continue;
             }
             let fileBlob = await response.blob();

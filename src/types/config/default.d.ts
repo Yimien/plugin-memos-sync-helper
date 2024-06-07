@@ -2,7 +2,7 @@ export interface IBase {
     /**
      * Memos 版本号
      */
-    version: string | number,
+    version: number,
     /**
      * 服务器地址
      */
@@ -14,7 +14,7 @@ export interface IBase {
     /**
      * 同步方案
      */
-    syncPlan: string | number,
+    syncPlan: number,
     /**
      * 笔记本
      */
@@ -24,9 +24,13 @@ export interface IBase {
      */
     docPath: string,
     /**
+     * 资源保存路径
+     */
+    resourceSavePath,
+    /**
      * 排序
      */
-    memosSort: string | number
+    memosSort: number
 }
 
 export interface IAdvanced {

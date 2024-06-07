@@ -35,7 +35,6 @@ export class Requests {
      */
     static getHeaders() {
         return new Headers({
-            'Content-Type': 'application/json; charset=UTF-8',
             'User-Agent': UA.ua,
             'Authorization': `Bearer ${pluginConfigData.base.token}`
         });
