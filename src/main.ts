@@ -99,26 +99,31 @@ class PlugConfig {
 
         const inputItems =[
             {
+                flag: true,
                 value: pluginConfigData.base.host,
                 text: "服务器路径",
                 check: [null, false]
             },
             {
+                flag: pluginConfigData.base.syncPlan === syncPlanKey.sameDoc,
                 value: pluginConfigData.base.docPath,
                 text: "文档路径",
                 check: [true, false]
             },
             {
+                flag: true,
                 value: pluginConfigData.base.resourceSavePath,
                 text: "资源保存路径",
                 check: [false, false]
             },
             {
+                flag: true,
                 value: pluginConfigData.advanced.subjectPath,
                 text: "主题路径",
                 check: [true, false]
             },
             {
+                flag: true,
                 value: pluginConfigData.advanced.labelName,
                 text: "标签名称",
                 check: [false, false]
@@ -146,6 +151,9 @@ class PlugConfig {
         }
 
         for (let item of inputItems){
+            if (!item.flag) {
+                continue;
+            }
             if (item.check[0] !== null) {
                 if (item.check[0] === true && item.value.charAt(0) !== '/') {
                     debugMessage(pluginConfigData.debug.isDebug, `${item.text} 应当以'/'开头`);
