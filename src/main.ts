@@ -117,13 +117,13 @@ class PlugConfig {
                 check: [false, false]
             },
             {
-                flag: true,
+                flag: pluginConfigData.advanced.isHandleBacklinks,
                 value: pluginConfigData.advanced.subjectPath,
                 text: "主题路径",
                 check: [true, false]
             },
             {
-                flag: true,
+                flag: pluginConfigData.advanced.isSuperLabel,
                 value: pluginConfigData.advanced.labelName,
                 text: "标签名称",
                 check: [false, false]
@@ -155,14 +155,14 @@ class PlugConfig {
                 continue;
             }
             if (item.check[0] !== null) {
-                if (item.check[0] === true && item.value.charAt(0) !== '/') {
+                if (item.check[0] === true && !isEmptyValue(item.value) && item.value.charAt(0) !== '/') {
                     debugMessage(pluginConfigData.debug.isDebug, `${item.text} 应当以'/'开头`);
                     return {
                         flag: false,
                         tip: `请检查 ${item.text} 是否配置正确！`
                     };
                 }
-                if (item.check[0] === false && item.value.charAt(0) === '/') {
+                if (item.check[0] === false && !isEmptyValue(item.value) &&  item.value.charAt(0) === '/') {
                     debugMessage(pluginConfigData.debug.isDebug, `${item.text} 不应以'/'开头`);
                     return {
                         flag: false,
@@ -172,14 +172,14 @@ class PlugConfig {
             }
 
             if (item.check[1] !== null) {
-                if (item.check[1] === true && item.value.charAt(item.value.length - 1) !== '/') {
+                if (item.check[1] === true && !isEmptyValue(item.value) && item.value.charAt(item.value.length - 1) !== '/') {
                     debugMessage(pluginConfigData.debug.isDebug, `${item.text} 应当以'/'结尾`);
                     return {
                         flag: false,
                         tip: `请检查 ${item.text} 是否配置正确！`
                     };
                 }
-                if (item.check[1] === false && item.value.charAt(item.value.length - 1) === '/') {
+                if (item.check[1] === false && !isEmptyValue(item.value) && item.value.charAt(item.value.length - 1) === '/') {
                     debugMessage(pluginConfigData.debug.isDebug, `${item.text} 不应以'/'结尾`);
                     return {
                         flag: false,
