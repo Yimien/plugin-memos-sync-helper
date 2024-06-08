@@ -86,7 +86,7 @@
             />
         </Item>
         <Item
-                title="memos 版本"
+                title="Memos 版本"
                 text="当前服务器上运行的 Memos 版本"
                 isTip={true}
                 tipTest="v0.22及以上版本不适用于docker版思源笔记"
@@ -106,7 +106,7 @@
         </Item>
         <Item
                 title="服务器地址"
-                text="访问 memos 的地址"
+                text="访问 Memos 的地址"
                 block={true}
                 isRequired={true}
         >
@@ -126,7 +126,7 @@
         </Item>
         <Item
                 title="Access Token"
-                text="请在 memos 设置页面获取"
+                text="请在 Memos 设置页面获取"
                 block={true}
                 isRequired={true}
         >
@@ -202,7 +202,7 @@
 
         <Item
                 title="资源保存路径"
-                text="保存 memos 资源的路径"
+                text="保存 Memos 资源的路径"
                 isRequired={true}
                 isShow={true}
         >
@@ -211,7 +211,7 @@
                     type={itemType.text}
                     settingKey="resourceSavePath"
                     settingValue={config.base.resourceSavePath}
-                    placeholder="开头和结尾请不要保存'/'"
+                    placeholder="开头和结尾请不要保存 '/'"
                     on:changed={e => {
                         config.base.resourceSavePath = e.detail.value;
                         updated();
@@ -256,7 +256,7 @@
         </Item>
         <Item
                 title="识别超链接"
-                text="识别超链接并转换成可点击的样式"
+                text="识别超链接并转换成可点击打开的样式"
         >
             <Input
                     slot="input"
@@ -271,8 +271,8 @@
             />
         </Item>
         <Item
-                title="识别双向链接符号"
-                text="识别双向链接符号并自动关联对应文档"
+                title="识别双向链接"
+                text="识别双向链接符号<code class='fn__code'>((</code> <code class='fn__code'>))</code>并自动关联对应文档"
                 isTip={true}
                 tipTest="只支持文档块的匹配"
         >
@@ -301,7 +301,7 @@
                     type={itemType.text}
                     settingKey="SubjectPath"
                     settingValue={config.advanced.subjectPath}
-                    placeholder="请以'/'开头进行填写"
+                    placeholder="请以 / 开头进行填写"
                     block={true}
                     on:changed={e => {
                         config.advanced.subjectPath = e.detail.value;
@@ -312,7 +312,7 @@
         </Item>
         <Item
                 title="优化视频样式"
-                text="识别对应的格式的视频文件并转换成可点击播放的样式"
+                text="识别指定格式的视频文件并转换成可点击播放的样式"
         >
             <Input
                     slot="input"
@@ -328,7 +328,7 @@
         </Item>
         <Item
                 title="需要优化的视频格式"
-                text="配置哪些格式的视频文件需要转换，使用英文分号 ';' 进行分隔"
+                text="配置需要转换的视频文件格式，以英文分号 <code class='fn__code'>;</code> 分隔"
                 block={true}
                 isRequired={true}
                 isShow={videoFormatsIsShow}
@@ -348,7 +348,7 @@
             />
         </Item>
         <Item
-                title="标签管理优化"
+                title="优化标签管理"
                 text="为所有的标签增加一个统一的上级标签"
         >
             <Input
@@ -364,8 +364,8 @@
             />
         </Item>
         <Item
-                title="上级标签名称"
-                text="配置上级标签的名称"
+                title="标签名称"
+                text="自定义上级标签的名称"
                 isRequired={true}
                 isShow={labelNameIsShow}
         >
@@ -374,7 +374,7 @@
                     type={itemType.text}
                     settingKey="LabelName"
                     settingValue={config.advanced.labelName}
-                    placeholder="请确认开头和结尾没有'/'"
+                    placeholder="请确认开头和结尾没有 '/'"
                     on:changed={e => {
                         config.advanced.labelName = e.detail.value;
                         updated();
@@ -387,7 +387,7 @@
     <Panel display={PANELS[2].key === focusPanel}>
         <Item
                 title="上次同步时间"
-                text="上次完成同步的时间，在同步完成后自动更新"
+                text="在同步完成后自动更新"
 
         >
             <Input
@@ -408,7 +408,7 @@
     <Panel display={PANELS[3].key === focusPanel}>
         <Item
                 title="调试模式"
-                text="开启后将在控制台输出执行日志"
+                text="开启后将在控制台输出操作日志"
         >
             <Input
                     slot="input"
@@ -442,7 +442,7 @@
         <Item
                 title="测试"
                 text="测试功能"
-                isShow={true}
+                isShow={false}
         >
             <Input
                     slot="input"

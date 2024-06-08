@@ -18,40 +18,77 @@ class PlugConfig {
      * 检查插件配置是否正确
      */
     static async check() {
-        const items = [
-            pluginConfigData.base.version,
-            pluginConfigData.base.host,
-            pluginConfigData.base.token,
-            pluginConfigData.base.syncPlan,
-            pluginConfigData.base.notebook,
-            pluginConfigData.base.resourceSavePath,
-            pluginConfigData.base.memosSort,
+        const requiredItems = [
+            {
+                value: pluginConfigData.base.version,
+                text: "Memos 版本"
+            },
+            {
+                value: pluginConfigData.base.host,
+                text: "服务器地址"
+            },
+            {
+                value: pluginConfigData.base.token,
+                text: "Access Token"
+            },
+            {
+                value: pluginConfigData.base.syncPlan,
+                text: "同步方案"
+            },
+            {
+                value: pluginConfigData.base.notebook,
+                text: "同步笔记本"
+            },
+            {
+                value: pluginConfigData.base.resourceSavePath,
+                text: "资源保存路径"
+            },
+            {
+                value: pluginConfigData.base.memosSort,
+                text: "数据排序"
+            },
+            {
+                value: pluginConfigData.advanced.isHandleHref,
+                text: "识别超链接开关"
+            },
+            {
+                value: pluginConfigData.advanced.isHandleBacklinks,
+                text: "识别双向链接开关"
+            },
+            {
+                value: pluginConfigData.advanced.isHandleVideo,
+                text: "优化视频样式开关"
+            },
+            {
+                value: pluginConfigData.advanced.isSuperLabel,
+                text: "优化标签管理开头"
+            },
 
-            pluginConfigData.advanced.isHandleBacklinks,
-            pluginConfigData.advanced.isSuperLabel,
-            pluginConfigData.advanced.isHandleVideo,
-            pluginConfigData.advanced.isHandleHref,
-
-            pluginConfigData.filter.lastSyncTime,
-
-            pluginConfigData.debug.isDebug
+            {
+                value: pluginConfigData.filter.lastSyncTime,
+                text: "上次同步时间"
+            },
+            {
+                value: pluginConfigData.debug.isDebug,
+                text: "调试模式开关"
+            }
         ]
 
-        const itemsConditions: IItemCondition[] = [
+        const conditionRequiredItems: IItemCondition[] = [
             {
                 text: "文档路径",
                 flag: pluginConfigData.base.syncPlan === syncPlanKey.sameDoc,
                 value: pluginConfigData.base.docPath
             },
             {
-                text: "上级标签名称",
-                flag: pluginConfigData.advanced.isSuperLabel,
-                value: pluginConfigData.advanced.labelName
-            },
-            {
                 text: "需要优化的视频样式",
                 flag: pluginConfigData.advanced.isHandleVideo,
                 value: pluginConfigData.advanced.videoFormats
+            },
+            {
+                text: "标签名称",
+                flag: pluginConfigData.advanced.isSuperLabel,
+                value: pluginConfigData.advanced.labelName
             },
             {
                 text: "是否允许自动更新上次同步时间",
@@ -60,7 +97,7 @@ class PlugConfig {
             }
         ]
 
-        const stringIsOk =[
+        const inputItems =[
             {
                 value: pluginConfigData.base.host,
                 text: "服务器路径",
@@ -89,41 +126,57 @@ class PlugConfig {
         ]
 
         // 判断必填项是否存在
-        for (const item of items) {
-            if (isEmptyValue(item)) {
-                debugMessage(pluginConfigData.debug.isDebug, "验证失败", item);
-                return false;
+        for (const item of requiredItems) {
+            if (isEmptyValue(item.value)) {
+                return {
+                    flag: false,
+                    tip: `请检查 ${item.text} 是否配置！`
+                };
             }
         }
 
         // 判断某种条件的必填项是否存在
-        for (const itemsCondition of itemsConditions) {
-            if (itemsCondition.flag && isEmptyValue(itemsCondition.value)) {
-                debugMessage(pluginConfigData.debug.isDebug, "验证失败", itemsCondition.text);
-                return false;
+        for (const item of conditionRequiredItems) {
+            if (item.flag && isEmptyValue(item.value)) {
+                return {
+                    flag: false,
+                    tip: `请检查 ${item.text} 是否配置！`
+                };
             }
         }
 
-        for (let item of stringIsOk){
+        for (let item of inputItems){
             if (item.check[0] !== null) {
                 if (item.check[0] === true && item.value.charAt(0) !== '/') {
                     debugMessage(pluginConfigData.debug.isDebug, `${item.text} 应当以'/'开头`);
-                    return false;
+                    return {
+                        flag: false,
+                        tip: `请检查 ${item.text} 是否配置正确！`
+                    };
                 }
                 if (item.check[0] === false && item.value.charAt(0) === '/') {
                     debugMessage(pluginConfigData.debug.isDebug, `${item.text} 不应以'/'开头`);
-                    return false;
+                    return {
+                        flag: false,
+                        tip: `请检查 ${item.text} 是否配置正确！`
+                    };
                 }
             }
 
             if (item.check[1] !== null) {
                 if (item.check[1] === true && item.value.charAt(item.value.length - 1) !== '/') {
                     debugMessage(pluginConfigData.debug.isDebug, `${item.text} 应当以'/'结尾`);
-                    return false;
+                    return {
+                        flag: false,
+                        tip: `请检查 ${item.text} 是否配置正确！`
+                    };
                 }
                 if (item.check[1] === false && item.value.charAt(item.value.length - 1) === '/') {
                     debugMessage(pluginConfigData.debug.isDebug, `${item.text} 不应以'/'结尾`);
-                    return false;
+                    return {
+                        flag: false,
+                        tip: `请检查 ${item.text} 是否配置正确！`
+                    };
                 }
             }
         }
@@ -131,7 +184,18 @@ class PlugConfig {
         // 判断同步笔记本是否存在
         let notebooks = await lsNotebooks();
         let notebookIdList: string[] = notebooks.notebooks.map(notebook => notebook.id);
-        return notebookIdList.includes(pluginConfigData.base.notebook);
+        let flag = notebookIdList.includes(pluginConfigData.base.notebook);
+        if (flag) {
+            return {
+                flag: true,
+                tip: "插件配置检查通过"
+            }
+        } else {
+            return {
+                flag: false,
+                tip: "请检查 同步笔记本 是否配置！"
+            }
+        }
     }
 }
 
@@ -231,10 +295,12 @@ class Sync {
 export async function checkConfig() {
     debugMessage(pluginConfigData.debug.isDebug, "正在检查插件配置...");
 
-    const result: boolean = await PlugConfig.check();
+    const result = await PlugConfig.check();
 
-    if (!result) {
-        await pushErrMsg("请检查插件配置是否正确！");
+    if (!result.flag) {
+        await pushErrMsg(result.tip);
+    } else {
+        await pushMsg(result.tip);
     }
 
     debugMessage(pluginConfigData.debug.isDebug, "检查完成");
@@ -248,11 +314,15 @@ export async function checkConfig() {
 export async function checkAccessToken() {
     debugMessage(pluginConfigData.debug.isDebug, "正在校验授权码...");
 
-    let result = await MemosServer.checkAccessToken();
-    if (result) {
-        await pushMsg("校验通过");
-    } else {
-        await pushErrMsg("校验失败，请检查服务器地址和授权码是否配置正确");
+    try {
+        let result = await MemosServer.checkAccessToken();
+        if (result) {
+            await pushMsg("校验通过");
+        } else {
+            await pushErrMsg("校验失败，请检查服务器地址和授权码是否配置正确");
+        }
+    } catch (error) {
+        await pushErrMsg(`校验失败: ${error.message}`);
     }
 
     debugMessage(pluginConfigData.debug.isDebug, "校验完成");
@@ -266,8 +336,8 @@ export async function checkNew() {
 
     const checkResult = await PlugConfig.check();
 
-    if (!checkResult) {
-        debugMessage(pluginConfigData.debug.isDebug, "请检查插件配置！");
+    if (!checkResult.flag) {
+        debugMessage(pluginConfigData.debug.isDebug, checkResult.tip);
         return;
     }
 
@@ -303,7 +373,7 @@ export async function main(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
 
         // 检查配置项
         const configIsOk = await checkConfig();
-        if (!configIsOk) {
+        if (!configIsOk.flag) {
             Sync.syncError();
             return;
         }
