@@ -43,10 +43,6 @@ export interface IAdvanced {
      */
     isHandleBacklinks: boolean,
     /**
-     * 主题路径
-     */
-    subjectPath: string,
-    /**
      * 是否处理视频资源
      */
     isHandleVideo: boolean,

@@ -16,7 +16,6 @@ export const DEFAULT_CONFIG: IConfig = {
     advanced: {
         isHandleHref: false,
         isHandleBacklinks: false,
-        subjectPath: "",
         isHandleVideo: false,
         videoFormats: "mp4",
         isSuperLabel: false,

@@ -32,7 +32,7 @@
     let docPathIsRequired = false; // 文档路径是否必须
     let docPathText = ""; // 文档路径的说明文字
 
-    let subjectPathIsShow = true; // 主题路径是否显示
+    // let subjectPathIsShow = true; // 主题路径是否显示
     let videoFormatsIsShow = true; // 需要优化的视频格式
     let labelNameIsShow = true; // 上级标签名称
 
@@ -59,7 +59,7 @@
                 syncPlanText = '';
         }
 
-        subjectPathIsShow = config.advanced.isHandleBacklinks;
+        // subjectPathIsShow = config.advanced.isHandleBacklinks;
         videoFormatsIsShow = config.advanced.isHandleVideo;
         labelNameIsShow = config.advanced.isSuperLabel;
     }
@@ -288,28 +288,28 @@
                 }
             />
         </Item>
-        <Item
-                title="主题路径"
-                text="配置保存识别双向链接时自动创建的文档路径"
-                isTip={true}
-                tipTest="若本项为空，则自动创建的文档会直接保存在同步笔记本下"
-                block={true}
-                isShow={subjectPathIsShow}
-        >
-            <Input
-                    slot="input"
-                    type={itemType.text}
-                    settingKey="SubjectPath"
-                    settingValue={config.advanced.subjectPath}
-                    placeholder="请以 / 开头进行填写"
-                    block={true}
-                    on:changed={e => {
-                        config.advanced.subjectPath = e.detail.value;
-                        updated();
-                    }
-                }
-            />
-        </Item>
+<!--        <Item-->
+<!--                title="主题路径"-->
+<!--                text="配置保存识别双向链接时自动创建的文档路径"-->
+<!--                isTip={true}-->
+<!--                tipTest="若本项为空，则自动创建的文档会直接保存在同步笔记本下"-->
+<!--                block={true}-->
+<!--                isShow={subjectPathIsShow}-->
+<!--        >-->
+<!--            <Input-->
+<!--                    slot="input"-->
+<!--                    type={itemType.text}-->
+<!--                    settingKey="SubjectPath"-->
+<!--                    settingValue={config.advanced.subjectPath}-->
+<!--                    placeholder="请以 / 开头进行填写"-->
+<!--                    block={true}-->
+<!--                    on:changed={e => {-->
+<!--                        config.advanced.subjectPath = e.detail.value;-->
+<!--                        updated();-->
+<!--                    }-->
+<!--                }-->
+<!--            />-->
+<!--        </Item>-->
         <Item
                 title="优化视频样式"
                 text="识别指定格式的视频文件并转换成可点击播放的样式"

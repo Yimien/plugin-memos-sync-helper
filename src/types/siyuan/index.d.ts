@@ -21,11 +21,16 @@ type Notebook = {
 
 type NotebookConf = {
     name: string;
+    sort: number;
+    icon: string;
     closed: boolean;
+    refCreateSaveBox: string;
     refCreateSavePath: string;
-    createDocNameTemplate: string;
+    docCreateSaveBox: string;
+    docCreateSavePath: string;
     dailyNoteSavePath: string;
     dailyNoteTemplatePath: string;
+    sortMode: number;
 }
 
 type BlockType = "d" | "s" | "h" | "t" | "i" | "p" | "f" | "audio" | "video" | "other";

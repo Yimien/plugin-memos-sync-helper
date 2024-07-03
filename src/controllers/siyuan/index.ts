@@ -20,8 +20,15 @@ export class SiYuanApiService {
      * @param name - 文档名称
      */
     static async getDocumentIdByName(name: string): Promise<string> {
-        let notebookId = pluginConfigData.base.notebook;
-        let subjectPath = pluginConfigData.advanced.subjectPath;
+        let notebook = pluginConfigData.base.notebook;
+        let notebookConfig = await getNotebookConf(notebook);
+
+        if (isEmptyValue(notebookConfig)) {
+            return
+        }
+
+        let notebookId = notebookConfig.conf.refCreateSaveBox === "" ? notebook : notebookConfig.conf.refCreateSaveBox;
+        let subjectPath = notebookConfig.conf.refCreateSavePath;
 
         let documentId: string;
 

@@ -116,12 +116,12 @@ class PlugConfig {
                 text: "资源保存路径",
                 check: [false, false]
             },
-            {
-                flag: pluginConfigData.advanced.isHandleBacklinks,
-                value: pluginConfigData.advanced.subjectPath,
-                text: "主题路径",
-                check: [true, false]
-            },
+            // {
+            //     flag: pluginConfigData.advanced.isHandleBacklinks,
+            //     value: pluginConfigData.advanced.subjectPath,
+            //     text: "主题路径",
+            //     check: [true, false]
+            // },
             {
                 flag: pluginConfigData.advanced.isSuperLabel,
                 value: pluginConfigData.advanced.labelName,
