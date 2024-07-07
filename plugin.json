@@ -7,7 +7,7 @@
   "backends": [
     "windows",
     "linux",
-    "darwin"
+    "darwin",
     "docker",
     "android",
     "ios"
