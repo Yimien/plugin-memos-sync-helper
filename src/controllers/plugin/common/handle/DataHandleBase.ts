@@ -194,15 +194,15 @@ export abstract class DataHandleBase {
             // 网址处理
             if (pluginConfigData.advanced.isHandleHref && regexMemosContent.href.test(content) && !regexMemosContent.mdLink.test(content)) {
                 result = Handle.handleHref(content);
+            } else {
+                // 标签处理
+                if (regexMemosContent.tag.test(content)) {
+                    result = Handle.handleTags(content);
+                    result = Handle.handleTagBlock(result);
+                }
+                regexMemosContent.tag.lastIndex = 0;
             }
             regexMemosContent.href.lastIndex = 0;
-
-            // 标签处理
-            if (regexMemosContent.tag.test(content)) {
-                result = Handle.handleTags(content);
-                result = Handle.handleTagBlock(result);
-            }
-            regexMemosContent.tag.lastIndex = 0;
 
             contents[i].content = result;
         }
