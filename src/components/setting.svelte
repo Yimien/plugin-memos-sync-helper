@@ -105,7 +105,7 @@
         <Item
                 title="Memos 版本"
                 text="当前服务器上运行的 Memos 版本"
-                isTip={true}
+                isTip={false}
                 tipTest="v0.22及以上版本不适用于docker版思源笔记"
         >
             <Input
