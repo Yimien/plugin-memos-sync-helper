@@ -65,6 +65,14 @@ export interface IFilter {
      * 上次同步时间
      */
     lastSyncTime: string,
+    /**
+     * 标签过滤模式
+     */
+    tagFilterMode: number,
+    /**
+     * 标签列表
+     */
+    tagList: string,
 }
 
 export interface IDebug {

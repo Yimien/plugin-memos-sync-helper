@@ -1,6 +1,6 @@
 import {IConfig} from "@/types/config/default";
 
-import {memosSortKey, syncPlanKey, versionKey} from "@/constants/components/select"
+import {memosSortKey, syncPlanKey, versionKey, tagFilterKey} from "@/constants/components/select"
 
 export const DEFAULT_CONFIG: IConfig = {
     base: {
@@ -23,6 +23,8 @@ export const DEFAULT_CONFIG: IConfig = {
     },
     filter: {
         lastSyncTime: "2021-12-08 00:00:00",
+        tagFilterMode: tagFilterKey.all,
+        tagList: ""
     },
     debug: {
         isDebug: false,

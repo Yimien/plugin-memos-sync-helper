@@ -1,7 +1,7 @@
 import {STORAGE_NAME} from "@/constants";
 import {sync_status} from "@/constants/main";
 import {ICONS} from "@/constants/assets/icons";
-import {syncPlanKey} from "@/constants/components/select";
+import {syncPlanKey, versionKey, tagFilterKey} from "@/constants/components/select";
 import {IItemCondition} from "@/types/plugin";
 import {lsNotebooks, pushErrMsg, pushMsg} from "@/controllers/siyuan/api";
 import {MemosServer} from "@/controllers/memos";
@@ -18,6 +18,12 @@ class PlugConfig {
      * 检查插件配置是否正确
      */
     static async check() {
+        const noUseTagList = [
+            tagFilterKey.all,
+            tagFilterKey.syncNoTag,
+            tagFilterKey.notSyncNoTag
+        ]
+
         const requiredItems = [
             {
                 value: pluginConfigData.base.version,
@@ -94,6 +100,16 @@ class PlugConfig {
                 text: "是否允许自动更新上次同步时间",
                 flag: pluginConfigData.debug.isDebug,
                 value: pluginConfigData.debug.isAutoUpdateTime
+            },
+            {
+                text: "标签过滤模式",
+                flag: pluginConfigData.base.version === versionKey.stable,
+                value: pluginConfigData.filter.tagFilterMode
+            },
+            {
+                text: "标签列表",
+                flag: !noUseTagList.includes(pluginConfigData.filter.tagFilterMode),
+                value: pluginConfigData.filter.tagList
             }
         ]
 

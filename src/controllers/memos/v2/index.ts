@@ -1,11 +1,11 @@
 import {pluginConfigData} from "@/index";
 import {DownloadResourceByName, GetAuthStatus, GetResourceBinary, ListMemos} from "@/controllers/memos/v2/api"
-import {debugMessage, isEmptyValue} from "@/utils";
+import {debugMessage, hasCommonElements, isEmptyValue} from "@/utils";
 import {toChinaTime, formatDateTime,} from "@/utils/misc/time";
 import {IResGetMemos} from "@/types/memos";
 import moment from "moment";
-import {IResourceV2} from "@/types/memos/v2";
-import {versionKey} from "@/constants/components/select";
+import {IMemoV2, IResourceV2} from "@/types/memos/v2";
+import {tagFilterKey, versionKey} from "@/constants/components/select";
 
 
 export class MemosApiServiceV2 {
@@ -18,6 +18,56 @@ export class MemosApiServiceV2 {
     private static async initData() {
         const userData = await this.getUserData();
         this.username = userData.name;
+    }
+
+    private static async tagFilter(memos: IMemoV2[])  {
+        const tagFilterMode = pluginConfigData.filter.tagFilterMode;
+
+        // 同步所有数据
+        if (tagFilterMode === tagFilterKey.all) {
+            return memos;
+        }
+
+        // 仅同步无标签的数据
+        if (tagFilterMode === tagFilterKey.syncNoTag) {
+            console.log("仅同步无标签的数据");
+            return memos.filter(memo => memo.property.tags.length === 0)
+        }
+
+        // 不同步无标签的数据
+        if (tagFilterMode === tagFilterKey.notSyncNoTag) {
+            console.log("不同步无标签的数据");
+            return memos.filter(memo => memo.property.tags.length > 0)
+        }
+
+        let tagListString = pluginConfigData.filter.tagList;
+        let tags = tagListString.split(";");
+
+        // 仅同步指定标签的数据
+        if (tagFilterMode === tagFilterKey.syncSpecTag) {
+            console.log("仅同步指定标签的数据");
+            return memos.filter(memo => hasCommonElements(memo.property.tags, tags))
+        }
+
+        // 不同步指定标签的数据
+        if (tagFilterMode === tagFilterKey.notSyncSpecTag) {
+            console.log("不同步指定标签的数据");
+            return memos.filter(memo => !hasCommonElements(memo.property.tags, tags))
+        }
+
+        // 同步指定标签及无标签的数据
+        if (tagFilterMode === tagFilterKey.syncSpecTagAndNoTag) {
+            console.log("同步指定标签及无标签的数据");
+            return memos.filter(memo => hasCommonElements(memo.property.tags, tags) || memo.property.tags.length === 0)
+        }
+
+        // 不同步指定标签及无标签的数据
+        if (tagFilterMode === tagFilterKey.notSyncSpecTagAndNoTag) {
+            console.log("不同步指定标签及无标签的数据");
+            return memos.filter(memo => !hasCommonElements(memo.property.tags, tags) && memo.property.tags.length > 0)
+        }
+
+        return memos;
     }
 
     /**
@@ -55,6 +105,11 @@ export class MemosApiServiceV2 {
 
             // 更新 pageToken 以获取下一页数据
             pageToken = resData.nextPageToken;
+        }
+
+        // 标签过滤
+        if (pluginConfigData.base.version === versionKey.stable) {
+            allMemos = await MemosApiServiceV2.tagFilter(allMemos);
         }
 
         debugMessage(pluginConfigData.debug.isDebug, "获取结果", allMemos);

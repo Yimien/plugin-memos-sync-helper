@@ -6,7 +6,7 @@
 
     import {panelKey, PANELS} from "@/constants/components/panels";
     import {itemType} from "@/constants/components/input";
-    import {MEMOS_SORT_OPTIONS, SYNC_PLAN_OPTIONS, VERSION_OPTIONS} from "@/constants/components/select";
+    import {MEMOS_SORT_OPTIONS, SYNC_PLAN_OPTIONS, VERSION_OPTIONS, TAG_FILTER_OPTIONS, versionKey, syncPlanKey, tagFilterKey} from "@/constants/components/select";
 
     import {IOptions} from "@/types/components/item.d";
     import {IConfig} from "@/types/config/default.d";
@@ -36,20 +36,29 @@
     let videoFormatsIsShow = true; // 需要优化的视频格式
     let labelNameIsShow = true; // 上级标签名称
 
+    let tagFilterModeIsShow = true; // 是否显示标签过滤模式
+    let tagListIsShow = true; // 是否显示标签列表
+
+    let hideTagList = [
+        tagFilterKey.all,
+        tagFilterKey.syncNoTag,
+        tagFilterKey.notSyncNoTag
+    ]
+
     $: {
         switch (config.base.syncPlan) {
-            case SYNC_PLAN_OPTIONS[0].key:
+            case syncPlanKey.dailyNotes:
                 syncPlanText = `请配置同步笔记本`;
                 docPathIsShow = false;
                 docPathIsRequired = false;
                 break;
-            case SYNC_PLAN_OPTIONS[1].key:
+            case syncPlanKey.singleDoc:
                 syncPlanText = `请配置同步笔记本，如需保存至指定文档下请配置文档路径`;
                 docPathIsShow = true;
                 docPathIsRequired = false;
                 docPathText = "将同步数据保存在指定路径的文档下级"
                 break;
-            case SYNC_PLAN_OPTIONS[2].key:
+            case syncPlanKey.sameDoc:
                 syncPlanText = `请配置同步笔记本以及文档路径`;
                 docPathIsShow = true;
                 docPathIsRequired = true;
@@ -62,6 +71,14 @@
         // subjectPathIsShow = config.advanced.isHandleBacklinks;
         videoFormatsIsShow = config.advanced.isHandleVideo;
         labelNameIsShow = config.advanced.isSuperLabel;
+
+        if (config.base.version === versionKey.stable) {
+            tagFilterModeIsShow = true;
+            tagListIsShow = !hideTagList.includes(config.filter.tagFilterMode);
+        } else {
+            tagFilterModeIsShow = false;
+            tagListIsShow = false;
+        }
     }
 
 
@@ -398,6 +415,47 @@
                     placeholder="YYYY/MM/DD HH:mm:ss"
                     on:changed={e => {
                         config.filter.lastSyncTime = e.detail.value;
+                        updated();
+                    }
+                }
+            />
+        </Item>
+
+        <Item
+                title="标签过滤模式"
+                text="对数据进行标签过滤"
+                isShow={tagFilterModeIsShow}
+        >
+            <Input
+                    slot="input"
+                    type={itemType.select}
+                    settingKey="tagFilterMode"
+                    settingValue={config.filter.tagFilterMode}
+                    options={TAG_FILTER_OPTIONS}
+                    on:changed={e => {
+                        config.filter.tagFilterMode = e.detail.value;
+                        updated();
+                    }
+                }
+            />
+        </Item>
+
+        <Item
+                title="配置标签"
+                text="配置允许同步或不允许同步的标签，以英文分号 <code class='fn__code'>;</code> 分隔"
+                block={true}
+                isRequired={true}
+                isShow={tagListIsShow}
+        >
+            <Input
+                    slot="input"
+                    type={itemType.textarea}
+                    settingKey="tagList"
+                    settingValue={config.filter.tagList ? config.filter.tagList : ""}
+                    block={true}
+                    height={100}
+                    on:changed={e => {
+                        config.filter.tagList = e.detail.value;
                         updated();
                     }
                 }

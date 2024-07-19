@@ -63,3 +63,65 @@ export const  MEMOS_SORT_OPTIONS: IOptions = [
         text: "升序"
     }
 ]
+
+export enum tagFilterKey {
+    /**
+     * 同步所有数据
+     */
+    all,
+    /**
+     * 仅同步无标签的数据
+     */
+    syncNoTag,
+    /**
+     * 不同步无标签的数据
+     */
+    notSyncNoTag,
+    /**
+     * 仅同步指定标签的数据
+     */
+    syncSpecTag,
+    /**
+     * 不同步指定标签的数据
+     */
+    notSyncSpecTag,
+    /**
+     * 同步指定标签及无标签的数据
+     */
+    syncSpecTagAndNoTag,
+    /**
+     * 不同步指定标签及无标签的数据
+     */
+    notSyncSpecTagAndNoTag
+}
+
+export const TAG_FILTER_OPTIONS: IOptions = [
+    {
+        key: tagFilterKey.all,
+        text: "同步所有数据"
+    },
+    {
+        key: tagFilterKey.syncNoTag,
+        text: "仅同步无标签的数据"
+    },
+    {
+        key: tagFilterKey.notSyncNoTag,
+        text: "不同步无标签的数据"
+    },
+    {
+        key: tagFilterKey.syncSpecTag,
+        text: "仅同步指定标签的数据"
+    },
+    {
+        key: tagFilterKey.notSyncSpecTag,
+        text: "不同步指定标签的数据"
+    },
+    {
+        key: tagFilterKey.syncSpecTagAndNoTag,
+        text: "同步指定标签及无标签的数据"
+    },
+    {
+        key: tagFilterKey.notSyncSpecTagAndNoTag,
+        text: "不同步指定标签及无标签的数据"
+    }
+]

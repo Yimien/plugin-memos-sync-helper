@@ -26,6 +26,14 @@ export interface IReactionV2 {
     reactionType: string
 }
 
+export interface IPropertyV2 {
+    tags: any,
+    hasLink: boolean,
+    hasTaskList: boolean,
+    hasCode: boolean,
+    hasIncompleteTasks: boolean
+}
+
 /**
  * Memos
  */
@@ -46,4 +54,6 @@ export interface IMemoV2 {
     resources: IResourceV2[],
     relations: IRelationV2[],
     reactions: IReactionV2[]
+    property?: IPropertyV2,
+    snippet?: string
 }
