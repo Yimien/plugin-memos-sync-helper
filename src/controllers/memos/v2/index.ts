@@ -107,12 +107,13 @@ export class MemosApiServiceV2 {
             pageToken = resData.nextPageToken;
         }
 
+        debugMessage(pluginConfigData.debug.isDebug, "数据拉取结果", allMemos);
+
         // 标签过滤
         if (pluginConfigData.base.version === versionKey.stable) {
             allMemos = await MemosApiServiceV2.tagFilter(allMemos);
+            debugMessage(pluginConfigData.debug.isDebug, "标签过滤结果", allMemos);
         }
-
-        debugMessage(pluginConfigData.debug.isDebug, "获取结果", allMemos);
 
         return allMemos;
     }
