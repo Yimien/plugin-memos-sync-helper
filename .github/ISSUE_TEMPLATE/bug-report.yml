@@ -1,0 +1,71 @@
+name: Bug 反馈
+description: 提交一个问题报告
+labels: 
+  - "bug"
+body:
+  - type: textarea
+    id: steps
+    attributes:
+      label: 操作步骤
+      description: |
+        请在这里写下您的操作步骤。如果可以，请附带截图或录屏。
+    validations:
+      required: true
+
+  - type: textarea
+    id: expect
+    attributes:
+      label: 预期结果
+      description: |
+        请在这里说明正常情况下插件的预期结果。
+    validations:
+      required: true
+
+  - type: textarea
+    id: reality
+    attributes:
+      label: 实际结果
+      description: |
+        请在这里描述插件运行的实际结果。如果可以，请附带截图或录屏。
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: 备注
+      description: |
+        请在这里写下其它您想说的内容
+    validations:
+      required: false
+      
+  - type: input
+    id: plugin
+    attributes:
+      label: 插件版本
+      description: 您可以在 设置 - 集市 - Memos 同步助手 - 当前版本 处找到版本号
+    validations:
+      required: true
+  
+  - type: input
+    id: memos
+    attributes:
+      label: Memos版本
+      description: 您可以在 设置 - Version 处找到版本号
+    validations:
+      required: true
+      
+  - type: dropdown
+    id: siyuan
+    attributes:
+      label: 思源笔记
+      multiple: true
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Android
+        - iOS
+        - Docker
+    validations:
+      required: true

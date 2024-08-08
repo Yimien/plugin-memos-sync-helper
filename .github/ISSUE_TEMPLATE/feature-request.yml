@@ -1,0 +1,40 @@
+name: 功能优化 / 功能需求
+description: 提交一个新的功能需求或者功能优化
+labels: 
+  - "enhancement"
+body:    
+  - type: textarea
+    id: background
+    attributes:
+      label: 在哪些情况下需要此功能？
+      description: |
+        请尽可能清晰准确地描述您期望的功能和应用场景。
+    validations:
+      required: true
+
+  - type: textarea
+    id: best
+    attributes:
+      label: 描述最优解决方案
+      description: |
+        请尝试描述最佳解决方案。可能有类似的软件实现了此功能。也请列出以供我们参考。
+    validations:
+      required: true    
+
+  - type: textarea
+    id: alternate
+    attributes:
+      label: 描述候选解决方案
+      description: |
+        请尽可能清楚准确地描述您可以接受的候选解决方案。
+    validations:
+      required: false   
+
+  - type: textarea
+    id: remarks
+    attributes:
+      label: 备注
+      description: |
+        请在这里写下其它您想说的内容
+    validations:
+      required: false
