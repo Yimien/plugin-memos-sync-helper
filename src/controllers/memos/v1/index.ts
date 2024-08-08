@@ -83,7 +83,7 @@ export class MemosApiServiceV1 {
         const lastSyncTime = pluginConfigData.filter.lastSyncTime; // 上次同步时间
 
         let memosCreatedBeforeLastSync = allMemos.filter(
-            memo => moment(formatDateTime(memo.updatedTs)).isBefore(formatDateTime(lastSyncTime))
+            memo => moment(formatDateTime(memo.createdTs)).isBefore(formatDateTime(lastSyncTime))
         );
 
         let result: IResGetMemos = {
