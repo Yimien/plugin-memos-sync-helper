@@ -145,7 +145,7 @@ export abstract class DataHandleBase {
             regex.lastIndex = 0;
             // debugMessage(pluginConfigData.debug.isDebug, "----------");
         }
-        // debugMessage(pluginConfigData.debug.isDebug, "contents", contents);
+        debugMessage(pluginConfigData.debug.isDebug, "contents", contents);
         await this.handleContent(contents);
         return contents;
     }
@@ -178,34 +178,33 @@ export abstract class DataHandleBase {
         for (let i = 0; i < contents.length; i++) {
             let type = contents[i].type;
             let content = contents[i].content;
-            let result = content;
+            // let result = content;
 
             // 处理嵌入内容
             if (type === contentsType.embedded) {
-                result = Handle.handleEmbeddedContent(content);
+                content = Handle.handleEmbeddedContent(content);
             }
 
             // 双链处理
-            const handleBacklinksFlag = pluginConfigData.advanced.isHandleBacklinks && regexMemosContent.backlinks.test(content);
-            if (handleBacklinksFlag) {
-                result = await Handle.handleBacklinks(content);
+            if (pluginConfigData.advanced.isHandleBacklinks && regexMemosContent.backlinks.test(content)) {
+                content = await Handle.handleBacklinks(content);
             }
             regexMemosContent.backlinks.lastIndex = 0;
 
             // 网址处理
             if (pluginConfigData.advanced.isHandleHref && regexMemosContent.href.test(content) && !regexMemosContent.mdLink.test(content)) {
-                result = Handle.handleHref(content);
+                content = Handle.handleHref(content);
             } else {
                 // 标签处理
                 if (regexMemosContent.tag.test(content)) {
-                    result = Handle.handleTags(content);
-                    result = Handle.handleTagBlock(result);
+                    content = Handle.handleTags(content);
+                    content = Handle.handleTagBlock(content);
                 }
                 regexMemosContent.tag.lastIndex = 0;
             }
             regexMemosContent.href.lastIndex = 0;
 
-            contents[i].content = result;
+            contents[i].content = content;
         }
     }
 

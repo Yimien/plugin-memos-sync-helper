@@ -19,7 +19,6 @@ export class Handle {
         } else {
             result = content.replace(regex, (match) => `${match}#`);
         }
-
         return result;
     }
 
@@ -47,8 +46,10 @@ export class Handle {
         let matchList = content.match(regex);
         for (let documentName of matchList) {
             let documentId = await SiYuanApiService.getDocumentIdByName(documentName);
-            content = content.replace(`((${documentName}))`, (match) => `((${documentId} "${match}"))`)
+            // content = content.replace(`((${documentName}))`, (match) => `((${documentId} "${match}"))`)
+            content = content.replace(`((${documentName}))`, `((${documentId} "${documentName}"))`);
         }
+        console.log("处理中", content)
         return content;
     }
 
