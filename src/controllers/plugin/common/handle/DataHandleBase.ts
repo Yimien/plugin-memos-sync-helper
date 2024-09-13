@@ -186,7 +186,8 @@ export abstract class DataHandleBase {
             }
 
             // 双链处理
-            if (pluginConfigData.advanced.isHandleBacklinks && regexMemosContent.backlinks.test(content)) {
+            const handleBacklinksFlag = pluginConfigData.advanced.isHandleBacklinks && regexMemosContent.backlinks.test(content);
+            if (handleBacklinksFlag) {
                 result = await Handle.handleBacklinks(content);
             }
             regexMemosContent.backlinks.lastIndex = 0;
