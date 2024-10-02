@@ -1,8 +1,18 @@
-import {appendBlock, createDocWithMd, getIDsByHPath, getNotebookConf, prependBlock, renderSprig, sql} from "./api";
+import {
+    appendBlock,
+    createDocWithMd,
+    getIDsByHPath,
+    getNotebookConf,
+    prependBlock,
+    renderSprig,
+    setBlockAttrs,
+    sql
+} from "./api";
 import {pluginConfigData} from "@/index";
 import {isEmptyValue} from "@/utils";
 import {IResdoOperations} from "@/types/siyuan/api";
 import {formatDate} from "@/utils/misc/time";
+import moment from "moment";
 
 
 export class SiYuanApiService {
@@ -92,14 +102,20 @@ export class SiYuanApiService {
     }
 
     static async getDailyNotePath(notebookId: string, datetime: string) {
-        // 读取笔记本配置
-        let responseData = await getNotebookConf(notebookId);
+        let dailyNoteSavePath: string = "";
 
-        if (isEmptyValue(responseData)) {
-            return;
+        if (isEmptyValue(pluginConfigData.base.docPath)) {
+            // 读取笔记本配置
+            let responseData = await getNotebookConf(notebookId);
+
+            if (isEmptyValue(responseData)) {
+                return;
+            }
+
+            dailyNoteSavePath = responseData.conf.dailyNoteSavePath;
+        } else {
+            dailyNoteSavePath = pluginConfigData.base.docPath;
         }
-
-        let dailyNoteSavePath: string = responseData.conf.dailyNoteSavePath;
 
         let dateString = formatDate(datetime);
         let sprig = `toDate "2006-01-02" "${dateString}"`;
@@ -108,16 +124,24 @@ export class SiYuanApiService {
         return await renderSprig(dailyNoteSavePath);
     }
 
-
-    static async appendDailyNoteBlockByDatetime(notebookId: string, data: string, datetime: string): Promise<IResdoOperations[]> {
+    static async getDailyNotePageId(notebookId: string, datetime: string) : Promise<string> {
         let hpath = await SiYuanApiService.getDailyNotePath(notebookId, datetime);
         let pageId = await SiYuanApiService.getDocumentIdByHPath(notebookId, hpath);
+        const formatDatetime = moment(datetime).format('YYYYMMDD');
+        let attrs = {};
+        let attrName = `custom-dailynote-${formatDatetime}`;
+        attrs[attrName] = formatDatetime;
+        await setBlockAttrs(pageId, attrs);
+        return pageId;
+    }
+
+    static async appendDailyNoteBlockByDatetime(notebookId: string, data: string, datetime: string): Promise<IResdoOperations[]> {
+        let pageId = await SiYuanApiService.getDailyNotePageId(notebookId, datetime);
         return await appendBlock("markdown", data, pageId);
     }
 
     static async prependDailyNoteBlockByDatetime(notebookId: string, data: string, datetime: string): Promise<IResdoOperations[]> {
-        let hpath = await SiYuanApiService.getDailyNotePath(notebookId, datetime);
-        let pageId = await SiYuanApiService.getDocumentIdByHPath(notebookId, hpath);
+        let pageId = await SiYuanApiService.getDailyNotePageId(notebookId, datetime);
         return await prependBlock("markdown", data, pageId);
     }
 }

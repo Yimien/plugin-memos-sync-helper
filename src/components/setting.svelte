@@ -28,6 +28,7 @@
     }
 
     let syncPlanText = ''; // 同步方案的说明文字
+    let docPathTitle = "文档路径";
     let docPathIsShow = true;
     let docPathIsRequired = false; // 文档路径是否必须
     let docPathText = ""; // 文档路径的说明文字
@@ -48,17 +49,21 @@
     $: {
         switch (config.base.syncPlan) {
             case syncPlanKey.dailyNotes:
-                syncPlanText = `请配置同步笔记本`;
-                docPathIsShow = false;
+                syncPlanText = `请配置同步笔记本，如需更改DailyNote路径请配置文档路径`;
+                docPathTitle = "日记存放路径"
+                docPathIsShow = true;
                 docPathIsRequired = false;
+                docPathText = "支持日期格式模板变量，与思源笔记设置一致";
                 break;
             case syncPlanKey.singleDoc:
+                docPathTitle = "文档路径";
                 syncPlanText = `请配置同步笔记本，如需保存至指定文档下请配置文档路径`;
                 docPathIsShow = true;
                 docPathIsRequired = false;
                 docPathText = "将同步数据保存在指定路径的文档下级"
                 break;
             case syncPlanKey.sameDoc:
+                docPathTitle = "文档路径";
                 syncPlanText = `请配置同步笔记本以及文档路径`;
                 docPathIsShow = true;
                 docPathIsRequired = true;
@@ -198,7 +203,7 @@
             />
         </Item>
         <Item
-                title="文档路径"
+                title={docPathTitle}
                 text={docPathText}
                 isRequired={docPathIsRequired}
                 isShow={docPathIsShow}

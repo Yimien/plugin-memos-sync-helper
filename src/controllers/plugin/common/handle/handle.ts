@@ -49,7 +49,6 @@ export class Handle {
             // content = content.replace(`((${documentName}))`, (match) => `((${documentId} "${match}"))`)
             content = content.replace(`((${documentName}))`, `((${documentId} "${documentName}"))`);
         }
-        console.log("处理中", content)
         return content;
     }
 
