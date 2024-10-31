@@ -20,7 +20,8 @@ import {
     IReslsNotebooks,
     IResReadDir,
     IResUpload
-} from "@/types/siyuan/api"
+} from "@/types/siyuan/api";
+import {PLUGIN_NAME} from "@/constants";
 
 
 export async function request(url: string, data?: any) {
@@ -442,7 +443,7 @@ export async function pandoc(args: PandocArgs[]) {
 
 export async function pushMsg(msg: string, timeout: number = 7000) {
     let payload = {
-        msg: msg,
+        msg: `${PLUGIN_NAME}：${msg}`,
         timeout: timeout
     };
     let url = "/api/notification/pushMsg";
@@ -452,7 +453,7 @@ export async function pushMsg(msg: string, timeout: number = 7000) {
 
 export async function pushErrMsg(msg: string, timeout: number = 7000) {
     let payload = {
-        msg: msg,
+        msg: `${PLUGIN_NAME}：${msg}`,
         timeout: timeout
     };
     let url = "/api/notification/pushErrMsg";
