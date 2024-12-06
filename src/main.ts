@@ -1,7 +1,8 @@
 import {STORAGE_NAME} from "@/constants";
 import {sync_status} from "@/constants/main";
 import {ICONS} from "@/constants/assets/icons";
-import {syncPlanKey, versionKey, tagFilterKey} from "@/constants/components/select";
+import {syncPlanKey, tagFilterKey} from "@/constants/components/select";
+import {API_VERSION} from "@/constants/memos";
 import {IItemCondition} from "@/types/plugin";
 import {lsNotebooks, pushErrMsg, pushMsg} from "@/controllers/siyuan/api";
 import {MemosServer} from "@/controllers/memos";
@@ -103,7 +104,7 @@ class PlugConfig {
             },
             {
                 text: "标签过滤模式",
-                flag: pluginConfigData.base.version === versionKey.stable,
+                flag: API_VERSION.V2_LabelFilter.includes(pluginConfigData.base.version),
                 value: pluginConfigData.filter.tagFilterMode
             },
             {

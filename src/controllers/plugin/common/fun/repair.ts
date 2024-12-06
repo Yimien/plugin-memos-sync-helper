@@ -2,13 +2,12 @@ import {SiYuanApiService} from "@/controllers/siyuan";
 import {CUSTOM_MEMO_ID, CUSTOM_MEMO_UID} from "@/constants/plugin";
 import {isEmptyValue} from "@/utils";
 import {pluginConfigData} from "@/index";
-import {versionKey} from "@/constants/components/select";
 import {getBlockAttrs, pushErrMsg, pushMsg, setBlockAttrs} from "@/controllers/siyuan/api";
 import {GetMemoById} from "@/controllers/memos/v1/api";
 import {IMemoV2} from "@/types/memos/v2";
 import {GetMemo} from "@/controllers/memos/v2/api";
 import {IMemoV1} from "@/types/memos/v1";
-import {API_V2_LIST} from "@/constants/memos";
+import {API_VERSION} from "@/constants/memos";
 
 
 let isRepair = false;
@@ -37,8 +36,10 @@ export async function repair() {
 
     await pushMsg("修复开始");
 
+    let version = pluginConfigData.base.version;
+
     // debugMessage(pluginConfigData.debug.isDebug, "属性查询", memosIdLinkBlockIdList);
-    if (pluginConfigData.base.version === versionKey.v1) {
+    if (API_VERSION.V1.includes(version)) {
         for (let m of memosIdLinkBlockIdList) {
             let memo: IMemoV1 = await GetMemoById(m.memoId);
             if (isEmptyValue(memo)) {
@@ -48,7 +49,7 @@ export async function repair() {
             // debugMessage(pluginConfigData.debug.isDebug, "memo", memo);
         }
 
-    } else if (API_V2_LIST.includes(pluginConfigData.base.version)) {
+    } else if (API_VERSION.V2.includes(version)) {
         for (let m of memosIdLinkBlockIdList) {
             let memo : IMemoV2 = await GetMemo(m.memoId);
             if (isEmptyValue(memo)) {

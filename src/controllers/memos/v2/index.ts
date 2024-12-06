@@ -5,7 +5,9 @@ import {toChinaTime, formatDateTime,} from "@/utils/misc/time";
 import {IResGetMemos} from "@/types/memos";
 import moment from "moment";
 import {IMemoV2, IResourceV2} from "@/types/memos/v2";
-import {tagFilterKey, versionKey} from "@/constants/components/select";
+import {tagFilterKey} from "@/constants/components/select";
+import {API_VERSION} from "@/constants/memos";
+import {IResListMemos} from "@/types/memos/v2/api";
 
 
 export class MemosApiServiceV2 {
@@ -78,6 +80,7 @@ export class MemosApiServiceV2 {
 
         await this.initData();
 
+        const version = pluginConfigData.base.version;
         const lastSyncTime = pluginConfigData.filter.lastSyncTime; // 上次同步时间
         const pageSize: number = 200; // 每页最大条数
         let pageToken = undefined;
@@ -89,8 +92,14 @@ export class MemosApiServiceV2 {
         ];
 
         while (true) {
+            let resData: IResListMemos;
             // 调用 ListMemos 函数获取一页数据
-            const resData = await ListMemos(pageSize, pageToken, filters);
+            if (API_VERSION.V2_MemosViewFull.includes(version)) {
+                const view = "MEMO_VIEW_FULL";
+                resData = await ListMemos(pageSize, pageToken, filters, view);
+            } else {
+                resData = await ListMemos(pageSize, pageToken, filters);
+            }
 
             // 将更新时间晚于等于 lastSyncTime 的数据添加到 memos 列表中
             const memos = resData.memos.filter(
@@ -110,7 +119,7 @@ export class MemosApiServiceV2 {
         debugMessage(pluginConfigData.debug.isDebug, "数据拉取结果", allMemos);
 
         // 标签过滤
-        if (pluginConfigData.base.version === versionKey.stable) {
+        if (API_VERSION.V2_LabelFilter.includes(version)) {
             allMemos = await MemosApiServiceV2.tagFilter(allMemos);
             debugMessage(pluginConfigData.debug.isDebug, "标签过滤结果", allMemos);
         }
@@ -176,7 +185,7 @@ export class MemosApiServiceV2 {
     }
 
     static async downloadResource(resource: IResourceV2) {
-        if (pluginConfigData.base.version === versionKey.v0_22_0) {
+        if (API_VERSION.V2_DownloadResourceByName.includes(pluginConfigData.base.version)) {
             return await DownloadResourceByName(resource.name);
         } else {
             return await GetResourceBinary(resource.name, resource.filename);

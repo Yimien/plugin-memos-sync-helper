@@ -1,10 +1,11 @@
 import {IConfig} from "@/types/config/default";
 
-import {memosSortKey, syncPlanKey, versionKey, tagFilterKey} from "@/constants/components/select"
+import {memosSortKey, syncPlanKey, tagFilterKey} from "@/constants/components/select"
+import {DEFAULT_VERSION} from "@/constants/memos";
 
 export const DEFAULT_CONFIG: IConfig = {
     base: {
-        version: versionKey.stable,
+        version: DEFAULT_VERSION,
         host: "",
         token: "",
         syncPlan: syncPlanKey.dailyNotes,

@@ -46,13 +46,15 @@ export async function GetAuthStatus() {
  * @param pageSize - 返回的最大条数
  * @param pageToken - 检索后续页面的令牌
  * @param filter - 过滤器
+ * @param view - 显示所有参数
  * @constructor
  */
-export async function ListMemos(pageSize?: number, pageToken?: string, filter?: any): Promise<IResListMemos> {
+export async function ListMemos(pageSize?: number, pageToken?: string, filter?: any, view?: string): Promise<IResListMemos> {
     return await Requests.send(METHOD.GET, '/api/v1/memos', {
         pageSize: pageSize,
         pageToken: pageToken,
-        filter: changeFilter(filter)
+        filter: changeFilter(filter),
+        view: view
     });
 }
 

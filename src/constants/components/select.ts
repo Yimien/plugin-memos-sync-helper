@@ -1,14 +1,15 @@
 import {IOptions} from "@/types/components/item"
 
 export enum versionKey {
-    v1,
-    stable,
-    v0_22_0
+    v0_21_0,
+    v0_22_0,
+    v0_22_1,
+    v0_23_0,
 }
 
 export const VERSION_OPTIONS: IOptions = [
     {
-        key: versionKey.v1,
+        key: versionKey.v0_21_0,
         text: "v0.21.0 及以下"
     },
     {
@@ -16,8 +17,12 @@ export const VERSION_OPTIONS: IOptions = [
         text: "v0.22.0"
     },
     {
-        key: versionKey.stable,
-        text: "v0.22.1 及以上"
+        key: versionKey.v0_22_1,
+        text: "v0.22.1~0.22.5"
+    },
+    {
+        key: versionKey.v0_23_0,
+        text: "v0.23.0 及以上"
     }
 ]
 

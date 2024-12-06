@@ -6,7 +6,8 @@
 
     import {panelKey, PANELS} from "@/constants/components/panels";
     import {itemType} from "@/constants/components/input";
-    import {MEMOS_SORT_OPTIONS, SYNC_PLAN_OPTIONS, VERSION_OPTIONS, TAG_FILTER_OPTIONS, versionKey, syncPlanKey, tagFilterKey} from "@/constants/components/select";
+    import {MEMOS_SORT_OPTIONS, SYNC_PLAN_OPTIONS, VERSION_OPTIONS, TAG_FILTER_OPTIONS, syncPlanKey, tagFilterKey} from "@/constants/components/select";
+    import {API_VERSION} from "@/constants/memos";
 
     import {IOptions} from "@/types/components/item.d";
     import {IConfig} from "@/types/config/default.d";
@@ -77,7 +78,7 @@
         videoFormatsIsShow = config.advanced.isHandleVideo;
         labelNameIsShow = config.advanced.isSuperLabel;
 
-        if (config.base.version === versionKey.stable) {
+        if (API_VERSION.V2_LabelFilter.includes(config.base.version)) {
             tagFilterModeIsShow = true;
             tagListIsShow = !hideTagList.includes(config.filter.tagFilterMode);
         } else {
