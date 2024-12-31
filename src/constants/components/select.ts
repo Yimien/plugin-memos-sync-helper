@@ -69,6 +69,28 @@ export const  MEMOS_SORT_OPTIONS: IOptions = [
     }
 ]
 
+export enum checkSyncMemosKey{
+    /**
+     * 禁止检查可同步的数据
+     */
+    no,
+    /**
+     * 启动后检查可同步的数据
+     */
+    start
+}
+
+export const CHECK_SYNC_MEMOS_OPTIONS: IOptions = [
+    {
+        key: checkSyncMemosKey.start,
+        text: "启动后检查可同步的数据"
+    },
+    {
+        key: checkSyncMemosKey.no,
+        text: "禁止检查可同步的数据"
+    }
+]
+
 export enum tagFilterKey {
     /**
      * 同步所有数据

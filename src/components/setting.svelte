@@ -6,7 +6,7 @@
 
     import {panelKey, PANELS} from "@/constants/components/panels";
     import {itemType} from "@/constants/components/input";
-    import {MEMOS_SORT_OPTIONS, SYNC_PLAN_OPTIONS, VERSION_OPTIONS, TAG_FILTER_OPTIONS, syncPlanKey, tagFilterKey} from "@/constants/components/select";
+    import {MEMOS_SORT_OPTIONS, CHECK_SYNC_MEMOS_OPTIONS, SYNC_PLAN_OPTIONS, VERSION_OPTIONS, TAG_FILTER_OPTIONS, syncPlanKey, tagFilterKey} from "@/constants/components/select";
     import {API_VERSION} from "@/constants/memos";
 
     import {IOptions} from "@/types/components/item.d";
@@ -257,6 +257,24 @@
                     options={MEMOS_SORT_OPTIONS}
                     on:changed={e => {
                         config.base.memosSort = e.detail.value;
+                        updated();
+                    }
+                }
+            />
+        </Item>
+
+        <Item
+                title="检查可同步数据"
+                text="是否在思源笔记启动后自动检查可同步的数据"
+        >
+            <Input
+                    slot="input"
+                    type={itemType.select}
+                    settingKey="checkMemosUpdate"
+                    settingValue={config.base.checkSyncMemos}
+                    options={CHECK_SYNC_MEMOS_OPTIONS}
+                    on:changed={e => {
+                        config.base.checkSyncMemos = e.detail.value;
                         updated();
                     }
                 }

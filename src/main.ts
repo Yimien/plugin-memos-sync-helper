@@ -1,7 +1,7 @@
 import {STORAGE_NAME} from "@/constants";
 import {sync_status} from "@/constants/main";
 import {ICONS} from "@/constants/assets/icons";
-import {syncPlanKey, tagFilterKey} from "@/constants/components/select";
+import {syncPlanKey, tagFilterKey, checkSyncMemosKey} from "@/constants/components/select";
 import {API_VERSION} from "@/constants/memos";
 import {IItemCondition} from "@/types/plugin";
 import {lsNotebooks, pushErrMsg, pushMsg} from "@/controllers/siyuan/api";
@@ -55,6 +55,10 @@ class PlugConfig {
                 text: "数据排序"
             },
             {
+                value: pluginConfigData.base.checkSyncMemos,
+                text: "检查同步数据"
+            },
+            {
                 value: pluginConfigData.advanced.isHandleHref,
                 text: "识别超链接开关"
             },
@@ -70,7 +74,6 @@ class PlugConfig {
                 value: pluginConfigData.advanced.isSuperLabel,
                 text: "优化标签管理开头"
             },
-
             {
                 value: pluginConfigData.filter.lastSyncTime,
                 text: "上次同步时间"
@@ -357,6 +360,10 @@ export async function checkAccessToken() {
  * 检查是否存在可更新的数据
  */
 export async function checkNew() {
+    if (pluginConfigData.base.checkSyncMemos === checkSyncMemosKey.no) {
+        return;
+    }
+
     debugMessage(pluginConfigData.debug.isDebug, "正在检查是否存在可同步的新数据...");
 
     const checkResult = await PlugConfig.check();

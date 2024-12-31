@@ -31,6 +31,10 @@ export interface IBase {
      * 排序
      */
     memosSort: number
+    /**
+     * 检查可同步的数据
+     */
+    checkSyncMemos: number
 }
 
 export interface IAdvanced {

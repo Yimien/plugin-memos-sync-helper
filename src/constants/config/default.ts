@@ -1,6 +1,6 @@
 import {IConfig} from "@/types/config/default";
 
-import {memosSortKey, syncPlanKey, tagFilterKey} from "@/constants/components/select"
+import {memosSortKey, checkSyncMemosKey, syncPlanKey, tagFilterKey} from "@/constants/components/select"
 import {DEFAULT_VERSION} from "@/constants/memos";
 
 export const DEFAULT_CONFIG: IConfig = {
@@ -12,7 +12,8 @@ export const DEFAULT_CONFIG: IConfig = {
         notebook: "",
         docPath: "",
         resourceSavePath: "assets/memos/resources",
-        memosSort: memosSortKey.asc
+        memosSort: memosSortKey.asc,
+        checkSyncMemos: checkSyncMemosKey.start
     },
     advanced: {
         isHandleHref: false,
