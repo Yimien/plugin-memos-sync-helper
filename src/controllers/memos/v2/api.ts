@@ -58,6 +58,31 @@ export async function ListMemos(pageSize?: number, pageToken?: string, filter?: 
     });
 }
 
+/**
+ * 列出带有分页和过滤器的备忘录 v0.24.0
+ * @param parent - 拥有者
+ * @param pageSize - 返回的最大条数
+ * @param pageToken - 检索后续页面的令牌
+ * @param state - 状态
+ * @param sort - 作为排序规则的字段，默认为 display_time
+ * @param direction - 排序方向，默认为 DESC
+ * @param filter - 过滤器
+ * @param oldFilter - 旧版过滤器
+ * @constructor
+ */
+export async function ListMemos_v0_24(parent?:string, pageSize?: number, pageToken?: string, state?: string, sort?: string, direction?: string, filter?: any, oldFilter?: any) {
+    return await Requests.send(METHOD.GET, '/api/v1/memos', {
+        parent: parent,
+        pageSize: pageSize,
+        pageToken: pageToken,
+        state: state,
+        sort: sort,
+        direction: direction,
+        filter: changeFilter(filter),
+        oldFilter: changeFilter(oldFilter)
+    });
+}
+
 
 // **************************************** ResourceService ****************************************
 

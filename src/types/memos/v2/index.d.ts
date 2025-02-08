@@ -16,6 +16,20 @@ export interface IRelationV2 {
     type: string
 }
 
+export interface IRelationV0_24_0 {
+    memo: {
+        name: string,
+        uid: string,
+        snippet: string
+    },
+    relatedMemo: {
+        name: string,
+        uid: string,
+        snippet: string
+    },
+    type: string
+}
+
 /**
  * 评论
  */
@@ -53,6 +67,26 @@ export interface IMemoV2 {
     parentId?: number,
     resources: IResourceV2[],
     relations: IRelationV2[],
+    reactions: IReactionV2[]
+    property?: IPropertyV2,
+    snippet?: string
+}
+
+export interface IMemoV0_24_0 {
+    name: string,
+    state: string,
+    creator: string,
+    createTime: string,
+    updateTime: string,
+    displayTime: string,
+    content: string,
+    nodes: any,
+    visibility: string,
+    tags: any,
+    pinned: boolean,
+    parentId?: number,
+    resources: IResourceV2[],
+    relations: IRelationV0_24_0[],
     reactions: IReactionV2[]
     property?: IPropertyV2,
     snippet?: string

@@ -1,5 +1,5 @@
 import {pluginConfigData} from "@/index";
-import {DownloadResourceByName, GetAuthStatus, GetResourceBinary, ListMemos} from "@/controllers/memos/v2/api"
+import {DownloadResourceByName, GetAuthStatus, GetResourceBinary, ListMemos, ListMemos_v0_24} from "@/controllers/memos/v2/api"
 import {debugMessage, hasCommonElements, isEmptyValue} from "@/utils";
 import {toChinaTime, formatDateTime,} from "@/utils/misc/time";
 import {IResGetMemos} from "@/types/memos";
@@ -94,7 +94,9 @@ export class MemosApiServiceV2 {
         while (true) {
             let resData: IResListMemos;
             // 调用 ListMemos 函数获取一页数据
-            if (API_VERSION.V2_MemosViewFull.includes(version)) {
+            if (API_VERSION.V2_Y2025_M02_D05.includes(version)) {
+                resData = await ListMemos_v0_24(this.username, pageSize, pageToken);
+            } else if(API_VERSION.V2_MemosViewFull.includes(version)) {
                 const view = "MEMO_VIEW_FULL";
                 resData = await ListMemos(pageSize, pageToken, filters, view);
             } else {

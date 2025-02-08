@@ -7,6 +7,8 @@ import {IResourceV2} from "@/types/memos/v2";
 import {IResDataHandleRunV2} from "@/types/plugin/v2/handle";
 import {MemosApiServiceV2} from "@/controllers/memos/v2";
 import {DataSaveV2} from "@/controllers/plugin/v2/data-save";
+import {API_VERSION} from "@/constants/memos";
+import {DataHandleV0_24} from "@/controllers/plugin/v2/data-handle-v0_24";
 
 
 export class PluginV2 {
@@ -39,7 +41,13 @@ export class PluginV2 {
         // 数据处理
         debugMessage(pluginConfigData.debug.isDebug, "数据处理", "", true);
 
-        let resHandleData : IResDataHandleRunV2 = await DataHandleV2.run(allMemos);
+        let resHandleData : IResDataHandleRunV2;
+
+        if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)) {
+            resHandleData = await DataHandleV0_24.run(allMemos);
+        } else {
+            resHandleData = await DataHandleV2.run(allMemos);
+        }
 
         debugMessage(pluginConfigData.debug.isDebug, "数据处理完成", "", true);
 
