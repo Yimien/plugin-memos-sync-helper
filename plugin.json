@@ -2,22 +2,13 @@
   "name": "plugin-memos-sync-helper",
   "author": "Yimien",
   "url": "https://github.com/Yimien/plugin-memos-sync-helper",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "minAppVersion": "3.0.12",
   "backends": [
-    "windows",
-    "linux",
-    "darwin",
-    "docker",
-    "android",
-    "ios"
+    "all"
   ],
   "frontends": [
-    "desktop",
-    "desktop-window",
-    "mobile",
-    "browser-desktop",
-    "browser-mobile"
+    "all"
   ],
   "displayName": {
     "en_US": "Memos Sync Assistant",
