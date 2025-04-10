@@ -11,6 +11,7 @@ export const DEFAULT_CONFIG: IConfig = {
         syncPlan: syncPlanKey.dailyNotes,
         notebook: "",
         docPath: "",
+        useTemplate: false,
         resourceSavePath: "assets/memos/resources",
         memosSort: memosSortKey.asc,
         checkSyncMemos: checkSyncMemosKey.start

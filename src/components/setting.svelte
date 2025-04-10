@@ -34,6 +34,8 @@
     let docPathIsRequired = false; // 文档路径是否必须
     let docPathText = ""; // 文档路径的说明文字
 
+    let showUseTemplate = false; // 开关：使用模板
+
     // let subjectPathIsShow = true; // 主题路径是否显示
     let videoFormatsIsShow = true; // 需要优化的视频格式
     let labelNameIsShow = true; // 上级标签名称
@@ -54,6 +56,7 @@
                 docPathTitle = "日记存放路径"
                 docPathIsShow = true;
                 docPathIsRequired = false;
+                showUseTemplate = true;
                 docPathText = "支持日期格式模板变量，与思源笔记设置一致";
                 break;
             case syncPlanKey.singleDoc:
@@ -61,6 +64,7 @@
                 syncPlanText = `请配置同步笔记本，如需保存至指定文档下请配置文档路径`;
                 docPathIsShow = true;
                 docPathIsRequired = false;
+                showUseTemplate = false;
                 docPathText = "将同步数据保存在指定路径的文档下级"
                 break;
             case syncPlanKey.sameDoc:
@@ -68,6 +72,7 @@
                 syncPlanText = `请配置同步笔记本以及文档路径`;
                 docPathIsShow = true;
                 docPathIsRequired = true;
+                showUseTemplate = false;
                 docPathText = "将同步数据保存在指定路径的文档中"
                 break;
             default:
@@ -222,7 +227,25 @@
                 }
             />
         </Item>
-
+        <Item
+                title="是否使用模板"
+                text="需自动配置笔记本设置中的模板路径"
+                isShow={showUseTemplate}
+                isTip={true}
+                tipTest="与降序排序功能冲突"
+        >
+            <Input
+                    slot="input"
+                    type={itemType.checkbox}
+                    settingKey="UseTemplate"
+                    settingValue={config.base.useTemplate}
+                    on:changed={e => {
+                        config.base.useTemplate = e.detail.value;
+                        updated();
+                    }
+                }
+            />
+        </Item>
         <Item
                 title="资源保存路径"
                 text="保存 Memos 资源的路径"

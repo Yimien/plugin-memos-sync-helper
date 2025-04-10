@@ -1,4 +1,6 @@
 import {
+    request,
+    render,
     appendBlock,
     createDocWithMd,
     getIDsByHPath,
@@ -13,6 +15,7 @@ import {isEmptyValue} from "@/utils";
 import {IResdoOperations} from "@/types/siyuan/api";
 import {formatDate} from "@/utils/misc/time";
 import moment from "moment";
+import {syncPlanKey} from "@/constants/components/select";
 
 
 export class SiYuanApiService {
@@ -62,6 +65,8 @@ export class SiYuanApiService {
      * 根据人类可读路径获取文档ID
      * @param notebookId
      * @param path
+     * @param useTemplate - 是否使用模板
+     * @param templatePath - 模板路径
      */
     static async getDocumentIdByHPath(notebookId: string, path: string): Promise<string> {
         let responseData = await getIDsByHPath(notebookId, path);
@@ -71,7 +76,22 @@ export class SiYuanApiService {
         }
 
         // 自动创建
-        return await createDocWithMd(notebookId, path, "");
+        const docID = await createDocWithMd(notebookId, path, "");
+        if (pluginConfigData.base.syncPlan === syncPlanKey.dailyNotes && pluginConfigData.base.useTemplate) {
+            // 获取模板路径
+            let notebookConfig = await getNotebookConf(pluginConfigData.base.notebook);
+            let dailyNoteTemplatePath = notebookConfig.conf.dailyNoteTemplatePath;
+            if (isEmptyValue(dailyNoteTemplatePath)) {
+                return docID;
+            }
+            const system = await request('/api/system/getConf');
+            dailyNoteTemplatePath = system.conf.system.dataDir + '/templates' + dailyNoteTemplatePath;
+
+            // 渲染模板
+            const res = await render(docID, dailyNoteTemplatePath);
+            await prependBlock('dom', res.content, docID);
+        }
+        return docID;
     }
 
     /**

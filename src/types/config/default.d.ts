@@ -24,6 +24,10 @@ export interface IBase {
      */
     docPath: string,
     /**
+     * 是否使用模板
+     */
+    useTemplate: boolean,
+    /**
      * 资源保存路径
      */
     resourceSavePath,

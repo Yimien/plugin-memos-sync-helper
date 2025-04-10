@@ -86,6 +86,11 @@ class PlugConfig {
 
         const conditionRequiredItems: IItemCondition[] = [
             {
+                text: "是否使用模板",
+                flag: pluginConfigData.base.syncPlan === syncPlanKey.dailyNotes,
+                value: pluginConfigData.base.useTemplate,
+            },
+            {
                 text: "文档路径",
                 flag: pluginConfigData.base.syncPlan === syncPlanKey.sameDoc,
                 value: pluginConfigData.base.docPath
