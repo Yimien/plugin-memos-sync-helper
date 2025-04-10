@@ -64,8 +64,6 @@ export class DataHandleV2 extends DataHandleBase{
         for (let relation of relations) {
             let exists: boolean;
 
-            console.log("旧")
-
             exists = this.relations.some(r =>
                 relation.memo === r.memo && relation.relatedMemo === r.relatedMemo
             );

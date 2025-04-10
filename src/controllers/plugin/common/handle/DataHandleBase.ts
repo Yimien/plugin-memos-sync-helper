@@ -114,8 +114,9 @@ export abstract class DataHandleBase {
         let contents: IContents = [];
         let content = '';
 
-        let splits = stringSplit(memo.content, '\n'); // 拆分源数据
-        // debugMessage(pluginConfigData.debug.isDebug, "内容根据换行符拆分成列表", splits);
+        let splits = stringSplit(memo.content, '\n', false); // 拆分源数据，不移除空元素
+        debugMessage(pluginConfigData.debug.isDebug, "内容根据换行符拆分成列表", splits);
+
         let regex = regexMemosContent.embedded;
         for (let i = 0; i < splits.length; i++) {
             let m = splits[i];
@@ -145,7 +146,9 @@ export abstract class DataHandleBase {
             regex.lastIndex = 0;
             // debugMessage(pluginConfigData.debug.isDebug, "----------");
         }
-        debugMessage(pluginConfigData.debug.isDebug, "contents", contents);
+
+        debugMessage(pluginConfigData.debug.isDebug, "处理后的内容", contents);
+
         await this.handleContent(contents);
         return contents;
     }
