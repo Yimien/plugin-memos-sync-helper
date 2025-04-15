@@ -2,7 +2,7 @@
   "name": "plugin-memos-sync-helper",
   "author": "Yimien",
   "url": "https://github.com/Yimien/plugin-memos-sync-helper",
-  "version": "0.2.12",
+  "version": "0.2.13",
   "minAppVersion": "3.0.12",
   "backends": [
     "all"
