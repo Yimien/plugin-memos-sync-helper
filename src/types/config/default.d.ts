@@ -43,6 +43,10 @@ export interface IBase {
 
 export interface IAdvanced {
     /**
+     * 格式化标题时间
+     */
+    formatDataTime: string;
+    /**
      * 是否识别超链接
      */
     isHandleHref: boolean,

@@ -59,6 +59,10 @@ class PlugConfig {
                 text: "检查同步数据"
             },
             {
+                value: pluginConfigData.advanced.formatDataTime,
+                text: "格式化标题时间"
+            },
+            {
                 value: pluginConfigData.advanced.isHandleHref,
                 text: "识别超链接开关"
             },

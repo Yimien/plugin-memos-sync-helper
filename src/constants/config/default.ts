@@ -17,6 +17,7 @@ export const DEFAULT_CONFIG: IConfig = {
         checkSyncMemos: checkSyncMemosKey.start
     },
     advanced: {
+        formatDataTime: "YYYY-MM-DD HH:mm:ss",
         isHandleHref: false,
         isHandleBacklinks: false,
         isHandleVideo: false,

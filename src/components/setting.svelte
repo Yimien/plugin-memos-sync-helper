@@ -318,6 +318,25 @@
                     on:clicked={ repair }
             />
         </Item>
+
+        <Item
+                title="格式化标题时间"
+                text="默认为 <code class='fn__code'>YYYY-MM-DD HH:mm:ss</code>"
+                isRequired={true}
+        >
+            <Input
+                    slot="input"
+                    type={itemType.text}
+                    settingKey="formatDataTime"
+                    settingValue={config.advanced.formatDataTime}
+                    on:changed={e => {
+                        config.advanced.formatDataTime = e.detail.value;
+                        updated();
+                    }
+                }
+            />
+        </Item>
+
         <Item
                 title="识别超链接"
                 text="识别超链接并转换成可点击打开的样式"

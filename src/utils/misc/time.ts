@@ -1,4 +1,5 @@
 import moment from "moment";
+import {pluginConfigData} from "@/index";
 
 
 /**
@@ -11,7 +12,8 @@ export function toChinaTime(timeString: string) {
 
 export function formatDateTime(timeString: string | number) {
     const timestamp = typeof timeString === 'number' ? timeString * 1000 : timeString;
-    return moment(timestamp).format('YYYY-MM-DD HH:mm:ss');
+    // return moment(timestamp).format('YYYY-MM-DD HH:mm:ss');
+    return moment(timestamp).format(pluginConfigData.advanced.formatDataTime);
 }
 
 export function formatDate(timeString: string | number) {
