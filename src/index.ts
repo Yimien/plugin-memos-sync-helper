@@ -2,7 +2,7 @@ import {Dialog, getFrontend, Plugin} from "siyuan";
 import "@/index.scss";
 import SettingExample from "@/components/setting.svelte";
 import {PLUGIN_NAME, STORAGE_NAME} from "@/constants";
-import {ICONS} from "@/constants/assets/icons";
+import {Icons} from "@/constants/assets/icons";
 import {DEFAULT_CONFIG} from "@/constants/config/default";
 import {IConfig} from "@/types/config/default";
 import {IOption, IOptions} from "@/types/components/item";
@@ -52,11 +52,11 @@ export default class PluginMemosSyncHelper extends Plugin {
         isMobile = frontEnd === "mobile" || frontEnd === "browser-mobile";
 
         // 批量添加图标
-        await this.batchAddIcons(ICONS);
+        this.addIcons(Icons.getIconsString());
 
         // 为插件在顶栏添加一个图标
         topBarElement = this.addTopBar({
-            icon: ICONS.memos.name,
+            icon: Icons.getIcon().default.name,
             title: PLUGIN_NAME,
             position: "right",
             callback: () => {
@@ -163,16 +163,5 @@ export default class PluginMemosSyncHelper extends Plugin {
                 notebookOptions: await this.getNotebookOptions()
             }
         });
-    }
-
-    /**
-     * 批量添加图标
-     * @param icons
-     * @private
-     */
-    private async batchAddIcons(icons: any) {
-        for (const key in icons) {
-            this.addIcons(icons[key].icon);
-        }
     }
 }

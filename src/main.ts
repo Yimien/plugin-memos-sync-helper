@@ -1,6 +1,6 @@
 import {STORAGE_NAME} from "@/constants";
 import {sync_status} from "@/constants/main";
-import {ICONS} from "@/constants/assets/icons";
+import {Icons} from "@/constants/assets/icons";
 import {syncPlanKey, tagFilterKey, checkSyncMemosKey} from "@/constants/components/select";
 import {API_VERSION} from "@/constants/memos";
 import {IItemCondition} from "@/types/plugin";
@@ -289,14 +289,11 @@ class Sync {
         let svg: any;
 
         if (Sync.status === sync_status.waiting) {
-            // svg = ICONS.syncing.svg;
-            svg = `<svg><use xlink:href="#${ICONS.syncing.name}"></use></svg>`
+            svg = Icons.getIcon().waiting.use;
         } else if (Sync.status === sync_status.downloading) {
-            // svg = ICONS.download.svg;
-            svg = `<svg><use xlink:href="#${ICONS.download.name}"></use></svg>`;
+            svg = Icons.getIcon().downloading.use;
         } else if (Sync.status === sync_status.completed) {
-            // svg = ICONS.memos.svg;
-            svg = `<svg><use xlink:href="#${ICONS.memos.name}"></use></svg>`;
+            svg = Icons.getIcon().completed.use;
         }
 
         if (isMobile) {
