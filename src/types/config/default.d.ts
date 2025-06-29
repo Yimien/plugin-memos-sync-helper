@@ -47,6 +47,10 @@ export interface IAdvanced {
      */
     formatDataTime: string;
     /**
+     * 是否显示创建时间
+     */
+    showCreateTime: boolean;
+    /**
      * 是否识别超链接
      */
     isHandleHref: boolean,

@@ -336,7 +336,24 @@
                 }
             />
         </Item>
-
+        <Item
+                title="显示创建时间"
+                text="同步时写入创建时间"
+                isTip={true}
+                tipTest="不支持v0.21.0及以下版本"
+        >
+            <Input
+                    slot="input"
+                    type={itemType.checkbox}
+                    settingKey="ShowCreateTimeSwitch"
+                    settingValue={config.advanced.showCreateTime}
+                    on:changed={e => {
+                        config.advanced.showCreateTime = e.detail.value;
+                        updated();
+                    }
+                }
+            />
+        </Item>
         <Item
                 title="识别超链接"
                 text="识别超链接并转换成可点击打开的样式"

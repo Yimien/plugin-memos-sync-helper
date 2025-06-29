@@ -79,6 +79,13 @@ export abstract class DataHandleBase {
      */
     protected abstract getMemoUid(memo: IMemo): string;
 
+    /**
+     * 获取创建时间
+     * @param memo
+     * @protected
+     */
+    protected abstract getCreateTime(memo: IMemo): string;
+
 
     /**
      * 获取更新时间

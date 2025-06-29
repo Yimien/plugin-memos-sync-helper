@@ -18,6 +18,7 @@ export const DEFAULT_CONFIG: IConfig = {
     },
     advanced: {
         formatDataTime: "YYYY-MM-DD HH:mm:ss",
+        showCreateTime: false,
         isHandleHref: false,
         isHandleBacklinks: false,
         isHandleVideo: false,

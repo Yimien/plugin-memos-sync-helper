@@ -63,6 +63,10 @@ class PlugConfig {
                 text: "格式化标题时间"
             },
             {
+                value: pluginConfigData.advanced.showCreateTime,
+                text: "显示创建时间开关"
+            },
+            {
                 value: pluginConfigData.advanced.isHandleHref,
                 text: "识别超链接开关"
             },

@@ -21,6 +21,10 @@ export class DataHandleV1 extends DataHandleBase{
         return memo.name;
     }
 
+    protected getCreateTime(memo: IMemoV1): string {
+        return formatDateTime(memo.createdTs);
+    }
+
     protected getUpdateTime(memo: IMemoV1): string {
         return formatDateTime(memo.updatedTs);
     }

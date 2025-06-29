@@ -19,7 +19,15 @@ export class DataHandleV2 extends DataHandleBase{
         let memoId: string = this.getMemoId(memo);
         let memoUid: string = memoId;
         let updateTime: string = this.getUpdateTime(memo);
-        let title: string = `${updateTime}`;
+        let title: string;
+        if (pluginConfigData.advanced.showCreateTime) {
+            let createTime: string = this.getCreateTime(memo);
+            // title = `${updateTime}・${createTime}`;
+            title = `${updateTime} <${createTime}>`;
+        } else {
+            title = `${updateTime}`;
+        }
+
         let contents: IContent[] = await this.getContents(memo);
 
         this.handleResources(memo, contents);
@@ -53,6 +61,10 @@ export class DataHandleV2 extends DataHandleBase{
 
     protected getMemoUid(memo: IMemoV2): string {
         return memo.uid;
+    }
+
+    protected getCreateTime(memo: IMemoV2): string {
+        return formatDateTime(toChinaTime(memo.createTime));
     }
 
     protected getUpdateTime(memo: IMemoV2): string {
