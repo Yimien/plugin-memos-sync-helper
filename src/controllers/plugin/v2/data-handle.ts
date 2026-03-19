@@ -9,6 +9,7 @@ import {IContent, IContents, INewMemo} from "@/types/plugin";
 import {DataHandleBase} from "@/controllers/plugin/common/handle/DataHandleBase";
 import {INewMemoV1} from "@/types/plugin/v1/handle";
 import {API_VERSION} from "@/constants/memos";
+import {MemosApiServiceV2} from "@/controllers/memos/v2";
 
 
 export class DataHandleV2 extends DataHandleBase{
@@ -60,7 +61,7 @@ export class DataHandleV2 extends DataHandleBase{
     }
 
     protected getMemoUid(memo: IMemoV2): string {
-        return memo.uid;
+        return memo.uid ?? this.getMemoId(memo);
     }
 
     protected getCreateTime(memo: IMemoV2): string {
@@ -72,7 +73,7 @@ export class DataHandleV2 extends DataHandleBase{
     }
 
     protected handleRelations(memo: IMemoV2 | IMemoV0_24_0): void {
-        let relations = memo.relations;
+        let relations = memo.relations ?? [];
         for (let relation of relations) {
             let exists: boolean;
 
@@ -87,7 +88,7 @@ export class DataHandleV2 extends DataHandleBase{
     }
 
     protected handleResources(memo: IMemoV2, contents: IContents): void {
-        let resources = memo.resources;
+        let resources = MemosApiServiceV2.normalizeResources(memo);
         this.getResourceContents(contents, resources);
         this.resources = this.resources.concat(resources);
     }

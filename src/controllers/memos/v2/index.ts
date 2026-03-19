@@ -1,10 +1,10 @@
 import {pluginConfigData} from "@/index";
-import {DownloadResourceByName, GetAuthStatus, GetResourceBinary, ListMemos, ListMemos_v0_24} from "@/controllers/memos/v2/api"
+import {DownloadResourceByName, GetResourceBinary, ListMemos, ListMemos_v0_24, ListUsers} from "@/controllers/memos/v2/api"
 import {debugMessage, hasCommonElements, isEmptyValue} from "@/utils";
 import {toChinaTime, formatDateTime,} from "@/utils/misc/time";
 import {IResGetMemos} from "@/types/memos";
 import moment from "moment";
-import {IMemoV2, IResourceV2} from "@/types/memos/v2";
+import {IAttachmentV2, IMemoV2, IResourceV2} from "@/types/memos/v2";
 import {tagFilterKey} from "@/constants/components/select";
 import {API_VERSION} from "@/constants/memos";
 import {IResListMemos} from "@/types/memos/v2/api";
@@ -12,6 +12,35 @@ import {IResListMemos} from "@/types/memos/v2/api";
 
 export class MemosApiServiceV2 {
     private static username: string;
+
+    private static getMemoResources(memo: IMemoV2): IResourceV2[] {
+        const resources = memo.resources ?? [];
+        if (resources.length > 0) {
+            return resources;
+        }
+
+        const attachments = memo.attachments ?? [];
+        return attachments.map((attachment: IAttachmentV2) => ({
+            name: attachment.name,
+            uid: attachment.uid ?? attachment.name.split('/').pop() ?? '',
+            createTime: attachment.createTime ?? memo.createTime,
+            filename: attachment.filename,
+            content: attachment.content ?? '',
+            externalLink: attachment.externalLink ?? '',
+            type: attachment.type,
+            size: attachment.size,
+            memo: attachment.memo ?? memo.name
+        }));
+    }
+
+    private static async getCurrentUser() {
+        const resData = await ListUsers();
+        if (isEmptyValue(resData?.users) || resData.users.length === 0) {
+            return null;
+        }
+
+        return resData.users[0];
+    }
 
     /**
      * 初始化数据
@@ -157,12 +186,12 @@ export class MemosApiServiceV2 {
      * 获取用户数据
      */
     static async getUserData() {
-        const userData = await GetAuthStatus();
+        const userData = await this.getCurrentUser();
         return {
             /**
              * 用户名称
              */
-            name: userData.name
+            name: userData.username ?? userData.name
         }
     }
 
@@ -170,7 +199,7 @@ export class MemosApiServiceV2 {
      * 授权校验
      */
     static async checkAccessToken() {
-        const userData = await GetAuthStatus();
+        const userData = await this.getCurrentUser();
         return !isEmptyValue(userData);
     }
 
@@ -212,5 +241,9 @@ export class MemosApiServiceV2 {
         } else {
             return await GetResourceBinary(resource.name, resource.filename);
         }
+    }
+
+    static normalizeResources(memo: IMemoV2): IResourceV2[] {
+        return this.getMemoResources(memo);
     }
 }

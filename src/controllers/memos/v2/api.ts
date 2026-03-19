@@ -30,18 +30,6 @@ export async function ListUsers() {
 
 
 /**
- * 获取用户的当前身份验证信息
- * @constructor
- */
-export async function GetAuthStatus() {
-    return await Requests.send(METHOD.POST, "/api/v1/auth/status");
-}
-
-
-// **************************************** MemoService ****************************************
-
-
-/**
  * 列出带有分页和过滤器的备忘录
  * @param pageSize - 返回的最大条数
  * @param pageToken - 检索后续页面的令牌
