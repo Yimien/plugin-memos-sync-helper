@@ -10,6 +10,18 @@ export interface IResourceV2 {
     memo: string
 }
 
+export interface IAttachmentV2 {
+    name: string,
+    filename: string,
+    externalLink: string,
+    type: string,
+    size: string,
+    createTime?: string,
+    uid?: string,
+    memo?: string,
+    content?: string
+}
+
 export interface IRelationV2 {
     memo: string,
     relatedMemo: string,
@@ -53,7 +65,7 @@ export interface IPropertyV2 {
  */
 export interface IMemoV2 {
     name: string,
-    uid: string,
+    uid?: string | null,
     rowStatus: string,
     creator: string,
     createTime: string,
@@ -65,7 +77,8 @@ export interface IMemoV2 {
     tags: any,
     pinned: boolean,
     parentId?: number,
-    resources: IResourceV2[],
+    resources?: IResourceV2[],
+    attachments?: IAttachmentV2[],
     relations: IRelationV2[],
     reactions: IReactionV2[]
     property?: IPropertyV2,
@@ -85,7 +98,8 @@ export interface IMemoV0_24_0 {
     tags: any,
     pinned: boolean,
     parentId?: number,
-    resources: IResourceV2[],
+    resources?: IResourceV2[],
+    attachments?: IAttachmentV2[],
     relations: IRelationV0_24_0[],
     reactions: IReactionV2[]
     property?: IPropertyV2,
