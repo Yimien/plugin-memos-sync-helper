@@ -23,11 +23,15 @@ export class DataSaveV2 extends DataSaveBase {
             let relatedMemoId ;
 
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)) {
-                memoId = relation.memo.uid;
-                relatedMemoId = relation.relatedMemo.uid;
+                memoId = relation.memo.uid ?? relation.memo.name?.split('/').pop();
+                relatedMemoId = relation.relatedMemo.uid ?? relation.relatedMemo.name?.split('/').pop();
             } else {
                 memoId = relation.memo.split('/').pop();
                 relatedMemoId = relation.relatedMemo.split('/').pop()
+            }
+
+            if (!memoId || !relatedMemoId) {
+                continue;
             }
 
             let blockId = this.memoIdLinkBlockId[memoId];

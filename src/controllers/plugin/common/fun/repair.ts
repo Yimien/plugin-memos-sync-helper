@@ -55,7 +55,7 @@ export async function repair() {
             if (isEmptyValue(memo)) {
                 continue;
             }
-            m.uid = memo.uid;
+            m.uid = memo.uid ?? memo.name?.split('/').pop();
             // debugMessage(pluginConfigData.debug.isDebug, "memo", memo);
         }
     } else {
