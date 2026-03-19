@@ -13,7 +13,7 @@
     import {IConfig} from "@/types/config/default.d";
 
     import type PluginMemosSyncHelper from "@/index";
-    import {checkAccessToken, test} from "@/main";
+    import {checkAccessToken, resetLastSyncTime, test} from "@/main";
     import {repair} from "@/controllers/plugin/common/fun/repair";
 
 
@@ -134,7 +134,7 @@
         </Item>
         <Item
                 title="服务器地址"
-                text="访问 Memos 的地址"
+                text="访问 Memos 的完整地址，需包含 http:// 或 https://，末尾不要加 '/'"
                 block={true}
                 isRequired={true}
         >
@@ -143,7 +143,7 @@
                     type={itemType.text}
                     settingKey="Host"
                     settingValue={config.base.host}
-                    placeholder="支持域名和IP地址，注意不要以 '/' 结尾"
+                    placeholder="示例：http://127.0.0.1:5230 或 https://demo.example.com（末尾不要加 '/'）"
                     block={true}
                     on:changed={e => {
                         config.base.host = e.detail.value;
@@ -487,7 +487,7 @@
     <Panel display={PANELS[2].key === focusPanel}>
         <Item
                 title="上次同步时间"
-                text="在同步完成后自动更新"
+                text="用于增量同步。若你手动删除了已同步笔记，可先重置这里，再执行一次同步以重新全量导入"
 
         >
             <Input
@@ -501,6 +501,19 @@
                         updated();
                     }
                 }
+            />
+        </Item>
+
+        <Item
+                title="重新全量同步"
+                text="将上次同步时间重置为初始值。适用于手动删除已同步笔记后，需要重新导入全部历史 Memo 的情况"
+        >
+            <Input
+                    slot="input"
+                    type={itemType.button}
+                    settingKey="ResetLastSyncTime"
+                    settingValue="重置并准备重同步"
+                    on:clicked={ () => resetLastSyncTime(plugin) }
             />
         </Item>
 
