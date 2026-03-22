@@ -366,6 +366,13 @@ export async function checkAccessToken() {
     debugMessage(pluginConfigData.debug.isDebug, "校验完成");
 }
 
+export async function resetLastSyncTime(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
+    const config: IConfig = pluginConfigData;
+    config.filter.lastSyncTime = "2021-12-08 00:00:00";
+    await plugin.updateConfig(config);
+    await pushMsg("已重置上次同步时间，请再次执行同步以重新全量导入历史 Memo");
+}
+
 /**
  * 检查是否存在可更新的数据
  */
