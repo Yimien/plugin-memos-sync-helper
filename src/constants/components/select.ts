@@ -37,7 +37,7 @@ export const VERSION_OPTIONS: IOptions = [
     },
     {
         key: versionKey.v0_26_0,
-        text: "v0.26.0 及以上"
+        text: "v0.26.0 ~ v0.31.x 及以上"
     }
 ]
 

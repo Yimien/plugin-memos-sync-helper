@@ -69,6 +69,7 @@
             class:fn__flex-center={!block}
             {placeholder}
             bind:value={settingValue}
+            on:input={changed}
             on:change={changed}
     />
 {:else if type === itemType.longText}
@@ -81,6 +82,7 @@
             class:fn__flex-center={!block}
             {placeholder}
             bind:value={settingValue}
+            on:input={changed}
             on:change={changed}
     />
 {:else if type === itemType.number}

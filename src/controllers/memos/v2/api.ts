@@ -13,8 +13,29 @@ function changeFilter(filter: any) {
 }
 
 
-// **************************************** UserService ****************************************
+// **************************************** UserService / AuthService ****************************************
 
+
+/**
+ * 获取当前登录用户信息（适用于 Memos v0.24 ~ v0.31+，不需要管理员权限）
+ */
+export async function GetAuthUser() {
+    return await Requests.send(METHOD.GET, '/api/v1/auth/me');
+}
+
+/**
+ * 获取认证状态（适用于部分旧版本 Memos 如 v0.22/v0.23）
+ */
+export async function GetAuthStatus() {
+    return await Requests.send(METHOD.GET, '/api/v1/auth/status');
+}
+
+/**
+ * 获取当前用户信息备用端点
+ */
+export async function GetUserMe() {
+    return await Requests.send(METHOD.GET, '/api/v1/users/me');
+}
 
 /**
  * 列出用户列表

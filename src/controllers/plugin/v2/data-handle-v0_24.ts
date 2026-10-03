@@ -9,14 +9,19 @@ import {pluginConfigData} from "@/index";
 export class DataHandleV0_24 extends DataHandleV2{
 
     protected handleRelations(memo): void {
-        let relations : IRelationV0_24_0[] = memo.relations;
+        let relations : IRelationV0_24_0[] = memo.relations || [];
 
         for (let relation of relations) {
-            let exists: boolean;
+            if (!relation) continue;
+            const memoName = typeof relation.memo === 'string' ? relation.memo : relation.memo?.name;
+            const relatedMemoName = typeof relation.relatedMemo === 'string' ? relation.relatedMemo : relation.relatedMemo?.name;
 
-            exists = this.relations.some(r =>
-                relation.memo.name === r.memo.name && relation.relatedMemo.name === r.relatedMemo.name
-            );
+            let exists = this.relations.some(r => {
+                if (!r) return false;
+                const rMemoName = typeof r.memo === 'string' ? r.memo : r.memo?.name;
+                const rRelatedMemoName = typeof r.relatedMemo === 'string' ? r.relatedMemo : r.relatedMemo?.name;
+                return memoName === rMemoName && relatedMemoName === rRelatedMemoName;
+            });
 
             if (!exists) {
                 this.relations.push(relation);

@@ -23,11 +23,32 @@ export class Requests {
 
 
     /**
+     * 获取规范化的主机地址（去除尾部斜杠）
+     */
+    static getHost(): string {
+        let host = (pluginConfigData?.base?.host || '').trim();
+        return host.replace(/\/+$/, '');
+    }
+
+    /**
+     * 获取规范化的 Token（去除首尾空格及多余的 Bearer 前缀）
+     */
+    static getToken(): string {
+        let token = (pluginConfigData?.base?.token || '').trim();
+        if (token.toLowerCase().startsWith('bearer ')) {
+            token = token.slice(7).trim();
+        }
+        return token;
+    }
+
+    /**
      * 生成请求地址
      * @param pathName
      */
     static getUrl(pathName: string) {
-        return `${pluginConfigData.base.host}${pathName}`;
+        const host = this.getHost();
+        const path = pathName.startsWith('/') ? pathName : `/${pathName}`;
+        return `${host}${path}`;
     }
 
     /**
@@ -36,7 +57,7 @@ export class Requests {
     static getHeaders() {
         return new Headers({
             'User-Agent': UA.ua,
-            'Authorization': `Bearer ${pluginConfigData.base.token}`
+            'Authorization': `Bearer ${this.getToken()}`
         });
     }
 
@@ -51,7 +72,9 @@ export class Requests {
 
         // 生成请求地址
         let url: URL = new URL(this.getUrl(pathName));
-        url.search = new URLSearchParams(data).toString();
+        if (data && Object.keys(data).length > 0) {
+            url.search = new URLSearchParams(data).toString();
+        }
 
         // 发送请求
         return await fetch(url, {
@@ -111,7 +134,9 @@ export class Requests {
 
         // 生成请求地址
         let url: URL = new URL(this.getUrl(pathName));
-        url.search = new URLSearchParams(data).toString();
+        if (data && Object.keys(data).length > 0) {
+            url.search = new URLSearchParams(data).toString();
+        }
 
         // 发送请求
         return await fetch(url, {
@@ -127,17 +152,35 @@ export class Requests {
      * @param data - 请求参数
      */
     static async send(method: string, pathName: string, data?: any) {
-        let response = null;
-        if (method === METHOD.GET) {
-            response = await this.get(pathName, data);
-        } else if (method === METHOD.POST) {
-            response = await this.post(pathName, data);
-        } else if (method === METHOD.PUT) {
-            response = await this.put(pathName, data);
-        } else if (method === METHOD.DELETE) {
-            response = await this.delete(pathName, data);
-        }
+        try {
+            let response = null;
+            if (method === METHOD.GET) {
+                response = await this.get(pathName, data);
+            } else if (method === METHOD.POST) {
+                response = await this.post(pathName, data);
+            } else if (method === METHOD.PUT) {
+                response = await this.put(pathName, data);
+            } else if (method === METHOD.DELETE) {
+                response = await this.delete(pathName, data);
+            }
 
-        return (response !== null && response.status === STATUS.OK) ? await response.json() : null;
+            if (!response || !response.ok) {
+                return null;
+            }
+
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                return await response.json();
+            } else {
+                const text = await response.text();
+                try {
+                    return JSON.parse(text);
+                } catch {
+                    return null;
+                }
+            }
+        } catch {
+            return null;
+        }
     }
 }
