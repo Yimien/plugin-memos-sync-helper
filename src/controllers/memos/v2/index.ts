@@ -1,5 +1,5 @@
 import {pluginConfigData} from "@/index";
-import {DownloadResourceByName, GetResourceBinary, ListMemos, ListMemos_v0_24, ListUsers} from "@/controllers/memos/v2/api"
+import {DownloadResourceByName, GetAuthStatus, GetAuthUser, GetResourceBinary, GetUserMe, ListMemos, ListMemos_v0_24, ListUsers} from "@/controllers/memos/v2/api"
 import {debugMessage, hasCommonElements, isEmptyValue} from "@/utils";
 import {toChinaTime, formatDateTime,} from "@/utils/misc/time";
 import {IResGetMemos} from "@/types/memos";
@@ -12,6 +12,7 @@ import {IResListMemos} from "@/types/memos/v2/api";
 
 export class MemosApiServiceV2 {
     private static username: string;
+    private static userResourceName: string;
 
     private static getMemoResources(memo: IMemoV2): IResourceV2[] {
         const resources = memo.resources ?? [];
@@ -34,12 +35,48 @@ export class MemosApiServiceV2 {
     }
 
     private static async getCurrentUser() {
-        const resData = await ListUsers();
-        if (isEmptyValue(resData?.users) || resData.users.length === 0) {
-            return null;
-        }
+        // 1. 尝试 /api/v1/auth/me (适用于 Memos v0.24 ~ v0.31+，普通用户与管理员均可访问)
+        try {
+            const authRes: any = await GetAuthUser();
+            if (authRes?.user) {
+                return authRes.user;
+            }
+            if (authRes?.name) {
+                return authRes;
+            }
+        } catch {}
 
-        return resData.users[0];
+        // 2. 尝试 /api/v1/auth/status (适用于旧版 Memos 如 v0.22/v0.23)
+        try {
+            const statusRes: any = await GetAuthStatus();
+            if (statusRes?.user) {
+                return statusRes.user;
+            }
+            if (statusRes?.name) {
+                return statusRes;
+            }
+        } catch {}
+
+        // 3. 尝试 /api/v1/users (需要管理员权限)
+        try {
+            const resData: any = await ListUsers();
+            if (!isEmptyValue(resData?.users) && resData.users.length > 0) {
+                return resData.users[0];
+            }
+        } catch {}
+
+        // 4. 尝试 /api/v1/users/me
+        try {
+            const meRes: any = await GetUserMe();
+            if (meRes?.user) {
+                return meRes.user;
+            }
+            if (meRes?.name) {
+                return meRes;
+            }
+        } catch {}
+
+        return null;
     }
 
     /**
@@ -47,8 +84,14 @@ export class MemosApiServiceV2 {
      * @private
      */
     private static async initData() {
-        const userData = await this.getUserData();
-        this.username = userData.name;
+        const userData = await this.getCurrentUser();
+        if (userData) {
+            this.username = userData.username ?? (userData.name ? userData.name.split('/').pop() : '');
+            this.userResourceName = userData.name ?? (this.username ? `users/${this.username}` : '');
+        } else {
+            this.username = '';
+            this.userResourceName = '';
+        }
     }
 
     private static async tagFilter(memos: IMemoV2[])  {
@@ -63,18 +106,18 @@ export class MemosApiServiceV2 {
         if (tagFilterMode === tagFilterKey.syncNoTag) {
             console.log("仅同步无标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
-                return memos.filter(memo => memo.tags.length === 0)
+                return memos.filter(memo => (memo.tags || []).length === 0)
             }
-            return memos.filter(memo => memo.property.tags.length === 0)
+            return memos.filter(memo => (memo.property?.tags || []).length === 0)
         }
 
         // 不同步无标签的数据
         if (tagFilterMode === tagFilterKey.notSyncNoTag) {
             console.log("不同步无标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
-                return memos.filter(memo => memo.tags.length > 0)
+                return memos.filter(memo => (memo.tags || []).length > 0)
             }
-            return memos.filter(memo => memo.property.tags.length > 0)
+            return memos.filter(memo => (memo.property?.tags || []).length > 0)
         }
 
         let tagListString = pluginConfigData.filter.tagList;
@@ -85,36 +128,36 @@ export class MemosApiServiceV2 {
             console.log("仅同步指定标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
                 console.log(tags);
-                return memos.filter(memo => hasCommonElements(memo.tags, tags))
+                return memos.filter(memo => hasCommonElements(memo.tags || [], tags))
             }
-            return memos.filter(memo => hasCommonElements(memo.property.tags, tags))
+            return memos.filter(memo => hasCommonElements(memo.property?.tags || [], tags))
         }
 
         // 不同步指定标签的数据
         if (tagFilterMode === tagFilterKey.notSyncSpecTag) {
             console.log("不同步指定标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
-                return memos.filter(memo => !hasCommonElements(memo.tags, tags))
+                return memos.filter(memo => !hasCommonElements(memo.tags || [], tags))
             }
-            return memos.filter(memo => !hasCommonElements(memo.property.tags, tags))
+            return memos.filter(memo => !hasCommonElements(memo.property?.tags || [], tags))
         }
 
         // 同步指定标签及无标签的数据
         if (tagFilterMode === tagFilterKey.syncSpecTagAndNoTag) {
             console.log("同步指定标签及无标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
-                return memos.filter(memo => hasCommonElements(memo.tags, tags) || memo.tags.length === 0)
+                return memos.filter(memo => hasCommonElements(memo.tags || [], tags) || (memo.tags || []).length === 0)
             }
-            return memos.filter(memo => hasCommonElements(memo.property.tags, tags) || memo.property.tags.length === 0)
+            return memos.filter(memo => hasCommonElements(memo.property?.tags || [], tags) || (memo.property?.tags || []).length === 0)
         }
 
         // 不同步指定标签及无标签的数据
         if (tagFilterMode === tagFilterKey.notSyncSpecTagAndNoTag) {
             console.log("不同步指定标签及无标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
-                return memos.filter(memo => !hasCommonElements(memo.tags, tags) && memo.tags.length > 0)
+                return memos.filter(memo => !hasCommonElements(memo.tags || [], tags) && (memo.tags || []).length > 0)
             }
-            return memos.filter(memo => !hasCommonElements(memo.property.tags, tags) && memo.property.tags.length > 0)
+            return memos.filter(memo => !hasCommonElements(memo.property?.tags || [], tags) && (memo.property?.tags || []).length > 0)
         }
 
         return memos;
@@ -136,20 +179,23 @@ export class MemosApiServiceV2 {
 
         let allMemos = [];
 
-        let filters = [
-            `creator == "${this.username}"`
-        ];
+        let creatorIdentifier = this.userResourceName || (this.username ? `users/${this.username}` : '');
+        let filters = creatorIdentifier ? [`creator == "${creatorIdentifier}"`] : [];
 
         while (true) {
             let resData: IResListMemos;
             // 调用 ListMemos 函数获取一页数据
             if (API_VERSION.V2_Y2025_M02_D05.includes(version)) {
-                resData = await ListMemos_v0_24(this.username, pageSize, pageToken);
+                resData = await ListMemos_v0_24(this.username || creatorIdentifier, pageSize, pageToken);
             } else if(API_VERSION.V2_MemosViewFull.includes(version)) {
                 const view = "MEMO_VIEW_FULL";
                 resData = await ListMemos(pageSize, pageToken, filters, view);
             } else {
                 resData = await ListMemos(pageSize, pageToken, filters);
+            }
+
+            if (!resData || !resData.memos || !Array.isArray(resData.memos)) {
+                break;
             }
 
             // 将更新时间晚于等于 lastSyncTime 的数据添加到 memos 列表中
@@ -187,11 +233,13 @@ export class MemosApiServiceV2 {
      */
     static async getUserData() {
         const userData = await this.getCurrentUser();
+        if (!userData) {
+            return {
+                name: ""
+            };
+        }
         return {
-            /**
-             * 用户名称
-             */
-            name: userData.username ?? userData.name
+            name: userData.username ?? (userData.name ? userData.name.split('/').pop() : "")
         }
     }
 

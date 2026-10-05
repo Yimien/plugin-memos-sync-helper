@@ -108,7 +108,7 @@ export default class PluginMemosSyncHelper extends Plugin {
      * @param config - 配置数据
      */
     public async updateConfig(config?: IConfig): Promise<void> {
-        if (config && config !== config) {
+        if (config) {
             pluginConfigData = config;
         }
         return this.saveData(STORAGE_NAME, pluginConfigData);

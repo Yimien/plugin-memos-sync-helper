@@ -134,7 +134,7 @@
         </Item>
         <Item
                 title="服务器地址"
-                text="访问 Memos 的完整地址，需包含 http:// 或 https://，末尾不要加 '/'"
+                text="访问 Memos 的完整地址，需包含 http:// 或 https://（末尾斜杠会自动处理）"
                 block={true}
                 isRequired={true}
         >
@@ -143,13 +143,14 @@
                     type={itemType.text}
                     settingKey="Host"
                     settingValue={config.base.host}
-                    placeholder="示例：http://127.0.0.1:5230 或 https://demo.example.com（末尾不要加 '/'）"
+                    placeholder="示例：http://127.0.0.1:5230 或 https://demo.example.com"
                     block={true}
                     on:changed={e => {
-                        config.base.host = e.detail.value;
+                        let val = (e.detail.value || '').trim();
+                        val = val.replace(/\/+$/, '');
+                        config.base.host = val;
                         updated();
-                    }
-                }
+                    }}
             />
         </Item>
         <Item
@@ -165,10 +166,13 @@
                     settingValue={config.base.token}
                     block={true}
                     on:changed={e => {
-                        config.base.token = e.detail.value;
+                        let val = (e.detail.value || '').trim();
+                        if (val.toLowerCase().startsWith('bearer ')) {
+                            val = val.slice(7).trim();
+                        }
+                        config.base.token = val;
                         updated();
-                    }
-                }
+                    }}
             />
         </Item>
 

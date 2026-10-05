@@ -19,6 +19,18 @@ class PlugConfig {
      * 检查插件配置是否正确
      */
     static async check() {
+        // 自动净化 host 和 token
+        if (pluginConfigData?.base?.host) {
+            pluginConfigData.base.host = pluginConfigData.base.host.trim().replace(/\/+$/, '');
+        }
+        if (pluginConfigData?.base?.token) {
+            let token = pluginConfigData.base.token.trim();
+            if (token.toLowerCase().startsWith('bearer ')) {
+                token = token.slice(7).trim();
+            }
+            pluginConfigData.base.token = token;
+        }
+
         const noUseTagList = [
             tagFilterKey.all,
             tagFilterKey.syncNoTag,
@@ -135,7 +147,7 @@ class PlugConfig {
                 flag: true,
                 value: pluginConfigData.base.host,
                 text: "服务器路径",
-                check: [null, false]
+                check: [null, null]
             },
             {
                 flag: pluginConfigData.base.syncPlan === syncPlanKey.sameDoc,
@@ -352,15 +364,37 @@ export async function checkConfig() {
 export async function checkAccessToken() {
     debugMessage(pluginConfigData.debug.isDebug, "正在校验授权码...");
 
+    if (!pluginConfigData?.base?.host || !pluginConfigData.base.host.trim()) {
+        await pushErrMsg("请先配置服务器地址！");
+        return;
+    }
+    if (!pluginConfigData?.base?.token || !pluginConfigData.base.token.trim()) {
+        await pushErrMsg("请先配置 Access Token！");
+        return;
+    }
+
+    // 净化 host 和 token
+    pluginConfigData.base.host = pluginConfigData.base.host.trim().replace(/\/+$/, '');
+    let token = pluginConfigData.base.token.trim();
+    if (token.toLowerCase().startsWith('bearer ')) {
+        token = token.slice(7).trim();
+    }
+    pluginConfigData.base.token = token;
+
     try {
         let result = await MemosServer.checkAccessToken();
         if (result) {
-            await pushMsg("校验通过");
+            const userData = await MemosServer.getUserData();
+            if (userData?.name) {
+                await pushMsg(`校验通过！已连接到 Memos 用户: ${userData.name}`);
+            } else {
+                await pushMsg("校验通过，Memos 连接正常！");
+            }
         } else {
             await pushErrMsg("校验失败，请检查服务器地址和授权码是否配置正确");
         }
-    } catch (error) {
-        await pushErrMsg(`校验失败: ${error.message}`);
+    } catch (error: any) {
+        await pushErrMsg(`校验失败: ${error?.message || error}`);
     }
 
     debugMessage(pluginConfigData.debug.isDebug, "校验完成");

@@ -15,7 +15,7 @@ export const API_VERSION = {
     V2_Y2025_M02_D05: [versionKey.v0_24_0, versionKey.v0_25_0, versionKey.v0_26_0]
 }
 
-export const DEFAULT_VERSION = versionKey.v0_24_0;
+export const DEFAULT_VERSION = versionKey.v0_26_0;
 
 export const RELATION_TYPE = {
     reference: "REFERENCE",
