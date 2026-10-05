@@ -19,8 +19,8 @@
     "zh_CN": "将 Memos 的数据同步至思源笔记中"
   },
   "readme": {
-    "en_US": "README.md",
-    "zh_CN": "README.md"
+    "zh-CN": "README.md",
+    "default": "README.md"
   },
   "funding": {
     "custom": [
