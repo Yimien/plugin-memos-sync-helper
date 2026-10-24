@@ -446,9 +446,12 @@ export async function checkImgBed() {
     }
 
     // 探针文件清理（删除失败不影响连通性结论）
+    // 用上传响应返回的真实 fileId（/file/<上传时间戳>_<文件名> 的最后一段）——
+    // 图床存储时会给文件名加时间戳前缀，用裸文件名删除会命中「不存在」假成功
+    const realFileId = link.split('/').pop();
     let cleaned = true;
     try {
-        const deleteUrl = `${imgbed.uploadUrl.trim().replace(/\/+$/, "")}/api/manage/delete/${probeFilename}`;
+        const deleteUrl = `${imgbed.uploadUrl.trim().replace(/\/+$/, "")}/api/manage/delete/${realFileId}`;
         const token = (imgbed.token || "").trim();
         const headers: Record<string, string> = {};
         if (token) {
