@@ -184,7 +184,7 @@ export class Requests {
      * 直连优先、失败回落内核代理的文件上传（multipart/form-data）。
      * 手工构造 multipart 报文，以便回落内核代理时以 base64 转发原始字节。
      */
-    static async upload(url: string, blob: Blob, filename: string, headers: Record<string, string> = {}): Promise<Response> {
+    static async upload(url: string, blob: Blob, filename: string, headers: Record<string, string> = {}, fallbackOnBadStatus: boolean = false): Promise<Response> {
         const boundary = `----siyuanImgBed${Date.now()}${Math.floor(Math.random() * 100000)}`;
         const safeFilename = filename.replace(/[^\x20-\x7e]/g, '_');
         const encoder = new TextEncoder();
@@ -203,11 +203,16 @@ export class Requests {
         const contentType = `multipart/form-data; boundary=${boundary}`;
 
         try {
-            return await fetch(url, {
+            const direct = await fetch(url, {
                 method: METHOD.POST,
                 headers: {...headers, 'Content-Type': contentType},
                 body: body
             });
+            if (fallbackOnBadStatus && !direct.ok) {
+                debugMessage(pluginConfigData.debug.isDebug, `直连上传返回 HTTP ${direct.status}，尝试内核代理`);
+                return await this.forwardViaKernel(url, METHOD.POST, body, contentType);
+            }
+            return direct;
         } catch (error) {
             debugMessage(pluginConfigData.debug.isDebug, "直连上传失败，回落内核代理", error);
             return await this.forwardViaKernel(url, METHOD.POST, body, contentType);

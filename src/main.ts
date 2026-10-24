@@ -440,7 +440,8 @@ export async function checkImgBed() {
     const link = await ImgBedService.upload(blob, probeFilename);
 
     if (!link) {
-        await pushErrMsg("图床连接失败：请检查图床上传 URL 是否可达（可开启调试模式查看详细日志）");
+        const detail = ImgBedService.lastError ? `（${ImgBedService.lastError}）` : '';
+        await pushErrMsg(`图床连接失败${detail}。请检查图床上传 URL 是否可达，或开启调试模式查看详细日志`);
         return;
     }
 

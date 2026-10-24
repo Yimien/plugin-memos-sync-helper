@@ -22,6 +22,11 @@ const VIDEO_EXTENSIONS: string[] = ["mp4", "mov", "avi", "mkv", "webm", "m4v", "
 export class ImgBedService {
 
     /**
+     * 最近一次上传失败的诊断信息
+     */
+    static lastError: string = '';
+
+    /**
      * 判断资源应当上传到图床时归属的类别；返回 null 表示不参与图床分类
      * @param resource - Memos 资源
      */
@@ -87,9 +92,10 @@ export class ImgBedService {
                 headerRecord["Authorization"] = `Bearer ${token}`;
             }
 
-            const response = await Requests.upload(`${host}/upload`, blob, filename, headerRecord);
+            const response = await Requests.upload(`${host}/upload`, blob, filename, headerRecord, true);
 
             if (!response.ok) {
+                this.lastError = `上传响应 HTTP ${response.status}（直连与内核代理均失败）`;
                 debugMessage(pluginConfigData.debug.isDebug, `图床上传失败: HTTP ${response.status}`);
                 return null;
             }
@@ -97,6 +103,7 @@ export class ImgBedService {
             const result = await response.json();
             const src = result?.[0]?.src;
             if (isEmptyText(src)) {
+                this.lastError = `图床响应异常: ${JSON.stringify(result).slice(0, 200)}`;
                 debugMessage(pluginConfigData.debug.isDebug, "图床响应中缺少 src 字段", result);
                 return null;
             }
@@ -106,7 +113,8 @@ export class ImgBedService {
             const link = src.startsWith("http") ? src : `${publicHost}${src}`;
             debugMessage(pluginConfigData.debug.isDebug, `图床上传成功: ${filename} -> ${link}`);
             return link;
-        } catch (error) {
+        } catch (error: any) {
+            this.lastError = String(error?.message || error);
             debugMessage(pluginConfigData.debug.isDebug, "图床上传异常，回退本地落盘", error);
             return null;
         }
