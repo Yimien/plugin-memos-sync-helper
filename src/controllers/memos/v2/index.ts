@@ -1,5 +1,5 @@
 import {pluginConfigData} from "@/index";
-import {DownloadResourceByName, GetAuthStatus, GetAuthUser, GetResourceBinary, GetUserMe, ListMemos, ListMemos_v0_24, ListUsers} from "@/controllers/memos/v2/api"
+import {DownloadResourceByName, GetAuthStatus, GetAuthUser, GetCurrentSession, GetResourceBinary, GetUserMe, ListMemos, ListUsers} from "@/controllers/memos/v2/api"
 import {debugMessage, hasCommonElements, isEmptyValue} from "@/utils";
 import {toChinaTime, formatDateTime,} from "@/utils/misc/time";
 import {IResGetMemos} from "@/types/memos";
@@ -46,7 +46,18 @@ export class MemosApiServiceV2 {
             }
         } catch {}
 
-        // 2. 尝试 /api/v1/auth/status (适用于旧版 Memos 如 v0.22/v0.23)
+        // 2. 尝试 /api/v1/auth/sessions/current (适用于 Memos v0.25.x 会话模型)
+        try {
+            const sessionRes: any = await GetCurrentSession();
+            if (sessionRes?.user) {
+                return sessionRes.user;
+            }
+            if (sessionRes?.name) {
+                return sessionRes;
+            }
+        } catch {}
+
+        // 3. 尝试 /api/v1/auth/status (POST，适用于 Memos v0.22 ~ v0.24)
         try {
             const statusRes: any = await GetAuthStatus();
             if (statusRes?.user) {
@@ -57,7 +68,7 @@ export class MemosApiServiceV2 {
             }
         } catch {}
 
-        // 3. 尝试 /api/v1/users (需要管理员权限)
+        // 4. 尝试 /api/v1/users (需要管理员权限)
         try {
             const resData: any = await ListUsers();
             if (!isEmptyValue(resData?.users) && resData.users.length > 0) {
@@ -65,7 +76,7 @@ export class MemosApiServiceV2 {
             }
         } catch {}
 
-        // 4. 尝试 /api/v1/users/me
+        // 5. 尝试 /api/v1/users/me
         try {
             const meRes: any = await GetUserMe();
             if (meRes?.user) {
@@ -104,7 +115,7 @@ export class MemosApiServiceV2 {
 
         // 仅同步无标签的数据
         if (tagFilterMode === tagFilterKey.syncNoTag) {
-            console.log("仅同步无标签的数据");
+            debugMessage(pluginConfigData.debug.isDebug, "仅同步无标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
                 return memos.filter(memo => (memo.tags || []).length === 0)
             }
@@ -113,7 +124,7 @@ export class MemosApiServiceV2 {
 
         // 不同步无标签的数据
         if (tagFilterMode === tagFilterKey.notSyncNoTag) {
-            console.log("不同步无标签的数据");
+            debugMessage(pluginConfigData.debug.isDebug, "不同步无标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
                 return memos.filter(memo => (memo.tags || []).length > 0)
             }
@@ -125,9 +136,8 @@ export class MemosApiServiceV2 {
 
         // 仅同步指定标签的数据
         if (tagFilterMode === tagFilterKey.syncSpecTag) {
-            console.log("仅同步指定标签的数据");
+            debugMessage(pluginConfigData.debug.isDebug, "仅同步指定标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
-                console.log(tags);
                 return memos.filter(memo => hasCommonElements(memo.tags || [], tags))
             }
             return memos.filter(memo => hasCommonElements(memo.property?.tags || [], tags))
@@ -135,7 +145,7 @@ export class MemosApiServiceV2 {
 
         // 不同步指定标签的数据
         if (tagFilterMode === tagFilterKey.notSyncSpecTag) {
-            console.log("不同步指定标签的数据");
+            debugMessage(pluginConfigData.debug.isDebug, "不同步指定标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
                 return memos.filter(memo => !hasCommonElements(memo.tags || [], tags))
             }
@@ -144,7 +154,7 @@ export class MemosApiServiceV2 {
 
         // 同步指定标签及无标签的数据
         if (tagFilterMode === tagFilterKey.syncSpecTagAndNoTag) {
-            console.log("同步指定标签及无标签的数据");
+            debugMessage(pluginConfigData.debug.isDebug, "同步指定标签及无标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
                 return memos.filter(memo => hasCommonElements(memo.tags || [], tags) || (memo.tags || []).length === 0)
             }
@@ -153,7 +163,7 @@ export class MemosApiServiceV2 {
 
         // 不同步指定标签及无标签的数据
         if (tagFilterMode === tagFilterKey.notSyncSpecTagAndNoTag) {
-            console.log("不同步指定标签及无标签的数据");
+            debugMessage(pluginConfigData.debug.isDebug, "不同步指定标签及无标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
                 return memos.filter(memo => !hasCommonElements(memo.tags || [], tags) && (memo.tags || []).length > 0)
             }
@@ -185,8 +195,12 @@ export class MemosApiServiceV2 {
         while (true) {
             let resData: IResListMemos;
             // 调用 ListMemos 函数获取一页数据
+            // v0.24+ 不再携带 parent 参数：v0.24/v0.25 服务端要求 parent 为数字形式的
+            // users/{id}，携带用户名会直接 400（issue #37）；v0.26+ 已删除该字段。
+            // 也不传 filter：各版本 CEL 方言不一致，请求方携带认证信息时服务端会
+            // 自动附加 creator_id 过滤，无需客户端指定创建者。
             if (API_VERSION.V2_Y2025_M02_D05.includes(version)) {
-                resData = await ListMemos_v0_24(this.username || creatorIdentifier, pageSize, pageToken);
+                resData = await ListMemos(pageSize, pageToken);
             } else if(API_VERSION.V2_MemosViewFull.includes(version)) {
                 const view = "MEMO_VIEW_FULL";
                 resData = await ListMemos(pageSize, pageToken, filters, view);
@@ -195,8 +209,12 @@ export class MemosApiServiceV2 {
             }
 
             if (!resData || !resData.memos || !Array.isArray(resData.memos)) {
-                break;
+                // 请求失败/解析失败返回 null，与「服务端确认无数据」是两回事：
+                // 静默空数组会让上层把它当作「暂无新数据」并推进同步时间，造成数据永久漏同步
+                throw new Error(`ListMemos 响应异常（${resData === null ? '请求或解析失败返回 null' : `unexpected keys: ${Object.keys(resData).join(',')}`}）`);
             }
+
+            debugMessage(pluginConfigData.debug.isDebug, `本页 ${resData.memos.length} 条，nextPageToken=${resData.nextPageToken ? '有' : '无'}`);
 
             // 将更新时间晚于等于 lastSyncTime 的数据添加到 memos 列表中
             const memos = resData.memos.filter(

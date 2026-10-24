@@ -15,5 +15,9 @@ export interface IResDataHandleRunV2 {
     resources: IResourceV2[],
     relations: IRelationV2[],
     oldMemos: IMemoV2[],
-    newMemos: INewMemoV2[]
+    newMemos: INewMemoV2[],
+    /**
+     * 已上传至图床的资源（resource.name），本地落盘时跳过
+     */
+    uploadedResourceNames: string[]
 }

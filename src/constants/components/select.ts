@@ -41,6 +41,32 @@ export const VERSION_OPTIONS: IOptions = [
     }
 ]
 
+export enum imgbedResourceKey {
+    image = "image",
+    video = "video",
+    file = "file",
+    custom = "custom"
+}
+
+export const IMGBED_RESOURCE_OPTIONS: IOptions = [
+    {
+        key: imgbedResourceKey.image,
+        text: "图片"
+    },
+    {
+        key: imgbedResourceKey.video,
+        text: "视频"
+    },
+    {
+        key: imgbedResourceKey.file,
+        text: "文件"
+    },
+    {
+        key: imgbedResourceKey.custom,
+        text: "自定义"
+    }
+]
+
 export enum syncPlanKey {
     dailyNotes,
     singleDoc,

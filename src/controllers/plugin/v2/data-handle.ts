@@ -10,6 +10,7 @@ import {DataHandleBase} from "@/controllers/plugin/common/handle/DataHandleBase"
 import {INewMemoV1} from "@/types/plugin/v1/handle";
 import {API_VERSION} from "@/constants/memos";
 import {MemosApiServiceV2} from "@/controllers/memos/v2";
+import {ImgBedService} from "@/controllers/imgbed";
 
 
 export class DataHandleV2 extends DataHandleBase{
@@ -31,7 +32,7 @@ export class DataHandleV2 extends DataHandleBase{
 
         let contents: IContent[] = await this.getContents(memo);
 
-        this.handleResources(memo, contents);
+        await this.handleResources(memo, contents);
         this.handleRelations(memo);
 
         let result: INewMemo = {
@@ -87,8 +88,32 @@ export class DataHandleV2 extends DataHandleBase{
         }
     }
 
-    protected handleResources(memo: IMemoV2, contents: IContents): void {
+    protected async handleResources(memo: IMemoV2, contents: IContents): Promise<void> {
         let resources = MemosApiServiceV2.normalizeResources(memo);
+
+        // 图床模式：命中的资源先下载并上传图床，文档内直接引用图床外链；
+        // 上传失败的资源保留在本地落盘列表，行为与旧版一致
+        if (pluginConfigData.imgbed?.enabled) {
+            for (let resource of resources) {
+                if (!ImgBedService.shouldUpload(resource)) {
+                    continue;
+                }
+                try {
+                    let response = await MemosApiServiceV2.downloadResource(resource);
+                    if (isEmptyValue(response) || !response.ok) {
+                        continue;
+                    }
+                    let blob = await response.blob();
+                    let link = await ImgBedService.upload(blob, resource.filename);
+                    if (!isEmptyValue(link)) {
+                        this.uploadedResourceLinks.set(resource.name, link);
+                    }
+                } catch (error) {
+                    debugMessage(pluginConfigData.debug.isDebug, "图床上传失败，该资源回退本地落盘", error);
+                }
+            }
+        }
+
         this.getResourceContents(contents, resources);
         this.resources = this.resources.concat(resources);
     }
@@ -124,7 +149,8 @@ export class DataHandleV2 extends DataHandleBase{
             resources: dh.resources,
             relations: dh.relations,
             oldMemos: data.old,
-            newMemos: dh.newMemos
+            newMemos: dh.newMemos,
+            uploadedResourceNames: Array.from(dh.uploadedResourceLinks.keys())
         }
 
         debugMessage(pluginConfigData.debug.isDebug, "数据处理结果", result);

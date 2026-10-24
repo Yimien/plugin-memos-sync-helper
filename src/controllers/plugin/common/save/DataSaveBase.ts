@@ -329,23 +329,49 @@ export abstract class DataSaveBase {
     }
 
     /**
-     * 保存为 Daily Notes
+     * 保存为 Daily Notes：日期日记作为父文档，每条 Memo 作为其下的子文档
      * @param newMemo
      * @protected
      */
     protected async saveDailyNotes(newMemo: any) {
         let notebookId = pluginConfigData.base.notebook;
-        let title = `- ${newMemo.title}`;
         let datetime = newMemo.updateTime;
-        let response: IResdoOperations[];
-        if (pluginConfigData.base.memosSort === memosSortKey.asc) {
-            response = await SiYuanApiService.appendDailyNoteBlockByDatetime(notebookId, title, datetime);
-        } else if (pluginConfigData.base.memosSort === memosSortKey.desc) {
-            response = await SiYuanApiService.prependDailyNoteBlockByDatetime(notebookId, title, datetime);
-        } else {
+
+        // 日期父文档（日记，不存在时自动创建）
+        let parentHpath = await SiYuanApiService.getDailyNotePath(notebookId, datetime);
+        if (isEmptyValue(parentHpath)) {
+            debugMessage(pluginConfigData.debug.isDebug, "日记路径获取失败");
             return;
         }
-        await this.saveBlocks(response, newMemo);
+        let parentPageId = await SiYuanApiService.getDocumentIdByHPath(notebookId, parentHpath);
+        if (isEmptyValue(parentPageId)) {
+            debugMessage(pluginConfigData.debug.isDebug, "日记文档创建失败", parentHpath);
+            return;
+        }
+
+        // 每条 Memo 作为日记下的子文档
+        let contents = newMemo.contents;
+        let markdown = contents.length > 0 ? contents[0].content : "";
+        let path = `${parentHpath}/${newMemo.title}`;
+        let pageId = await createDocWithMd(notebookId, path, markdown);
+
+        if (isEmptyValue(pageId)) {
+            debugMessage(pluginConfigData.debug.isDebug, `子文档创建失败！`, path);
+            return;
+        }
+
+        if (contents[0].type === contentsType.embedded) {
+            let response: IResGetChildBlock[] = await getChildBlocks(pageId);
+            if (!isEmptyValue(response) && response.length > 0) {
+                let blockId = response[0].id;
+                this.blockIdLinkEmbeddedContent[blockId] = contents[0].content;
+            }
+        }
+
+        let newContents = contents.slice(1);
+        await this.saveContents(pageId, newContents);
+
+        await this.saveAfter(pageId, newMemo);
     }
 
     /**

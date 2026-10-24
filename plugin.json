@@ -2,7 +2,7 @@
   "name": "plugin-memos-sync-helper",
   "author": "Yimien",
   "url": "https://github.com/Yimien/plugin-memos-sync-helper",
-  "version": "0.2.20",
+  "version": "0.2.35",
   "minAppVersion": "3.0.12",
   "backends": [
     "all"
@@ -23,11 +23,11 @@
     "default": "README.md"
   },
   "funding": {
-    "custom": [
-
-    ]
+    "custom": []
   },
   "keywords": [
-    "Memos", "同步", "Sync"
+    "Memos",
+    "同步",
+    "Sync"
   ]
 }

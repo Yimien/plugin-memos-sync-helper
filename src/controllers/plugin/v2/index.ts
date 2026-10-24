@@ -16,8 +16,11 @@ export class PluginV2 {
      * 下载资源
      * @param resources
      */
-    static async downloadResources(resources: IResourceV2[]) {
+    static async downloadResources(resources: IResourceV2[], skipResourceNames: string[] = []) {
         for (let resource of resources) {
+            if (skipResourceNames.includes(resource.name)) {
+                continue;
+            }
             let response = await MemosApiServiceV2.downloadResource(resource);
             debugMessage(pluginConfigData.debug.isDebug, "响应结果", response);
             if (isEmptyValue(response)) {
@@ -54,7 +57,7 @@ export class PluginV2 {
         // 资源下载
         debugMessage(pluginConfigData.debug.isDebug, "资源下载", "", true);
 
-        await this.downloadResources(resHandleData.resources);
+        await this.downloadResources(resHandleData.resources, resHandleData.uploadedResourceNames);
 
         debugMessage(pluginConfigData.debug.isDebug, "资源下载完成", "", true);
 

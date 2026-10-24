@@ -6,7 +6,9 @@ import {API_VERSION} from "@/constants/memos";
 import {IItemCondition} from "@/types/plugin";
 import {lsNotebooks, pushErrMsg, pushMsg} from "@/controllers/siyuan/api";
 import {MemosServer} from "@/controllers/memos";
-import {debugMessage, isEmptyValue} from "@/utils";
+import {Requests} from "@/utils/requests";
+import {ImgBedService} from "@/controllers/imgbed";
+import {debugMessage, debugLogBuffer, isEmptyValue} from "@/utils";
 import PluginMemosSyncHelper, {isMobile, pluginConfigData, topBarElement} from "@/index";
 import {PluginMaster} from "@/controllers/plugin";
 import {IConfig} from "@/types/config/default";
@@ -139,6 +141,16 @@ class PlugConfig {
                 text: "标签列表",
                 flag: !noUseTagList.includes(pluginConfigData.filter.tagFilterMode),
                 value: pluginConfigData.filter.tagList
+            },
+            {
+                text: "图床上传 URL",
+                flag: pluginConfigData.imgbed?.enabled === true,
+                value: pluginConfigData.imgbed?.uploadUrl
+            },
+            {
+                text: "自定义文件后缀名",
+                flag: pluginConfigData.imgbed?.enabled === true && (pluginConfigData.imgbed?.resourceTypes || []).includes("custom"),
+                value: pluginConfigData.imgbed?.customExtensions
             }
         ]
 
@@ -382,6 +394,7 @@ export async function checkAccessToken() {
     pluginConfigData.base.token = token;
 
     try {
+        Requests.errorLog = [];
         let result = await MemosServer.checkAccessToken();
         if (result) {
             const userData = await MemosServer.getUserData();
@@ -391,13 +404,67 @@ export async function checkAccessToken() {
                 await pushMsg("校验通过，Memos 连接正常！");
             }
         } else {
-            await pushErrMsg("校验失败，请检查服务器地址和授权码是否配置正确");
+            const detail = Requests.drainErrorSummary();
+            await pushErrMsg(`校验失败，请检查服务器地址和授权码是否配置正确${detail ? `（${detail}）` : ''}`);
         }
     } catch (error: any) {
         await pushErrMsg(`校验失败: ${error?.message || error}`);
     }
 
     debugMessage(pluginConfigData.debug.isDebug, "校验完成");
+}
+
+/**
+ * 检验图床连通性：上传探针文件验证上传通道
+ */
+export async function checkImgBed() {
+    const imgbed = pluginConfigData.imgbed;
+    if (imgbed?.enabled !== true) {
+        await pushErrMsg("请先开启图床功能！");
+        return;
+    }
+    if (isEmptyValue(imgbed.uploadUrl) || !imgbed.uploadUrl.trim()) {
+        await pushErrMsg("请先填写图床上传 URL！");
+        return;
+    }
+
+    await pushMsg("正在检测图床连通性...");
+
+    // 1x1 PNG 探针
+    const probe = Uint8Array.from(
+        atob("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="),
+        c => c.charCodeAt(0)
+    );
+    const probeFilename = `imgbed-probe-${Date.now()}.png`;
+    const blob = new Blob([probe], {type: "image/png"});
+    const link = await ImgBedService.upload(blob, probeFilename);
+
+    if (!link) {
+        const detail = ImgBedService.lastError ? `（${ImgBedService.lastError}）` : '';
+        await pushErrMsg(`图床连接失败${detail}。请检查图床上传 URL 是否可达，或开启调试模式查看详细日志`);
+        return;
+    }
+
+    // 探针文件清理（删除失败不影响连通性结论）
+    let cleaned = true;
+    try {
+        const deleteUrl = `${imgbed.uploadUrl.trim().replace(/\/+$/, "")}/api/manage/delete/${probeFilename}`;
+        const token = (imgbed.token || "").trim();
+        const headers: Record<string, string> = {};
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+        const deleteResponse = await Requests.deleteUrl(deleteUrl, headers);
+        cleaned = deleteResponse.ok;
+    } catch {
+        cleaned = false;
+    }
+
+    if (cleaned) {
+        await pushMsg(`图床连通性正常！探针文件已清理`);
+    } else {
+        await pushMsg(`图床连通性正常！探针清理失败，请到图床面板删除 ${probeFilename}`);
+    }
 }
 
 export async function resetLastSyncTime(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
@@ -454,6 +521,9 @@ export async function main(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
             Sync.startSync();
         }
 
+        debugLogBuffer.length = 0;
+        debugMessage(pluginConfigData.debug.isDebug, "同步起点 lastSyncTime", pluginConfigData.filter.lastSyncTime);
+
         // 检查配置项
         const configIsOk = await checkConfig();
         if (!configIsOk.flag) {
@@ -485,9 +555,8 @@ export async function main(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
                 }, 1000);
             });
 
-            await plugin.updateConfig(config);
-
-            debugMessage(pluginConfigData.debug.isDebug, "上次同步时间修改完成！");
+            const updateResponse = await plugin.updateConfig(config);
+            debugMessage(pluginConfigData.debug.isDebug, "上次同步时间修改完成！写盘响应", updateResponse);
         }
 
         Sync.syncSuccess();
@@ -497,6 +566,16 @@ export async function main(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
         await pushErrMsg(`${STORAGE_NAME}：${error}`);
         throw new Error(error);
     } finally {
-
+        // 调试模式下将本次同步日志落盘，便于不开开发者工具时取证
+        if (pluginConfigData?.debug?.isDebug && debugLogBuffer.length > 0) {
+            try {
+                await plugin.saveData("debug-log", {
+                    time: moment().format("YYYY-MM-DD HH:mm:ss"),
+                    logs: [...debugLogBuffer]
+                });
+            } catch (logError) {
+                console.error("调试日志落盘失败", logError);
+            }
+        }
     }
 }

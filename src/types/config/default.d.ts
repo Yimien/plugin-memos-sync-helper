@@ -102,9 +102,37 @@ export interface IDebug {
     isAutoUpdateTime: boolean
 }
 
+export interface IImgbed {
+    /**
+     * 是否启用图床
+     */
+    enabled: boolean,
+    /**
+     * 图床上传地址（同步时上传资源用，需为思源可直达的地址）
+     */
+    uploadUrl: string,
+    /**
+     * 外链访问地址（写入文档的链接前缀，留空则与上传地址相同）
+     */
+    publicUrl: string,
+    /**
+     * 图床访问令牌（可选）
+     */
+    token: string,
+    /**
+     * 上传至图床的资源类型
+     */
+    resourceTypes: string[],
+    /**
+     * 自定义文件后缀名（分号分隔）
+     */
+    customExtensions: string,
+}
+
 export interface IConfig {
     base: IBase,
     advanced: IAdvanced,
     filter: IFilter,
-    debug: IDebug
+    debug: IDebug,
+    imgbed: IImgbed
 }
