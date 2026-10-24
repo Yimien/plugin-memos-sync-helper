@@ -11,7 +11,8 @@ export class MemosApiServiceV1 {
     private static async getAllMemos() {
         debugMessage(pluginConfigData.debug.isDebug, "正在获取 Memos 数据...");
 
-        const lastSyncTime = pluginConfigData.filter.lastSyncTime; // 上次同步时间
+        // 全量模式（一次性）以初始时间为过滤基线
+        const lastSyncTime = pluginConfigData.filter.forceFullSync ? "1970-01-01 00:00:00" : pluginConfigData.filter.lastSyncTime; // 上次同步时间
         const limit: number = 10; // 每页最大条数
         let offset = 0;
 
@@ -80,7 +81,8 @@ export class MemosApiServiceV1 {
 
         debugMessage(pluginConfigData.debug.isDebug, "正在整理 Memos 数据...");
 
-        const lastSyncTime = pluginConfigData.filter.lastSyncTime; // 上次同步时间
+        // 全量模式（一次性）以初始时间为过滤基线
+        const lastSyncTime = pluginConfigData.filter.forceFullSync ? "1970-01-01 00:00:00" : pluginConfigData.filter.lastSyncTime; // 上次同步时间
 
         let memosCreatedBeforeLastSync = allMemos.filter(
             memo => moment(formatDateTime(memo.createdTs)).isBefore(formatDateTime(lastSyncTime))

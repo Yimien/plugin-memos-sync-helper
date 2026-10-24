@@ -534,7 +534,7 @@ export async function main(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
         const hasNew = await MemosServer.checkNew();
         if (hasNew) {
             // 同步
-            await pushMsg("开始同步");
+            await pushMsg(pluginConfigData.filter.forceFullSync ? "开始同步（本次为全量模式）" : "开始同步");
             await PluginMaster.runSync();
             await pushMsg("同步完成！");
         } else {
@@ -560,6 +560,13 @@ export async function main(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
         }
 
         Sync.syncSuccess();
+
+        // 全量模式为一次性：同步成功后恢复增量
+        if (pluginConfigData.filter.forceFullSync) {
+            pluginConfigData.filter.forceFullSync = false;
+            await plugin.updateConfig(pluginConfigData);
+            debugMessage(pluginConfigData.debug.isDebug, "全量模式已完成，已恢复为增量同步");
+        }
 
     } catch (error) {
         Sync.syncError();

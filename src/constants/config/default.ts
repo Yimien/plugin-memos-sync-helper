@@ -28,6 +28,7 @@ export const DEFAULT_CONFIG: IConfig = {
     },
     filter: {
         lastSyncTime: "2021-12-08 00:00:00",
+        forceFullSync: false,
         tagFilterMode: tagFilterKey.all,
         tagList: ""
     },

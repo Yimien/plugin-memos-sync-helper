@@ -183,7 +183,8 @@ export class MemosApiServiceV2 {
         await this.initData();
 
         const version = pluginConfigData.base.version;
-        const lastSyncTime = pluginConfigData.filter.lastSyncTime; // 上次同步时间
+        // 全量模式（一次性）以初始时间为过滤基线，等价于拉取全部历史
+        const lastSyncTime = pluginConfigData.filter.forceFullSync ? "1970-01-01 00:00:00" : pluginConfigData.filter.lastSyncTime; // 上次同步时间
         const pageSize: number = 200; // 每页最大条数
         let pageToken = undefined;
 

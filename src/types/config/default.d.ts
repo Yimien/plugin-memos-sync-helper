@@ -82,6 +82,10 @@ export interface IFilter {
      */
     lastSyncTime: string,
     /**
+     * 下一次同步使用全量模式（同步完成后自动恢复为增量）
+     */
+    forceFullSync: boolean,
+    /**
      * 标签过滤模式
      */
     tagFilterMode: number,

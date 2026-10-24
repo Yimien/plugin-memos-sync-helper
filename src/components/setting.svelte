@@ -636,6 +636,24 @@
         </Item>
 
         <Item
+                title="同步模式：全量（一次性）"
+                text="开启后，下一次同步将拉取全部历史数据，完成后自动恢复为增量模式"
+                isTip={true}
+                tipTest="全量同步会重新处理所有历史 Memo，耗时较长"
+        >
+            <Input
+                    slot="input"
+                    type={itemType.checkbox}
+                    settingKey="ForceFullSync"
+                    settingValue={config.filter.forceFullSync}
+                    on:changed={e => {
+                        config.filter.forceFullSync = e.detail.value;
+                        updated();
+                    }
+                }
+            />
+        </Item>
+        <Item
                 title="重新全量同步"
                 text="将上次同步时间重置为初始值。适用于手动删除已同步笔记后，需要重新导入全部历史 Memo 的情况"
         >
