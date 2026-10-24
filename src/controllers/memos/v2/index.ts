@@ -210,8 +210,9 @@ export class MemosApiServiceV2 {
             }
 
             if (!resData || !resData.memos || !Array.isArray(resData.memos)) {
-                debugMessage(pluginConfigData.debug.isDebug, `ListMemos 响应异常，提前终止`, resData === null ? 'null（请求或解析失败）' : Object.keys(resData));
-                break;
+                // 请求失败/解析失败返回 null，与「服务端确认无数据」是两回事：
+                // 静默空数组会让上层把它当作「暂无新数据」并推进同步时间，造成数据永久漏同步
+                throw new Error(`ListMemos 响应异常（${resData === null ? '请求或解析失败返回 null' : `unexpected keys: ${Object.keys(resData).join(',')}`}）`);
             }
 
             debugMessage(pluginConfigData.debug.isDebug, `本页 ${resData.memos.length} 条，nextPageToken=${resData.nextPageToken ? '有' : '无'}`);
