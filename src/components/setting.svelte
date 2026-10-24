@@ -13,7 +13,7 @@
     import {IConfig} from "@/types/config/default.d";
 
     import type PluginMemosSyncHelper from "@/index";
-    import {checkAccessToken, resetLastSyncTime, test} from "@/main";
+    import {checkAccessToken, checkImgBed, resetLastSyncTime, test} from "@/main";
     import {repair} from "@/controllers/plugin/common/fun/repair";
 
 
@@ -362,6 +362,19 @@
             />
         </Item>
         {/if}
+        <Item
+                title="图床连通性检验"
+                text="上传探针文件验证图床是否可用"
+                isShow={true}
+        >
+            <Input
+                    slot="input"
+                    type={itemType.button}
+                    settingKey="ImgbedProbe"
+                    settingValue="检验"
+                    on:clicked={() => { checkImgBed(); }}
+            />
+        </Item>
         {/if}
 
         <Item

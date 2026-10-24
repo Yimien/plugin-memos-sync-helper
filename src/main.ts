@@ -7,6 +7,7 @@ import {IItemCondition} from "@/types/plugin";
 import {lsNotebooks, pushErrMsg, pushMsg} from "@/controllers/siyuan/api";
 import {MemosServer} from "@/controllers/memos";
 import {Requests} from "@/utils/requests";
+import {ImgBedService} from "@/controllers/imgbed";
 import {debugMessage, debugLogBuffer, isEmptyValue} from "@/utils";
 import PluginMemosSyncHelper, {isMobile, pluginConfigData, topBarElement} from "@/index";
 import {PluginMaster} from "@/controllers/plugin";
@@ -411,6 +412,38 @@ export async function checkAccessToken() {
     }
 
     debugMessage(pluginConfigData.debug.isDebug, "校验完成");
+}
+
+/**
+ * 检验图床连通性：上传探针文件验证上传通道
+ */
+export async function checkImgBed() {
+    const imgbed = pluginConfigData.imgbed;
+    if (imgbed?.enabled !== true) {
+        await pushErrMsg("请先开启图床功能！");
+        return;
+    }
+    if (isEmptyValue(imgbed.uploadUrl) || !imgbed.uploadUrl.trim()) {
+        await pushErrMsg("请先填写图床上传 URL！");
+        return;
+    }
+
+    await pushMsg("正在检测图床连通性...");
+
+    // 1x1 PNG 探针
+    const probe = Uint8Array.from(
+        atob("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="),
+        c => c.charCodeAt(0)
+    );
+    const blob = new Blob([probe], {type: "image/png"});
+    const link = await ImgBedService.upload(blob, `imgbed-probe-${Date.now()}.png`);
+
+    if (!link) {
+        await pushErrMsg("图床连接失败：请检查图床上传 URL 是否可达（可开启调试模式查看详细日志）");
+        return;
+    }
+
+    await pushMsg(`图床连通性正常！测试外链: ${link}`);
 }
 
 export async function resetLastSyncTime(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
