@@ -4,8 +4,9 @@ import {
     createDocWithMd,
     deleteBlock,
     getChildBlocks,
+    getNotebookConf,
     prependBlock,
-    removeDoc, setBlockAttrs, updateBlock
+    removeDoc, setBlockAttrs, sql, updateBlock
 } from "@/controllers/siyuan/api";
 import {pluginConfigData} from "@/index";
 import {debugMessage, isEmptyValue} from "@/utils";
@@ -317,6 +318,11 @@ export abstract class DataSaveBase {
 
 
     protected async batchSaveDailyNotes() {
+        // 全量模式：清空笔记本下的日记目录后重建，保证幂等（不重复追加）
+        if (pluginConfigData.filter.forceFullSync) {
+            await this.clearDailyNotes();
+        }
+
         DataHandleBase.sortMemos(this.data.newMemos, true);
 
         for (let newMemo of this.data.newMemos) {
@@ -325,6 +331,28 @@ export abstract class DataSaveBase {
             await this.saveDailyNotes(newMemo);
 
             debugMessage(pluginConfigData.debug.isDebug, `Memos/${newMemo.id} 写入完成`);
+        }
+    }
+
+    /**
+     * 清空笔记本下的日记目录（dailyNoteSavePath 模板的静态前缀）下的全部文档
+     */
+    protected async clearDailyNotes() {
+        let notebookId = pluginConfigData.base.notebook;
+        let notebookConfig = await getNotebookConf(notebookId);
+        let template = notebookConfig?.conf?.dailyNoteSavePath || "";
+        let prefix = template.split("{{")[0];
+        if (isEmptyValue(prefix) || !prefix.startsWith("/")) {
+            debugMessage(pluginConfigData.debug.isDebug, "日记目录前缀解析失败，跳过清空", template);
+            return;
+        }
+
+        let escaped = prefix.replace(/'/g, "''");
+        let docs = await sql(`SELECT id, hpath FROM blocks WHERE box = '${notebookId}' AND type = 'd' AND hpath LIKE '${escaped}%'`);
+        debugMessage(pluginConfigData.debug.isDebug, `全量模式：清空日记目录 ${prefix} 下 ${docs.length} 篇文档`);
+
+        for (let doc of docs) {
+            await removeDoc(notebookId, doc.hpath);
         }
     }
 

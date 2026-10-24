@@ -42,6 +42,7 @@ export const DEFAULT_CONFIG: IConfig = {
         publicUrl: "",
         token: "",
         resourceTypes: ["image", "video"],
-        customExtensions: ""
+        customExtensions: "",
+        links: {}
     }
 }

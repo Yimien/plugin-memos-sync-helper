@@ -1,4 +1,5 @@
 import {putFile} from "@/controllers/siyuan/api";
+import {STORAGE_NAME} from "@/constants";
 import {IResGetMemos} from "@/types/memos";
 import {DataHandleV2} from "@/controllers/plugin/v2/data-handle";
 import {debugMessage, isEmptyValue} from "@/utils";
@@ -58,6 +59,16 @@ export class PluginV2 {
         debugMessage(pluginConfigData.debug.isDebug, "资源下载", "", true);
 
         await this.downloadResources(resHandleData.resources, resHandleData.uploadedResourceNames);
+
+        // 图床链接映射持久化（下一次同步/全量重建时复用，避免重复上传）
+        if (resHandleData.imgbedLinksChanged && pluginConfigData.imgbed) {
+            try {
+                let cfgJson = JSON.stringify(pluginConfigData);
+                await putFile(`/data/storage/petal/plugin-memos-sync-helper/${STORAGE_NAME}`, false, new Blob([cfgJson], {type: "application/json"}));
+            } catch (error) {
+                debugMessage(pluginConfigData.debug.isDebug, "图床链接映射持久化失败", error);
+            }
+        }
 
         debugMessage(pluginConfigData.debug.isDebug, "资源下载完成", "", true);
 
