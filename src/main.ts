@@ -142,9 +142,9 @@ class PlugConfig {
                 value: pluginConfigData.filter.tagList
             },
             {
-                text: "图床 URL",
+                text: "图床上传 URL",
                 flag: pluginConfigData.imgbed?.enabled === true,
-                value: pluginConfigData.imgbed?.url
+                value: pluginConfigData.imgbed?.uploadUrl
             },
             {
                 text: "自定义文件后缀名",

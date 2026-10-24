@@ -108,9 +108,13 @@ export interface IImgbed {
      */
     enabled: boolean,
     /**
-     * 图床服务地址
+     * 图床上传地址（同步时上传资源用，需为思源可直达的地址）
      */
-    url: string,
+    uploadUrl: string,
+    /**
+     * 外链访问地址（写入文档的链接前缀，留空则与上传地址相同）
+     */
+    publicUrl: string,
     /**
      * 图床访问令牌（可选）
      */

@@ -37,7 +37,8 @@ export const DEFAULT_CONFIG: IConfig = {
     },
     imgbed: {
         enabled: false,
-        url: "",
+        uploadUrl: "",
+        publicUrl: "",
         token: "",
         resourceTypes: ["image", "video"],
         customExtensions: ""

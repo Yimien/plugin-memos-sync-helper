@@ -72,12 +72,12 @@ export class ImgBedService {
      */
     static async upload(blob: Blob, filename: string): Promise<string | null> {
         const imgbed = pluginConfigData.imgbed;
-        if (!imgbed?.enabled || isEmptyText(imgbed.url)) {
+        if (!imgbed?.enabled || isEmptyText(imgbed.uploadUrl)) {
             return null;
         }
 
         try {
-            const host = imgbed.url.trim().replace(/\/+$/, "");
+            const host = imgbed.uploadUrl.trim().replace(/\/+$/, "");
             const form = new FormData();
             form.append("file", blob, filename);
 
@@ -101,8 +101,9 @@ export class ImgBedService {
                 return null;
             }
 
-            // src 形如 /file/xxxx，拼接为可访问的外链
-            const link = src.startsWith("http") ? src : `${host}${src}`;
+            // src 形如 /file/xxxx；文档内引用使用外链地址（留空则与上传地址相同）
+            const publicHost = (isEmptyText(imgbed.publicUrl) ? imgbed.uploadUrl : imgbed.publicUrl).trim().replace(/\/+$/, "");
+            const link = src.startsWith("http") ? src : `${publicHost}${src}`;
             debugMessage(pluginConfigData.debug.isDebug, `图床上传成功: ${filename} -> ${link}`);
             return link;
         } catch (error) {

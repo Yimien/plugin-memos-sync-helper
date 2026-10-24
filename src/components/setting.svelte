@@ -269,19 +269,37 @@
         </Item>
         {#if config.imgbed.enabled}
         <Item
-                title="图床 URL"
-                text="图床服务地址，不含末尾 '/'"
+                title="图床上传 URL"
+                text="上传资源用的图床地址，需为思源可直达的地址，不含末尾 '/'"
                 isRequired={true}
                 isShow={true}
         >
             <Input
                     slot="input"
                     type={itemType.text}
-                    settingKey="ImgbedUrl"
-                    settingValue={config.imgbed.url}
-                    placeholder="如 http://192.168.1.10:7658"
+                    settingKey="ImgbedUploadUrl"
+                    settingValue={config.imgbed.uploadUrl}
+                    placeholder="如 http://cloudflare-imgbed:8080"
                     on:changed={e => {
-                        config.imgbed.url = e.detail.value;
+                        config.imgbed.uploadUrl = e.detail.value;
+                        updated();
+                    }
+                }
+            />
+        </Item>
+        <Item
+                title="外链访问 URL"
+                text="写入文档的图床链接前缀，留空则与上传 URL 相同"
+                isShow={true}
+        >
+            <Input
+                    slot="input"
+                    type={itemType.text}
+                    settingKey="ImgbedPublicUrl"
+                    settingValue={config.imgbed.publicUrl}
+                    placeholder="如 http://nas.example.com:7658"
+                    on:changed={e => {
+                        config.imgbed.publicUrl = e.detail.value;
                         updated();
                     }
                 }
