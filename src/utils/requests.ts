@@ -1,7 +1,8 @@
-import {METHOD, STATUS} from '@/constants/utils/request'
+import {METHOD} from '@/constants/utils/request'
 import {isEmptyValue} from '@/utils/index'
 import {UA} from "@/utils/misc/user-agent";
 import {pluginConfigData} from "@/index";
+import {debugMessage} from "@/utils";
 
 
 export class Requests {
@@ -62,6 +63,79 @@ export class Requests {
     }
 
     /**
+     * 内核代理使用的请求头（forwardProxy 的 headers 为对象数组形式）
+     */
+    private static getProxyHeaderList() {
+        return [
+            {'Authorization': `Bearer ${this.getToken()}`},
+            {'User-Agent': UA.ua}
+        ];
+    }
+
+    /**
+     * 通过思源内核 /api/network/forwardProxy 转发请求。
+     * 思源 remote 模式下 webSecurity 为 true，页面直连第三方 http 地址会被
+     * CORS / 混合内容策略拦截，此时改由内核（Go，无浏览器策略）代为请求。
+     * 响应以 base64 编码回传，还原为合成 Response，保持与直连一致的下游接口。
+     */
+    private static async forwardViaKernel(url: string, method: string, payload?: string): Promise<Response> {
+        try {
+            return await this.kernelForward(url, method, payload);
+        } catch (error: any) {
+            // docker 容器内核无法解析外部主机名（如 Tailscale 域名）时，
+            // 保持端口不变，改用 host.docker.internal（指向宿主机）重试
+            const message = String(error?.message || error);
+            if (!message.includes('no such host')) {
+                throw error;
+            }
+            debugMessage(pluginConfigData.debug.isDebug, "内核无法解析主机名，尝试 host.docker.internal", url);
+            const rewritten = new URL(url);
+            rewritten.hostname = 'host.docker.internal';
+            return await this.kernelForward(rewritten.toString(), method, payload);
+        }
+    }
+
+    private static async kernelForward(url: string, method: string, payload?: string): Promise<Response> {
+        const body: any = {
+            url: url,
+            method: method,
+            timeout: 30000,
+            responseEncoding: 'base64',
+            headers: this.getProxyHeaderList()
+        };
+        if (payload !== undefined) {
+            body.payload = payload;
+        }
+
+        const resp = await fetch('/api/network/forwardProxy', {
+            method: METHOD.POST,
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        });
+
+        const result = await resp.json();
+        if (!result || result.code !== 0 || !result.data) {
+            throw new Error(`内核代理请求失败: ${result?.msg || `HTTP ${resp.status}`}`);
+        }
+
+        const {status, contentType, body: bodyBase64} = result.data;
+        const bytes = Uint8Array.from(atob(bodyBase64 || ''), c => c.charCodeAt(0));
+        const headers = contentType ? {'Content-Type': contentType} : {};
+        return new Response(bytes, {status: status, headers: headers});
+    }
+
+    /**
+     * 生成带查询参数的完整地址
+     */
+    private static buildUrl(pathName: string, data?: any): URL {
+        const url = new URL(this.getUrl(pathName));
+        if (data && Object.keys(data).length > 0) {
+            url.search = new URLSearchParams(data).toString();
+        }
+        return url;
+    }
+
+    /**
      * 发送 GET 请求
      * @param pathName - 请求地址
      * @param data - 请求参数
@@ -71,16 +145,19 @@ export class Requests {
         await this.removeEmptyValues(data);
 
         // 生成请求地址
-        let url: URL = new URL(this.getUrl(pathName));
-        if (data && Object.keys(data).length > 0) {
-            url.search = new URLSearchParams(data).toString();
-        }
+        const url = this.buildUrl(pathName, data);
 
-        // 发送请求
-        return await fetch(url, {
-            method: METHOD.GET,
-            headers: this.getHeaders()
-        });
+        try {
+            // 发送请求
+            return await fetch(url, {
+                method: METHOD.GET,
+                headers: this.getHeaders()
+            });
+        } catch (error) {
+            // 直连被浏览器策略拦截（remote 模式 CORS / 混合内容）时回落内核代理
+            debugMessage(pluginConfigData.debug.isDebug, "直连请求失败，回落内核代理", error);
+            return await this.forwardViaKernel(url.toString(), METHOD.GET);
+        }
     }
 
     /**
@@ -93,14 +170,20 @@ export class Requests {
         await this.removeEmptyValues(data);
 
         // 生成请求地址
-        let url = this.getUrl(pathName);
+        const url = this.getUrl(pathName);
+        const payload = data === undefined ? undefined : (typeof data === 'string' ? data : JSON.stringify(data));
 
-        // 发送请求
-        return await fetch(url, {
-            method: METHOD.POST,
-            body: data,
-            headers: this.getHeaders()
-        });
+        try {
+            // 发送请求
+            return await fetch(url, {
+                method: METHOD.POST,
+                body: data,
+                headers: this.getHeaders()
+            });
+        } catch (error) {
+            debugMessage(pluginConfigData.debug.isDebug, "直连请求失败，回落内核代理", error);
+            return await this.forwardViaKernel(url, METHOD.POST, payload);
+        }
     }
 
     /**
@@ -113,14 +196,20 @@ export class Requests {
         await this.removeEmptyValues(data);
 
         // 生成请求地址
-        let url = this.getUrl(pathName);
+        const url = this.getUrl(pathName);
+        const payload = data === undefined ? undefined : (typeof data === 'string' ? data : JSON.stringify(data));
 
-        // 发送请求
-        return await fetch(url, {
-            method: METHOD.PUT,
-            body: data,
-            headers: this.getHeaders()
-        });
+        try {
+            // 发送请求
+            return await fetch(url, {
+                method: METHOD.PUT,
+                body: data,
+                headers: this.getHeaders()
+            });
+        } catch (error) {
+            debugMessage(pluginConfigData.debug.isDebug, "直连请求失败，回落内核代理", error);
+            return await this.forwardViaKernel(url, METHOD.PUT, payload);
+        }
     }
 
     /**
@@ -133,16 +222,18 @@ export class Requests {
         await this.removeEmptyValues(data);
 
         // 生成请求地址
-        let url: URL = new URL(this.getUrl(pathName));
-        if (data && Object.keys(data).length > 0) {
-            url.search = new URLSearchParams(data).toString();
-        }
+        const url = this.buildUrl(pathName, data);
 
-        // 发送请求
-        return await fetch(url, {
-            method: METHOD.DELETE,
-            headers: this.getHeaders()
-        });
+        try {
+            // 发送请求
+            return await fetch(url, {
+                method: METHOD.DELETE,
+                headers: this.getHeaders()
+            });
+        } catch (error) {
+            debugMessage(pluginConfigData.debug.isDebug, "直连请求失败，回落内核代理", error);
+            return await this.forwardViaKernel(url.toString(), METHOD.DELETE);
+        }
     }
 
     /**
@@ -165,6 +256,9 @@ export class Requests {
             }
 
             if (!response || !response.ok) {
+                if (response) {
+                    debugMessage(pluginConfigData.debug.isDebug, `请求失败: ${method} ${pathName} -> HTTP ${response.status}`);
+                }
                 return null;
             }
 
@@ -179,7 +273,8 @@ export class Requests {
                     return null;
                 }
             }
-        } catch {
+        } catch (error) {
+            debugMessage(pluginConfigData.debug.isDebug, `请求异常: ${method} ${pathName}`, error);
             return null;
         }
     }

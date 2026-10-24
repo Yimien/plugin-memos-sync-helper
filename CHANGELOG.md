@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.22
+
+* 修复思源 remote 模式（内核与页面不同源）下所有请求失败的问题：该模式下 webSecurity 强制开启，页面直连第三方 http 地址会被 CORS 与混合内容策略拦截
+* 直连失败时自动回落思源内核代理 `/api/network/forwardProxy`（base64 编码还原，资源二进制同样支持），本地模式行为不变
+* 内核（docker 容器）无法解析外部主机名时自动改用 `host.docker.internal` 重试
+
 ## 0.2.21
 
 * 修复 Memos v0.24 ~ v0.25 拉取数据时请求 400 的问题：不再携带 `parent` 参数（服务端要求 `users/{数字ID}` 格式，携带用户名会被拒绝；v0.26+ 已删除该字段）
