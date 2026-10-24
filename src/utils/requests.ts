@@ -106,9 +106,9 @@ export class Requests {
      * CORS / 混合内容策略拦截，此时改由内核（Go，无浏览器策略）代为请求。
      * 响应以 base64 编码回传，还原为合成 Response，保持与直连一致的下游接口。
      */
-    static async forwardViaKernel(url: string, method: string, payload?: string | Uint8Array, contentType?: string): Promise<Response> {
+    static async forwardViaKernel(url: string, method: string, payload?: string | Uint8Array, contentType?: string, proxyHeaders?: Record<string, string>): Promise<Response> {
         try {
-            return await this.kernelForward(url, method, payload, contentType);
+            return await this.kernelForward(url, method, payload, contentType, proxyHeaders);
         } catch (error: any) {
             // docker 容器内核无法解析外部主机名（如 Tailscale 域名）时，
             // 保持端口不变，改用 host.docker.internal（指向宿主机）重试
@@ -123,13 +123,17 @@ export class Requests {
         }
     }
 
-    private static async kernelForward(url: string, method: string, payload?: string | Uint8Array, contentType?: string): Promise<Response> {
+    private static async kernelForward(url: string, method: string, payload?: string | Uint8Array, contentType?: string, proxyHeaders?: Record<string, string>): Promise<Response> {
+        // 代理转发时携带调用方指定的认证头（不同服务的 token 不同），缺省为 Memos 凭证
+        const headerList = proxyHeaders
+            ? Object.entries(proxyHeaders).map(([key, value]) => ({[key]: value}))
+            : this.getProxyHeaderList();
         const body: any = {
             url: url,
             method: method,
             timeout: 30000,
             responseEncoding: 'base64',
-            headers: this.getProxyHeaderList()
+            headers: headerList
         };
         if (payload !== undefined) {
             if (payload instanceof Uint8Array) {
@@ -215,7 +219,7 @@ export class Requests {
             return direct;
         } catch (error) {
             debugMessage(pluginConfigData.debug.isDebug, "直连上传失败，回落内核代理", error);
-            return await this.forwardViaKernel(url, METHOD.POST, body, contentType);
+            return await this.forwardViaKernel(url, METHOD.POST, body, contentType, headers);
         }
     }
 
