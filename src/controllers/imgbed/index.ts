@@ -4,6 +4,7 @@ import {debugMessage} from "@/utils";
 import {IResourceV2} from "@/types/memos/v2";
 
 
+
 /**
  * 图床资源的类别
  */
@@ -80,17 +81,13 @@ export class ImgBedService {
             const form = new FormData();
             form.append("file", blob, filename);
 
-            const headers = new Headers();
+            const headerRecord: Record<string, string> = {};
             const token = (imgbed.token || "").trim();
             if (token.length > 0) {
-                headers.set("Authorization", `Bearer ${token}`);
+                headerRecord["Authorization"] = `Bearer ${token}`;
             }
 
-            const response = await fetch(`${host}/upload`, {
-                method: "POST",
-                headers: headers,
-                body: form
-            });
+            const response = await Requests.upload(`${host}/upload`, blob, filename, headerRecord);
 
             if (!response.ok) {
                 debugMessage(pluginConfigData.debug.isDebug, `图床上传失败: HTTP ${response.status}`);

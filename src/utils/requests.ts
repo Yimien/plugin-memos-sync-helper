@@ -106,7 +106,7 @@ export class Requests {
      * CORS / 混合内容策略拦截，此时改由内核（Go，无浏览器策略）代为请求。
      * 响应以 base64 编码回传，还原为合成 Response，保持与直连一致的下游接口。
      */
-    private static async forwardViaKernel(url: string, method: string, payload?: string): Promise<Response> {
+    static async forwardViaKernel(url: string, method: string, payload?: string | Uint8Array, contentType?: string): Promise<Response> {
         try {
             return await this.kernelForward(url, method, payload);
         } catch (error: any) {
@@ -123,7 +123,7 @@ export class Requests {
         }
     }
 
-    private static async kernelForward(url: string, method: string, payload?: string): Promise<Response> {
+    private static async kernelForward(url: string, method: string, payload?: string | Uint8Array, contentType?: string): Promise<Response> {
         const body: any = {
             url: url,
             method: method,
@@ -132,7 +132,20 @@ export class Requests {
             headers: this.getProxyHeaderList()
         };
         if (payload !== undefined) {
-            body.payload = payload;
+            if (payload instanceof Uint8Array) {
+                // 二进制载荷以 base64 传递，避免字符串化破坏字节流
+                let binary = '';
+                for (let i = 0; i < payload.length; i++) {
+                    binary += String.fromCharCode(payload[i]);
+                }
+                body.payload = btoa(binary);
+                body.payloadEncoding = 'base64';
+            } else {
+                body.payload = payload;
+            }
+        }
+        if (contentType !== undefined) {
+            body.contentType = contentType;
         }
 
         const resp = await fetch('/api/network/forwardProxy', {
@@ -146,10 +159,44 @@ export class Requests {
             throw new Error(`内核代理请求失败: ${result?.msg || `HTTP ${resp.status}`}`);
         }
 
-        const {status, contentType, body: bodyBase64} = result.data;
+        const {status, contentType: responseContentType, body: bodyBase64} = result.data;
         const bytes = Uint8Array.from(atob(bodyBase64 || ''), c => c.charCodeAt(0));
-        const headers = contentType ? {'Content-Type': contentType} : {};
+        const headers = responseContentType ? {'Content-Type': responseContentType} : {};
         return new Response(bytes, {status: status, headers: headers});
+    }
+
+    /**
+     * 直连优先、失败回落内核代理的文件上传（multipart/form-data）。
+     * 手工构造 multipart 报文，以便回落内核代理时以 base64 转发原始字节。
+     */
+    static async upload(url: string, blob: Blob, filename: string, headers: Record<string, string> = {}): Promise<Response> {
+        const boundary = `----siyuanImgBed${Date.now()}${Math.floor(Math.random() * 100000)}`;
+        const safeFilename = filename.replace(/[^\x20-\x7e]/g, '_');
+        const encoder = new TextEncoder();
+        const head = encoder.encode(
+            `--${boundary}\r\n` +
+            `Content-Disposition: form-data; name="file"; filename="${safeFilename}"\r\n` +
+            `Content-Type: ${blob.type || 'application/octet-stream'}\r\n\r\n`
+        );
+        const tail = encoder.encode(`\r\n--${boundary}--\r\n`);
+        const fileBytes = new Uint8Array(await blob.arrayBuffer());
+        const body = new Uint8Array(head.length + fileBytes.length + tail.length);
+        body.set(head, 0);
+        body.set(fileBytes, head.length);
+        body.set(tail, head.length + fileBytes.length);
+
+        const contentType = `multipart/form-data; boundary=${boundary}`;
+
+        try {
+            return await fetch(url, {
+                method: METHOD.POST,
+                headers: {...headers, 'Content-Type': contentType},
+                body: body
+            });
+        } catch (error) {
+            debugMessage(pluginConfigData.debug.isDebug, "直连上传失败，回落内核代理", error);
+            return await this.forwardViaKernel(url, METHOD.POST, body, contentType);
+        }
     }
 
     /**

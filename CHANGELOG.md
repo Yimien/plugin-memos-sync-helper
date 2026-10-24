@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.28
+* 图床上传接入「直连优先、失败回落内核代理」通道（与 Memos 请求一致），remote 模式下可靠工作
+
 ## 0.2.27
 * 新增图床集成（[#1](https://github.com/kamasylvia/plugin-memos-sync-helper/issues/1)）：开启后命中的资源上传至图床并在文档中引用图床外链，上传失败自动回退本地落盘
 * 设置项：是否使用图床、图床 URL（必填）、图床 Access Token（可选）、上传至图床的资源多选（图片/视频/文件/自定义，默认勾选图片与视频）
