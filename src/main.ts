@@ -6,7 +6,8 @@ import {API_VERSION} from "@/constants/memos";
 import {IItemCondition} from "@/types/plugin";
 import {lsNotebooks, pushErrMsg, pushMsg} from "@/controllers/siyuan/api";
 import {MemosServer} from "@/controllers/memos";
-import {debugMessage, isEmptyValue} from "@/utils";
+import {Requests} from "@/utils/requests";
+import {debugMessage, debugLogBuffer, isEmptyValue} from "@/utils";
 import PluginMemosSyncHelper, {isMobile, pluginConfigData, topBarElement} from "@/index";
 import {PluginMaster} from "@/controllers/plugin";
 import {IConfig} from "@/types/config/default";
@@ -382,6 +383,7 @@ export async function checkAccessToken() {
     pluginConfigData.base.token = token;
 
     try {
+        Requests.errorLog = [];
         let result = await MemosServer.checkAccessToken();
         if (result) {
             const userData = await MemosServer.getUserData();
@@ -391,7 +393,8 @@ export async function checkAccessToken() {
                 await pushMsg("校验通过，Memos 连接正常！");
             }
         } else {
-            await pushErrMsg("校验失败，请检查服务器地址和授权码是否配置正确");
+            const detail = Requests.drainErrorSummary();
+            await pushErrMsg(`校验失败，请检查服务器地址和授权码是否配置正确${detail ? `（${detail}）` : ''}`);
         }
     } catch (error: any) {
         await pushErrMsg(`校验失败: ${error?.message || error}`);
@@ -454,6 +457,9 @@ export async function main(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
             Sync.startSync();
         }
 
+        debugLogBuffer.length = 0;
+        debugMessage(pluginConfigData.debug.isDebug, "同步起点 lastSyncTime", pluginConfigData.filter.lastSyncTime);
+
         // 检查配置项
         const configIsOk = await checkConfig();
         if (!configIsOk.flag) {
@@ -485,9 +491,8 @@ export async function main(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
                 }, 1000);
             });
 
-            await plugin.updateConfig(config);
-
-            debugMessage(pluginConfigData.debug.isDebug, "上次同步时间修改完成！");
+            const updateResponse = await plugin.updateConfig(config);
+            debugMessage(pluginConfigData.debug.isDebug, "上次同步时间修改完成！写盘响应", updateResponse);
         }
 
         Sync.syncSuccess();
@@ -497,6 +502,16 @@ export async function main(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
         await pushErrMsg(`${STORAGE_NAME}：${error}`);
         throw new Error(error);
     } finally {
-
+        // 调试模式下将本次同步日志落盘，便于不开开发者工具时取证
+        if (pluginConfigData?.debug?.isDebug && debugLogBuffer.length > 0) {
+            try {
+                await plugin.saveData("debug-log", {
+                    time: moment().format("YYYY-MM-DD HH:mm:ss"),
+                    logs: [...debugLogBuffer]
+                });
+            } catch (logError) {
+                console.error("调试日志落盘失败", logError);
+            }
+        }
     }
 }

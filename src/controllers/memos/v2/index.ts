@@ -210,8 +210,11 @@ export class MemosApiServiceV2 {
             }
 
             if (!resData || !resData.memos || !Array.isArray(resData.memos)) {
+                debugMessage(pluginConfigData.debug.isDebug, `ListMemos 响应异常，提前终止`, resData === null ? 'null（请求或解析失败）' : Object.keys(resData));
                 break;
             }
+
+            debugMessage(pluginConfigData.debug.isDebug, `本页 ${resData.memos.length} 条，nextPageToken=${resData.nextPageToken ? '有' : '无'}`);
 
             // 将更新时间晚于等于 lastSyncTime 的数据添加到 memos 列表中
             const memos = resData.memos.filter(

@@ -8,6 +8,34 @@ import {debugMessage} from "@/utils";
 export class Requests {
 
     /**
+     * 当前批次请求失败的诊断信息（供校验失败等场景向用户展示）
+     */
+    static lastError: string = '';
+
+    /**
+     * 累积记录当前批次的全部请求失败，checkAccessToken 等场景开始时 clear
+     */
+    static errorLog: string[] = [];
+
+    /**
+     * 记录一条请求失败诊断
+     */
+    private static recordError(message: string) {
+        this.lastError = message;
+        this.errorLog.push(message);
+        if (this.errorLog.length > 12) {
+            this.errorLog.shift();
+        }
+    }
+
+    /**
+     * 汇总当前批次的失败记录（去重）
+     */
+    static drainErrorSummary(): string {
+        return [...new Set(this.errorLog)].join('；');
+    }
+
+    /**
      * 移除请求参数的空值
      * @param obj - 原请求参数
      */
@@ -256,6 +284,7 @@ export class Requests {
             }
 
             if (!response || !response.ok) {
+                this.recordError(`${pathName.replace('/api/v1/', '')}:${response ? `HTTP ${response.status}` : '无响应'}`);
                 if (response) {
                     debugMessage(pluginConfigData.debug.isDebug, `请求失败: ${method} ${pathName} -> HTTP ${response.status}`);
                 }
@@ -269,11 +298,14 @@ export class Requests {
                 const text = await response.text();
                 try {
                     return JSON.parse(text);
-                } catch {
+                } catch (parseError) {
+                    this.recordError(`${pathName}:响应非JSON(${(contentType || 'empty')}, ${text.length} bytes)`);
+                    debugMessage(pluginConfigData.debug.isDebug, `响应 JSON 解析失败: ${pathName}`, text.slice(0, 200));
                     return null;
                 }
             }
-        } catch (error) {
+        } catch (error: any) {
+            this.recordError(`${pathName}:${error?.message || error}`);
             debugMessage(pluginConfigData.debug.isDebug, `请求异常: ${method} ${pathName}`, error);
             return null;
         }
