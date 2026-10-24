@@ -108,7 +108,7 @@ export class Requests {
      */
     static async forwardViaKernel(url: string, method: string, payload?: string | Uint8Array, contentType?: string): Promise<Response> {
         try {
-            return await this.kernelForward(url, method, payload);
+            return await this.kernelForward(url, method, payload, contentType);
         } catch (error: any) {
             // docker 容器内核无法解析外部主机名（如 Tailscale 域名）时，
             // 保持端口不变，改用 host.docker.internal（指向宿主机）重试
