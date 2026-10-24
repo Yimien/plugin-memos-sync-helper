@@ -1,5 +1,5 @@
 import {pluginConfigData} from "@/index";
-import {DownloadResourceByName, GetAuthStatus, GetAuthUser, GetResourceBinary, GetUserMe, ListMemos, ListMemos_v0_24, ListUsers} from "@/controllers/memos/v2/api"
+import {DownloadResourceByName, GetAuthStatus, GetAuthUser, GetCurrentSession, GetResourceBinary, GetUserMe, ListMemos, ListUsers} from "@/controllers/memos/v2/api"
 import {debugMessage, hasCommonElements, isEmptyValue} from "@/utils";
 import {toChinaTime, formatDateTime,} from "@/utils/misc/time";
 import {IResGetMemos} from "@/types/memos";
@@ -46,7 +46,18 @@ export class MemosApiServiceV2 {
             }
         } catch {}
 
-        // 2. 尝试 /api/v1/auth/status (适用于旧版 Memos 如 v0.22/v0.23)
+        // 2. 尝试 /api/v1/auth/sessions/current (适用于 Memos v0.25.x 会话模型)
+        try {
+            const sessionRes: any = await GetCurrentSession();
+            if (sessionRes?.user) {
+                return sessionRes.user;
+            }
+            if (sessionRes?.name) {
+                return sessionRes;
+            }
+        } catch {}
+
+        // 3. 尝试 /api/v1/auth/status (POST，适用于 Memos v0.22 ~ v0.24)
         try {
             const statusRes: any = await GetAuthStatus();
             if (statusRes?.user) {
@@ -57,7 +68,7 @@ export class MemosApiServiceV2 {
             }
         } catch {}
 
-        // 3. 尝试 /api/v1/users (需要管理员权限)
+        // 4. 尝试 /api/v1/users (需要管理员权限)
         try {
             const resData: any = await ListUsers();
             if (!isEmptyValue(resData?.users) && resData.users.length > 0) {
@@ -65,7 +76,7 @@ export class MemosApiServiceV2 {
             }
         } catch {}
 
-        // 4. 尝试 /api/v1/users/me
+        // 5. 尝试 /api/v1/users/me
         try {
             const meRes: any = await GetUserMe();
             if (meRes?.user) {
@@ -185,8 +196,12 @@ export class MemosApiServiceV2 {
         while (true) {
             let resData: IResListMemos;
             // 调用 ListMemos 函数获取一页数据
+            // v0.24+ 不再携带 parent 参数：v0.24/v0.25 服务端要求 parent 为数字形式的
+            // users/{id}，携带用户名会直接 400（issue #37）；v0.26+ 已删除该字段。
+            // 也不传 filter：各版本 CEL 方言不一致，请求方携带认证信息时服务端会
+            // 自动附加 creator_id 过滤，无需客户端指定创建者。
             if (API_VERSION.V2_Y2025_M02_D05.includes(version)) {
-                resData = await ListMemos_v0_24(this.username || creatorIdentifier, pageSize, pageToken);
+                resData = await ListMemos(pageSize, pageToken);
             } else if(API_VERSION.V2_MemosViewFull.includes(version)) {
                 const view = "MEMO_VIEW_FULL";
                 resData = await ListMemos(pageSize, pageToken, filters, view);

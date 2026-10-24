@@ -24,10 +24,17 @@ export async function GetAuthUser() {
 }
 
 /**
- * 获取认证状态（适用于部分旧版本 Memos 如 v0.22/v0.23）
+ * 获取认证状态（适用于 Memos v0.22 ~ v0.24，该端点为 POST 方法）
  */
 export async function GetAuthStatus() {
-    return await Requests.send(METHOD.GET, '/api/v1/auth/status');
+    return await Requests.send(METHOD.POST, '/api/v1/auth/status');
+}
+
+/**
+ * 获取当前会话用户（适用于 Memos v0.25.x 的会话模型）
+ */
+export async function GetCurrentSession() {
+    return await Requests.send(METHOD.GET, '/api/v1/auth/sessions/current');
 }
 
 /**
@@ -66,32 +73,6 @@ export async function ListMemos(pageSize?: number, pageToken?: string, filter?: 
         view: view
     });
 }
-
-/**
- * 列出带有分页和过滤器的备忘录 v0.24.0
- * @param parent - 拥有者
- * @param pageSize - 返回的最大条数
- * @param pageToken - 检索后续页面的令牌
- * @param state - 状态
- * @param sort - 作为排序规则的字段，默认为 display_time
- * @param direction - 排序方向，默认为 DESC
- * @param filter - 过滤器
- * @param oldFilter - 旧版过滤器
- * @constructor
- */
-export async function ListMemos_v0_24(parent?:string, pageSize?: number, pageToken?: string, state?: string, sort?: string, direction?: string, filter?: any, oldFilter?: any) {
-    return await Requests.send(METHOD.GET, '/api/v1/memos', {
-        parent: parent,
-        pageSize: pageSize,
-        pageToken: pageToken,
-        state: state,
-        sort: sort,
-        direction: direction,
-        filter: changeFilter(filter),
-        oldFilter: changeFilter(oldFilter)
-    });
-}
-
 
 // **************************************** ResourceService ****************************************
 
