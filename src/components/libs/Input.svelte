@@ -127,6 +127,36 @@
     >
         {settingValue}
     </button>
+{:else if type === itemType.checkboxGroup}
+    <!-- Checkbox Group -->
+    <div class="imgbed-checkbox-group" class:fn__flex-center={!block}>
+        {#each options as opt}
+            <label class="imgbed-checkbox-item">
+                <input
+                        {disabled}
+                        type="checkbox"
+                        class="b3-checkbox"
+                        checked={Array.isArray(settingValue) && settingValue.includes(opt.key)}
+                        on:change={(e) => {
+                            const current = Array.isArray(settingValue) ? [...settingValue] : [];
+                            if (e.currentTarget.checked) {
+                                if (!current.includes(opt.key)) {
+                                    current.push(opt.key);
+                                }
+                            } else {
+                                const idx = current.indexOf(opt.key);
+                                if (idx >= 0) {
+                                    current.splice(idx, 1);
+                                }
+                            }
+                            settingValue = current;
+                            changed(e);
+                        }}
+                />
+                <span>{opt.text}</span>
+            </label>
+        {/each}
+    </div>
 {:else if type === itemType.select}
     <!-- Dropdown select -->
     <select
@@ -176,5 +206,20 @@
 
   .fn__size300 {
     width: 300px;
+  }
+
+  .imgbed-checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    align-items: center;
+  }
+
+  .imgbed-checkbox-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    white-space: nowrap;
   }
 </style>

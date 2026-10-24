@@ -140,6 +140,16 @@ class PlugConfig {
                 text: "标签列表",
                 flag: !noUseTagList.includes(pluginConfigData.filter.tagFilterMode),
                 value: pluginConfigData.filter.tagList
+            },
+            {
+                text: "图床 URL",
+                flag: pluginConfigData.imgbed?.enabled === true,
+                value: pluginConfigData.imgbed?.url
+            },
+            {
+                text: "自定义文件后缀名",
+                flag: pluginConfigData.imgbed?.enabled === true && (pluginConfigData.imgbed?.resourceTypes || []).includes("custom"),
+                value: pluginConfigData.imgbed?.customExtensions
             }
         ]
 

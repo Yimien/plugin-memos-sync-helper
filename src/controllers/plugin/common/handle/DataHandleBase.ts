@@ -9,6 +9,12 @@ import {Handle} from "@/controllers/plugin/common/handle/handle";
 
 
 export abstract class DataHandleBase {
+
+    /**
+     * 已上传至图床的资源：resource.name -> 图床外链
+     */
+    protected uploadedResourceLinks: Map<string, string> = new Map();
+
     protected relations: any[];
     protected resources: any[];
     protected newMemos: any[];
@@ -46,7 +52,7 @@ export abstract class DataHandleBase {
         let title: string = `${updateTime}・#${memoId}`;
         let contents: IContent[] = await this.getContents(memo);
 
-        this.handleResources(memo, contents);
+        await this.handleResources(memo, contents);
         this.handleRelations(memo);
 
         let result: INewMemo = {
@@ -244,7 +250,12 @@ export abstract class DataHandleBase {
         let path = "";
         let end = "";
 
-        if (isEmptyValue(resource.externalLink)) {
+        // 图床上传成功过的资源，直接引用图床外链
+        let remoteLink = this.uploadedResourceLinks.get(resource.name);
+        if (!isEmptyValue(remoteLink)) {
+            path = remoteLink;
+            end = filename.split('.').pop();
+        } else if (isEmptyValue(resource.externalLink)) {
             path = this.getResourcePath(resource);
             end = filename.split('.').pop();
         } else {

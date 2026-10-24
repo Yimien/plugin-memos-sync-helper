@@ -34,5 +34,12 @@ export const DEFAULT_CONFIG: IConfig = {
     debug: {
         isDebug: false,
         isAutoUpdateTime: false
+    },
+    imgbed: {
+        enabled: false,
+        url: "",
+        token: "",
+        resourceTypes: ["image", "video"],
+        customExtensions: ""
     }
 }

@@ -1,5 +1,6 @@
 export enum itemType {
     checkbox,
+    checkboxGroup,
     text,
     number,
     slider,

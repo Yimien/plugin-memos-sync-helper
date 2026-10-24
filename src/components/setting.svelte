@@ -6,7 +6,7 @@
 
     import {panelKey, PANELS} from "@/constants/components/panels";
     import {itemType} from "@/constants/components/input";
-    import {MEMOS_SORT_OPTIONS, CHECK_SYNC_MEMOS_OPTIONS, SYNC_PLAN_OPTIONS, VERSION_OPTIONS, TAG_FILTER_OPTIONS, syncPlanKey, tagFilterKey} from "@/constants/components/select";
+    import {MEMOS_SORT_OPTIONS, CHECK_SYNC_MEMOS_OPTIONS, SYNC_PLAN_OPTIONS, VERSION_OPTIONS, TAG_FILTER_OPTIONS, IMGBED_RESOURCE_OPTIONS, syncPlanKey, tagFilterKey} from "@/constants/components/select";
     import {API_VERSION} from "@/constants/memos";
 
     import {IOptions} from "@/types/components/item.d";
@@ -250,6 +250,102 @@
                 }
             />
         </Item>
+        <Item
+                title="是否使用图床"
+                text="开启后，命中的资源将上传至图床并在文档中引用图床链接"
+                isShow={true}
+        >
+            <Input
+                    slot="input"
+                    type={itemType.checkbox}
+                    settingKey="ImgbedEnabled"
+                    settingValue={config.imgbed.enabled}
+                    on:changed={e => {
+                        config.imgbed.enabled = e.detail.value;
+                        updated();
+                    }
+                }
+            />
+        </Item>
+        {#if config.imgbed.enabled}
+        <Item
+                title="图床 URL"
+                text="图床服务地址，不含末尾 '/'"
+                isRequired={true}
+                isShow={true}
+        >
+            <Input
+                    slot="input"
+                    type={itemType.text}
+                    settingKey="ImgbedUrl"
+                    settingValue={config.imgbed.url}
+                    placeholder="如 http://192.168.1.10:7658"
+                    on:changed={e => {
+                        config.imgbed.url = e.detail.value;
+                        updated();
+                    }
+                }
+            />
+        </Item>
+        <Item
+                title="图床 Access Token"
+                text="图床访问令牌，图床未启用鉴权时可留空"
+                isShow={true}
+        >
+            <Input
+                    slot="input"
+                    type={itemType.text}
+                    settingKey="ImgbedToken"
+                    settingValue={config.imgbed.token}
+                    placeholder="可留空"
+                    on:changed={e => {
+                        config.imgbed.token = e.detail.value;
+                        updated();
+                    }
+                }
+            />
+        </Item>
+        <Item
+                title="上传至图床的资源"
+                text="仅命中勾选类型的资源会上传至图床"
+                isShow={true}
+        >
+            <Input
+                    slot="input"
+                    type={itemType.checkboxGroup}
+                    settingKey="ImgbedResourceTypes"
+                    settingValue={config.imgbed.resourceTypes}
+                    options={IMGBED_RESOURCE_OPTIONS}
+                    on:changed={e => {
+                        config.imgbed.resourceTypes = e.detail.value;
+                        updated();
+                    }
+                }
+            />
+        </Item>
+        {#if config.imgbed.resourceTypes.includes('custom')}
+        <Item
+                title="自定义文件后缀名"
+                text="分号分隔，命中的后缀按「自定义」类型处理"
+                isRequired={true}
+                isShow={true}
+        >
+            <Input
+                    slot="input"
+                    type={itemType.text}
+                    settingKey="ImgbedCustomExtensions"
+                    settingValue={config.imgbed.customExtensions}
+                    placeholder="如 psd;zip;apk"
+                    on:changed={e => {
+                        config.imgbed.customExtensions = e.detail.value;
+                        updated();
+                    }
+                }
+            />
+        </Item>
+        {/if}
+        {/if}
+
         <Item
                 title="资源保存路径"
                 text="保存 Memos 资源的路径"
