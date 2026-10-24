@@ -166,6 +166,21 @@ export class Requests {
     }
 
     /**
+     * 直连优先、失败回落内核代理的 DELETE 请求（任意 URL，不拼接 Memos 主机地址）
+     */
+    static async deleteUrl(url: string, headers: Record<string, string> = {}): Promise<Response> {
+        try {
+            return await fetch(url, {
+                method: METHOD.DELETE,
+                headers: headers
+            });
+        } catch (error) {
+            debugMessage(pluginConfigData.debug.isDebug, "直连请求失败，回落内核代理", error);
+            return await this.forwardViaKernel(url, METHOD.DELETE);
+        }
+    }
+
+    /**
      * 直连优先、失败回落内核代理的文件上传（multipart/form-data）。
      * 手工构造 multipart 报文，以便回落内核代理时以 base64 转发原始字节。
      */

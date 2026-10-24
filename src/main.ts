@@ -435,15 +435,35 @@ export async function checkImgBed() {
         atob("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="),
         c => c.charCodeAt(0)
     );
+    const probeFilename = `imgbed-probe-${Date.now()}.png`;
     const blob = new Blob([probe], {type: "image/png"});
-    const link = await ImgBedService.upload(blob, `imgbed-probe-${Date.now()}.png`);
+    const link = await ImgBedService.upload(blob, probeFilename);
 
     if (!link) {
         await pushErrMsg("图床连接失败：请检查图床上传 URL 是否可达（可开启调试模式查看详细日志）");
         return;
     }
 
-    await pushMsg(`图床连通性正常！测试外链: ${link}`);
+    // 探针文件清理（删除失败不影响连通性结论）
+    let cleaned = true;
+    try {
+        const deleteUrl = `${imgbed.uploadUrl.trim().replace(/\/+$/, "")}/api/manage/delete/${probeFilename}`;
+        const token = (imgbed.token || "").trim();
+        const headers: Record<string, string> = {};
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+        const deleteResponse = await Requests.deleteUrl(deleteUrl, headers);
+        cleaned = deleteResponse.ok;
+    } catch {
+        cleaned = false;
+    }
+
+    if (cleaned) {
+        await pushMsg(`图床连通性正常！探针文件已清理`);
+    } else {
+        await pushMsg(`图床连通性正常！探针清理失败，请到图床面板删除 ${probeFilename}`);
+    }
 }
 
 export async function resetLastSyncTime(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
