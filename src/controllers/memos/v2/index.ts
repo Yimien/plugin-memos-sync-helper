@@ -115,7 +115,7 @@ export class MemosApiServiceV2 {
 
         // 仅同步无标签的数据
         if (tagFilterMode === tagFilterKey.syncNoTag) {
-            console.log("仅同步无标签的数据");
+            debugMessage(pluginConfigData.debug.isDebug, "仅同步无标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
                 return memos.filter(memo => (memo.tags || []).length === 0)
             }
@@ -124,7 +124,7 @@ export class MemosApiServiceV2 {
 
         // 不同步无标签的数据
         if (tagFilterMode === tagFilterKey.notSyncNoTag) {
-            console.log("不同步无标签的数据");
+            debugMessage(pluginConfigData.debug.isDebug, "不同步无标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
                 return memos.filter(memo => (memo.tags || []).length > 0)
             }
@@ -136,9 +136,8 @@ export class MemosApiServiceV2 {
 
         // 仅同步指定标签的数据
         if (tagFilterMode === tagFilterKey.syncSpecTag) {
-            console.log("仅同步指定标签的数据");
+            debugMessage(pluginConfigData.debug.isDebug, "仅同步指定标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
-                console.log(tags);
                 return memos.filter(memo => hasCommonElements(memo.tags || [], tags))
             }
             return memos.filter(memo => hasCommonElements(memo.property?.tags || [], tags))
@@ -146,7 +145,7 @@ export class MemosApiServiceV2 {
 
         // 不同步指定标签的数据
         if (tagFilterMode === tagFilterKey.notSyncSpecTag) {
-            console.log("不同步指定标签的数据");
+            debugMessage(pluginConfigData.debug.isDebug, "不同步指定标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
                 return memos.filter(memo => !hasCommonElements(memo.tags || [], tags))
             }
@@ -155,7 +154,7 @@ export class MemosApiServiceV2 {
 
         // 同步指定标签及无标签的数据
         if (tagFilterMode === tagFilterKey.syncSpecTagAndNoTag) {
-            console.log("同步指定标签及无标签的数据");
+            debugMessage(pluginConfigData.debug.isDebug, "同步指定标签及无标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
                 return memos.filter(memo => hasCommonElements(memo.tags || [], tags) || (memo.tags || []).length === 0)
             }
@@ -164,7 +163,7 @@ export class MemosApiServiceV2 {
 
         // 不同步指定标签及无标签的数据
         if (tagFilterMode === tagFilterKey.notSyncSpecTagAndNoTag) {
-            console.log("不同步指定标签及无标签的数据");
+            debugMessage(pluginConfigData.debug.isDebug, "不同步指定标签及无标签的数据");
             if (API_VERSION.V2_Y2025_M02_D05.includes(pluginConfigData.base.version)){
                 return memos.filter(memo => !hasCommonElements(memo.tags || [], tags) && (memo.tags || []).length > 0)
             }
