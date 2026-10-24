@@ -180,7 +180,7 @@ export class Requests {
             });
         } catch (error) {
             debugMessage(pluginConfigData.debug.isDebug, "直连请求失败，回落内核代理", error);
-            return await this.forwardViaKernel(url, METHOD.DELETE);
+            return await this.forwardViaKernel(url, METHOD.DELETE, undefined, undefined, headers);
         }
     }
 
