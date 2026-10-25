@@ -19,5 +19,9 @@ export interface IResDataHandleRunV2 {
     /**
      * 已上传至图床的资源（resource.name），本地落盘时跳过
      */
-    uploadedResourceNames: string[]
+    uploadedResourceNames: string[],
+    /**
+     * 图床链接映射是否有新增，由调用方持久化
+     */
+    imgbedLinksChanged: boolean
 }

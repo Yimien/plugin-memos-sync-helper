@@ -15,6 +15,11 @@ import {ImgBedService} from "@/controllers/imgbed";
 
 export class DataHandleV2 extends DataHandleBase{
 
+    /**
+     * 图床链接映射是否有新增（run 结束后由调用方持久化）
+     */
+    public imgbedLinksChanged: boolean = false;
+
     async handelMemoV0240(memo: any) {
         debugMessage(pluginConfigData.debug.isDebug, "开始处理 Memos", memo);
 
@@ -92,10 +97,19 @@ export class DataHandleV2 extends DataHandleBase{
         let resources = MemosApiServiceV2.normalizeResources(memo);
 
         // 图床模式：命中的资源先下载并上传图床，文档内直接引用图床外链；
+        // 已有持久化映射的资源直接复用外链（全量重建时不重复上传）；
         // 上传失败的资源保留在本地落盘列表，行为与旧版一致
         if (pluginConfigData.imgbed?.enabled) {
+            if (!pluginConfigData.imgbed.links) {
+                pluginConfigData.imgbed.links = {};
+            }
             for (let resource of resources) {
                 if (!ImgBedService.shouldUpload(resource)) {
+                    continue;
+                }
+                let persistedLink = pluginConfigData.imgbed.links[resource.name];
+                if (!isEmptyValue(persistedLink)) {
+                    this.uploadedResourceLinks.set(resource.name, persistedLink);
                     continue;
                 }
                 try {
@@ -107,6 +121,8 @@ export class DataHandleV2 extends DataHandleBase{
                     let link = await ImgBedService.upload(blob, resource.filename);
                     if (!isEmptyValue(link)) {
                         this.uploadedResourceLinks.set(resource.name, link);
+                        pluginConfigData.imgbed.links[resource.name] = link;
+                        this.imgbedLinksChanged = true;
                     }
                 } catch (error) {
                     debugMessage(pluginConfigData.debug.isDebug, "图床上传失败，该资源回退本地落盘", error);
@@ -150,7 +166,8 @@ export class DataHandleV2 extends DataHandleBase{
             relations: dh.relations,
             oldMemos: data.old,
             newMemos: dh.newMemos,
-            uploadedResourceNames: Array.from(dh.uploadedResourceLinks.keys())
+            uploadedResourceNames: Array.from(dh.uploadedResourceLinks.keys()),
+            imgbedLinksChanged: dh.imgbedLinksChanged
         }
 
         debugMessage(pluginConfigData.debug.isDebug, "数据处理结果", result);

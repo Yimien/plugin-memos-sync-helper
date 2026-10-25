@@ -446,9 +446,12 @@ export async function checkImgBed() {
     }
 
     // 探针文件清理（删除失败不影响连通性结论）
+    // 用上传响应返回的真实 fileId（/file/<上传时间戳>_<文件名> 的最后一段）——
+    // 图床存储时会给文件名加时间戳前缀，用裸文件名删除会命中「不存在」假成功
+    const realFileId = link.split('/').pop();
     let cleaned = true;
     try {
-        const deleteUrl = `${imgbed.uploadUrl.trim().replace(/\/+$/, "")}/api/manage/delete/${probeFilename}`;
+        const deleteUrl = `${imgbed.uploadUrl.trim().replace(/\/+$/, "")}/api/manage/delete/${realFileId}`;
         const token = (imgbed.token || "").trim();
         const headers: Record<string, string> = {};
         if (token) {
@@ -534,7 +537,7 @@ export async function main(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
         const hasNew = await MemosServer.checkNew();
         if (hasNew) {
             // 同步
-            await pushMsg("开始同步");
+            await pushMsg(pluginConfigData.filter.forceFullSync ? "开始同步（本次为全量模式）" : "开始同步");
             await PluginMaster.runSync();
             await pushMsg("同步完成！");
         } else {
@@ -560,6 +563,13 @@ export async function main(plugin: InstanceType<typeof PluginMemosSyncHelper>) {
         }
 
         Sync.syncSuccess();
+
+        // 全量模式为一次性：同步成功后恢复增量
+        if (pluginConfigData.filter.forceFullSync) {
+            pluginConfigData.filter.forceFullSync = false;
+            await plugin.updateConfig(pluginConfigData);
+            debugMessage(pluginConfigData.debug.isDebug, "全量模式已完成，已恢复为增量同步");
+        }
 
     } catch (error) {
         Sync.syncError();

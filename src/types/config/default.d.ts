@@ -82,6 +82,10 @@ export interface IFilter {
      */
     lastSyncTime: string,
     /**
+     * 下一次同步使用全量模式（同步完成后自动恢复为增量）
+     */
+    forceFullSync: boolean,
+    /**
      * 标签过滤模式
      */
     tagFilterMode: number,
@@ -127,6 +131,10 @@ export interface IImgbed {
      * 自定义文件后缀名（分号分隔）
      */
     customExtensions: string,
+    /**
+     * 已上传资源的持久化映射：resource.name -> 图床外链（全量重建时复用，避免重复上传）
+     */
+    links: Record<string, string>,
 }
 
 export interface IConfig {
