@@ -38,7 +38,9 @@ export class DataHandleV0_24 extends DataHandleV2{
             resources: dh.resources,
             relations: dh.relations,
             oldMemos: data.old,
-            newMemos: dh.newMemos
+            newMemos: dh.newMemos,
+            uploadedResourceNames: Array.from(dh.uploadedResourceLinks.keys()),
+            imgbedLinksChanged: dh.imgbedLinksChanged
         }
 
         debugMessage(pluginConfigData.debug.isDebug, "数据处理结果", result);
